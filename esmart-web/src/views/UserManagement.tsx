@@ -17,22 +17,28 @@ import { makeStyles } from '@mui/styles';
 import { ConfirmiationModal } from '../components/ConfirmitionModal';
 import Camera, { FACING_MODES, IMAGE_TYPES } from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
+import { UserService } from '../services/UserService';
 
 const ValidationSchema = Yup.object().shape({
-  // name: Yup.string().required('Name is required'),
-  // lastName: Yup.string().required('Last name is required'),
-  // contactNumber: Yup.string().required('Name is required'),
-  // // image: Yup.string().required('Email is required'),
-  // roleType: Yup.object().required('Please select access type'),
+  firstname: Yup.string().required('Name is required'),
+  lastname: Yup.string().required('Last name is required'),
+  idNumber: Yup.string().required('Name is required'),
+  loginCode: Yup.string().required('Name is required'),
+  roleType: Yup.object().required('Please select access type'),
 });
 
 interface IData {
   username: string;
   fullName: string;
   number: string;
-  // email: string;
   access: string;
   actions: JSX.Element;
+}
+
+interface IRole {
+  _id: string;
+  type: string;
+  description: string;
 }
 
 interface IColumn {
@@ -62,7 +68,7 @@ export const UserManagement = () => {
   const classes = useStyles();
   const [showModal, setShowModal] = React.useState(false);
   const [confirmDeleteUser, setConfirmDeleteUser] = React.useState(false);
-
+  const [roles, setRoles] = React.useState([]);
   const [mobilenetModel, setMobilenetModel] =
     React.useState<mobilenet.MobileNet | null>(null);
 
@@ -72,8 +78,15 @@ export const UserManagement = () => {
   React.useEffect(() => {
     (async function () {
       try {
+        const user = new UserService()
+        const roles = await user.getRoles()
         const net = await mobilenet.load();
         const classifier = await knnClassifier.create();
+        const res = roles.data.map((role: IRole)=> (
+          {label: role.type, type: role.type, id: role._id}
+        ))
+
+        setRoles(res)
         setMobilenetModel(net);
         setKnnClassifierModel(classifier);
       } catch (err) {
@@ -144,11 +157,6 @@ export const UserManagement = () => {
     },
   ];
 
-  const acceessData = [
-    { label: 'Full', type: 'admin' },
-    { label: 'Limitted', type: 'user' },
-  ];
-
   function base64ImageToTensor(base64: string) {
     //Function to convert jpeg image to tensors
     // console.log('base64 ', base64.split(',')[1])
@@ -179,11 +187,11 @@ export const UserManagement = () => {
         </Typography>
         <Formik
           initialValues={{
-            image: '',
-            lastName: '',
+            firstname: '',
+            lastname: '',
             idNumber: '',
-            name: '',
             roleType: '',
+            loginCode: '',
           }}
           validationSchema={ValidationSchema}
           onSubmit={(values, { setSubmitting }) => {
@@ -204,47 +212,47 @@ export const UserManagement = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <FTextField
-                    type="name"
-                    name="name"
-                    label="Name"
-                    placeholder="Name"
+                    type="firstname"
+                    name="firstname"
+                    label="First Name"
+                    placeholder="Last Name"
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <FTextField
-                    type="lastName"
-                    name="lastName"
+                    type="lastname"
+                    name="lastname"
                     label="Last Name"
                     placeholder="Last Name"
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <FTextField
-                    type="contactNumber"
-                    name="contactNumber"
-                    label="Contact Number"
-                    placeholder="Contact Number"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FTextField
-                    type="email"
-                    name="email"
-                    label="Email"
-                    placeholder="Email"
+                    type="idNumber"
+                    name="idNumber"
+                    label="ID Number"
+                    placeholder="ID Number"
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <ComboBox
-                    label="Access"
-                    data={acceessData}
+                    label="User Role"
+                    data={roles}
                     error={errors.roleType}
                     handleChange={(_: any, val: any) =>
                       setFieldValue('roleType', val)
                     }
                   />
                 </Grid>
-                <Grid>
+                <Grid item xs={12}>
+                  <FTextField
+                    type="loginCode"
+                    name="loginCode"
+                    label="Login Code"
+                    placeholder="Login Code"
+                  />
+                </Grid>
+                {/* <Grid>
                   <Camera
                     idealFacingMode={FACING_MODES.USER}
                     imageType={IMAGE_TYPES.JPG}
@@ -269,7 +277,7 @@ export const UserManagement = () => {
                       console.log('data ', knnClassifierModel);
                     }}
                   />
-                </Grid>
+                </Grid> */}
                 <Box
                   style={{
                     display: 'flex',
