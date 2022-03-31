@@ -1,0 +1,20 @@
+{
+  "roles": [
+    {
+      "type": "ADMIN",
+      "description": "admin role"
+    },
+    {
+      "type": "PRINCIPAL",
+      "description": "principal role"
+    },
+    {
+      "type": "TEACHER",
+      "description": "teacher role"
+    },
+    {
+      "type": "STUDENT",
+      "description": "student role"
+    }
+  ]
+}

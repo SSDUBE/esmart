@@ -1,0 +1,17 @@
+#!/bin/bash
+
+rm -rf node_modules;
+echo "------- Building project..." &&
+echo "------- 1) Install required packages..." &&
+npm install &&
+echo "-------    Install required packages DONE..." &&
+echo "------- 2) Removing old 'dist' folder..." &&
+rm -rf dist &&
+echo "-------    Removing old 'dist' folder DONE..." &&
+echo "------- 3) Making new 'dist' folder..." &&
+mkdir dist &&
+echo "-------    Making new 'dist' folder DONE" &&
+echo "------- 4) Babel build js files to CommonJS..." &&
+npx babel . -d dist --ignore node_modules,dist &&
+echo "-------    Babel build js files to CommonJS DONE" &&
+echo "------- Building project complete!"
