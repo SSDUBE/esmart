@@ -1,4 +1,38 @@
 {
-  "name": "EsmartApp",
-  "displayName": "EsmartApp"
+  "expo": {
+    "name": "campus-navigation",
+    "slug": "campus-navigation",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  },
+  "infoPlist": {
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow campus navigation to use your location",
+    "NSLocationAlwaysUsageDescription": "Allow campus navigation to use your location",
+    "NSLocationWhenInUseUsageDescription": "Allow campus navigation to use your location",
+    "NSFaceIDUsageDescription": "Allow esmart to use your face ID"
+  }
 }
