@@ -93,3 +93,5 @@
 
 # CocoaPods
 /esmart-app/ios/Pods/
+
+.DS_Store
