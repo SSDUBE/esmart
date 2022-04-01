@@ -52,7 +52,7 @@ export const getRoles = async (_req: Request, res: Response) => {
       data: roles,
     });
   } catch (err: any) {
-    Logger.error('Failed to get user ', err);
+    Logger.error('Failed to get roles ', err);
     return res.status(HTTP_CODES.SERVER_ERROR).json({
       success: false,
       message: 'Something went wrong please try again',
@@ -133,7 +133,25 @@ export const addUser = async (req: Request, res: Response) => {
       });
     }
   } catch (err: any) {
-    Logger.error('Failed to get user ', err);
+    Logger.error('Failed to add user ', err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const { schoolId } = req.params;
+    const users = await UserModel.find({ school_id: schoolId });
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: users,
+    });
+  } catch (err) {
+    Logger.error('Failed to get all user ');
     return res.status(HTTP_CODES.SERVER_ERROR).json({
       success: false,
       message: 'Something went wrong please try again',
