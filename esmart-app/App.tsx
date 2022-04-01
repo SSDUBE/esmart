@@ -1,20 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { Home } from './app/views/Home';
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { AppStack } from './app/navigations/Screens';
+import { Block, GalioProvider } from 'galio-framework';
+import theme from './app/constants/Theme';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-     <Home />
-    </View>
+    <NavigationContainer>
+      <GalioProvider theme={theme}>
+        <Block flex>
+          <AppStack />
+        </Block>
+      </GalioProvider>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

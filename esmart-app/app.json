@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "campus-navigation",
-    "slug": "campus-navigation",
+    "name": "esmart-app",
+    "slug": "esmart-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,11 +28,5 @@
     "web": {
       "favicon": "./assets/favicon.png"
     }
-  },
-  "infoPlist": {
-    "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow campus navigation to use your location",
-    "NSLocationAlwaysUsageDescription": "Allow campus navigation to use your location",
-    "NSLocationWhenInUseUsageDescription": "Allow campus navigation to use your location",
-    "NSFaceIDUsageDescription": "Allow esmart to use your face ID"
   }
 }

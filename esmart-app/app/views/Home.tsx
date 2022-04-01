@@ -1,10 +1,10 @@
 import React from 'react'
 import { SafeAreaView, Text } from 'react-native'
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
-import { Maps } from '../components/Maps';
-import { Biomatric } from '../components/Biomatric';
-import { FaceRecognation } from '../components/FaceRecognation';
+// import { Maps } from '../components/Maps';
+// import { Biomatric } from '../components/Biomatric';
+// import { FaceRecognation } from '../components/FaceRecognation';
 
 export const Home = () => {
   const [location, setLocation] = React.useState<Location.LocationObject | null>(null);
@@ -41,8 +41,8 @@ export const Home = () => {
       {/* <Text style={{fontSize: 13, marginTop: 20}}>{text}</Text> */}
       {/* <Maps region={mapRegion} /> */}
       {/* <Biomatric /> */}
-
-      <FaceRecognation />
+      <Text>hello</Text>
+      {/* <FaceRecognation /> */}
     </SafeAreaView>
   );
 }
