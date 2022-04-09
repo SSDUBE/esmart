@@ -8,6 +8,7 @@ import { Dimensions } from 'react-native';
 import {
   Image, StyleSheet, ScrollView, SafeAreaView, Platform,
 } from 'react-native';
+import { NavigationProps } from './RootStackParamList';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -80,7 +81,7 @@ function HomeStack() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {/* <Stack.Screen name='GetStarted' component={GetStarted} /> */}
+      <Stack.Screen name='GetStarted' component={GetStarted} />
       <Stack.Screen name='Login' component={Login} />
     </Stack.Navigator>
   );
