@@ -2,15 +2,26 @@ import mongoose from 'mongoose';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import http from 'http';
+import { Server } from 'socket.io';
+
 import { API } from './src/globals';
 import { Logger } from './src/utilities/logger';
 import { DB } from './src/globals';
 
-
 const app = express();
 
+const server = http.createServer(app)
+
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST']
+  }
+})
+
 // The name of your app/service
-const serviceName = 'School Dashboard';
+const serviceName = 'Esmart';
 
 // The port which it should listen on
 const port = API.PORT;
@@ -60,4 +71,12 @@ require('./src/routes')(app);
 
 app.get('/', (req, res) => res.send('Hello World'));
 
-app.listen(port, () => Logger.log(`${serviceName} listening on port ${port}!`));
+io.on('connection', (socket) => {
+  console.log('socket ', socket.id)
+
+  io.on('disconnect', () => {
+    console.log('user disconnected ', socket.id)
+  })
+})
+
+server.listen(port, () => Logger.log(`${serviceName} listening on port ${port}!`));
