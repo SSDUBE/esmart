@@ -1,81 +1,81 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/esmart-web/node_modules
-/esmart-web/.pnp
-/esmart-web.pnp.js
+/web/node_modules
+/web/.pnp
+/web.pnp.js
 
 # testing
-/esmart-web/coverage
+/web/coverage
 
 # production
-/esmart-web/build
+/web/build
 
 # misc
-/esmart-web/.DS_Store
-/esmart-web/.env.local
-/esmart-web/.env.development.local
-/esmart-web/.env.test.local
-/esmart-web/.env.production.local
+/web/.DS_Store
+/web/.env.local
+/web/.env.development.local
+/web/.env.test.local
+/web/.env.production.local
 
-/esmart-web/npm-debug.log*
-/esmart-web/yarn-debug.log*
-/esmart-web/yarn-error.log*
+/web/npm-debug.log*
+/web/yarn-debug.log*
+/web/yarn-error.log*
 
 # server
-/esmart-server/node_modules
-/esmart-server/dist
-/esmart-server/.DS_Store
-/esmart-server/.env
-/esmart-server/.env.compose
-/esmart-server/.env.test
-/esmart-server/.env.stage
-/esmart-server/.env.prod
+/server/node_modules
+/server/dist
+/server/.DS_Store
+/server/.env
+/server/.env.compose
+/server/.env.test
+/server/.env.stage
+/server/.env.prod
 
 # App
 # OSX
 #
-/esmart-app/.DS_Store
+/app/.DS_Store
 
 # Xcode
 #
-/esmart-app/build/
-/esmart-app/*.pbxuser
-/esmart-app/!default.pbxuser
-/esmart-app/*.mode1v3
-/esmart-app/!default.mode1v3
-/esmart-app/*.mode2v3
-/esmart-app/!default.mode2v3
-/esmart-app/*.perspectivev3
-/esmart-app/!default.perspectivev3
-/esmart-app/xcuserdata
-/esmart-app/*.xccheckout
-/esmart-app/*.moved-aside
-/esmart-app/DerivedData
-/esmart-app/*.hmap
-/esmart-app/*.ipa
-/esmart-app/*.xcuserstate
+/app/build/
+/app/*.pbxuser
+/app/!default.pbxuser
+/app/*.mode1v3
+/app/!default.mode1v3
+/app/*.mode2v3
+/app/!default.mode2v3
+/app/*.perspectivev3
+/app/!default.perspectivev3
+/app/xcuserdata
+/app/*.xccheckout
+/app/*.moved-aside
+/app/DerivedData
+/app/*.hmap
+/app/*.ipa
+/app/*.xcuserstate
 
 # Android/IntelliJ
 #
-/esmart-app/build/
-/esmart-app/.idea
-/esmart-app/.gradle
-/esmart-app/local.properties
-/esmart-app/*.iml
-/esmart-app/*.hprof
+/app/build/
+/app/.idea
+/app/.gradle
+/app/local.properties
+/app/*.iml
+/app/*.hprof
 
 # node.js
 #
-/esmart-app/node_modules/
-/esmart-app/npm-debug.log
-/esmart-app/yarn-error.log
+/app/node_modules/
+/app/npm-debug.log
+/app/yarn-error.log
 
 # BUCK
-/esmart-app/buck-out/
-/esmart-app/\.buckd/
-/esmart-app/*.keystore
-/esmart-app/!debug.keystore
+/app/buck-out/
+/app/\.buckd/
+/app/*.keystore
+/app/!debug.keystore
 
 # fastlane
 #
@@ -84,14 +84,14 @@
 # For more information about the recommended setup visit:
 # https://docs.fastlane.tools/best-practices/source-control/
 
-/esmart-app/*/fastlane/report.xml
-/esmart-app/*/fastlane/Preview.html
-/esmart-app/*/fastlane/screenshots
+/app/*/fastlane/report.xml
+/app/*/fastlane/Preview.html
+/app/*/fastlane/screenshots
 
 # Bundle artifact
-/esmart-app/*.jsbundle
+/app/*.jsbundle
 
 # CocoaPods
-/esmart-app/ios/Pods/
+/app/ios/Pods/
 
 .DS_Store
