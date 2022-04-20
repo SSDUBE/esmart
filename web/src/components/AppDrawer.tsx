@@ -93,9 +93,7 @@ export const AppDrawer: FunctionComponent<IProps> = ({ children }) => {
           }}
         >
           {!open ? (
-            <IconButton
-              onClick={handleDrawerOpen}
-            >
+            <IconButton onClick={handleDrawerOpen}>
               <MenuIcon />
             </IconButton>
           ) : (
@@ -107,7 +105,9 @@ export const AppDrawer: FunctionComponent<IProps> = ({ children }) => {
         <Divider />
         <SideMenuNav />
       </Drawer>
-      <Container maxWidth="lg">{children}</Container>
+      <Container maxWidth="lg" style={{ marginTop: 40 }}>
+        {children}
+      </Container>
     </Box>
   );
 };

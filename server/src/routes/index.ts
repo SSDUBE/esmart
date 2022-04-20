@@ -4,6 +4,7 @@ import {
   addUser,
   getAllUsers,
   getAllGrades,
+  addNewUser,
 } from '../controllers/user';
 import { authentication } from './aunthentication';
 import { signin } from './signin';
@@ -13,6 +14,7 @@ const route = '/esmart';
 
 export = function (app: any) {
   app.post(`${route}/sign-up`, signup);
+  app.post(`${route}/add-new-user`, addNewUser);
   app.post(`${route}/sign-in`, signin);
   app.get(`${route}/user`, authentication, getUser);
   app.get(`${route}/roles`, authentication, getRoles);

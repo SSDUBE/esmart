@@ -41,7 +41,9 @@ const AppRoutes = () => {
               const routeComponents = [];
 
               for (let i = 0; i < paths.length; i++) {
-                roles?.includes(context.global.user.roleName) &&
+                (roles?.includes(context.global.user.roleName) ||
+                  paths.includes('/signin') ||
+                  paths.includes('/signup')) &&
                   routeComponents.push(
                     <Route
                       key={`${idx}${i}`}

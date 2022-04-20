@@ -152,7 +152,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
       data: users,
     });
   } catch (err) {
-    Logger.error('Failed to get all user ');
+    Logger.error('Failed to get all user ' + err);
     return res.status(HTTP_CODES.SERVER_ERROR).json({
       success: false,
       message: 'Something went wrong please try again',
@@ -168,6 +168,94 @@ export const getAllGrades = async (_req: Request, res: Response) => {
       success: true,
       data: grades,
     });
+  } catch (err) {
+    Logger.error('Failed to get all user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const addNewUser = async (req: Request, res: Response) => {
+  try {
+    let {
+      firstname,
+      idNumber,
+      lastname,
+      password,
+      roleType,
+      roleId,
+      schoolId,
+      schoolName,
+      grade,
+      gradeId
+    } = req.body;
+
+    if (roleType === 'STUDENT') {
+      if (!grade || !gradeId) {
+        return res.status(HTTP_CODES.FORBIDDEN).json({
+          success: false,
+          message:
+            'grade, and gradeId are required params',
+        });
+      }
+    }
+
+    if (
+      !firstname ||
+      !lastname ||
+      !idNumber ||
+      !roleId ||
+      !password ||
+      !roleType ||
+      !schoolId ||
+      !schoolName
+    ) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message:
+          'firstname, lastname, idNumber, roleId, roleType, gradeType, schoolId, schoolName and password are required params',
+      });
+    }
+
+    try {
+      password = await PasswordBcrypt.encrypt(password);
+      const findUser = await UserModel.findOne({ id_number: idNumber });
+
+      if (findUser) {
+        return res.status(HTTP_CODES.NOT_ALLOWED).json({
+          success: false,
+          message: 'User already exists',
+        });
+      }
+
+      const newUser = new UserModel({
+        first_name: firstname,
+        id_number: idNumber,
+        last_name: lastname,
+        role_type: roleType,
+        role_id: roleId,
+        school_id: schoolId,
+        school_name: schoolName,
+        password,
+        grade,
+        gradeId
+      });
+
+      const user = await newUser.save();
+
+      return res.status(HTTP_CODES.OK).json({
+        success: true,
+        data: user,
+      });
+    } catch (err) {
+      Logger.error('Failed to add user ' + err);
+      return res.status(HTTP_CODES.SERVER_ERROR).json({
+        success: false,
+        message: 'Something went wrong please try again',
+      });
+    }
   } catch (err) {
     Logger.error('Failed to get all user ');
     return res.status(HTTP_CODES.SERVER_ERROR).json({

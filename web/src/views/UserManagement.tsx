@@ -18,6 +18,7 @@ import { ConfirmiationModal } from '../components/ConfirmitionModal';
 import Camera, { FACING_MODES, IMAGE_TYPES } from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
 import { UserService } from '../services/UserService';
+import { AppContext } from '../context/context';
 
 const ValidationSchema = Yup.object().shape({
   firstname: Yup.string().required('Name is required'),
@@ -41,6 +42,14 @@ interface IGrades {
   _id: string;
   grade: Number;
   wordLength: Number;
+}
+
+interface ITableData {
+  firstname: string,
+  lastname: string,
+  idNumber: string,
+  role: string,
+  grade: string
 }
 
 interface IColumn {
@@ -105,13 +114,17 @@ const columns: readonly IColumn[] = [
   },
 ];
 
+
+
 export const UserManagement = () => {
   const classes = useStyles();
   const [showModal, setShowModal] = React.useState(false);
   const [confirmDeleteUser, setConfirmDeleteUser] = React.useState(false);
   const [roles, setRoles] = React.useState([]);
   const [grades, setGrades] = React.useState([]);
-  const [rows, setRows] = React.useState([]);
+  const [rows, setRows] = React.useState<ITableData[]>([]);
+  const context: any = React.useContext(AppContext);
+
   // const [mobilenetModel, setMobilenetModel] =
   //   React.useState<mobilenet.MobileNet | null>(null);
 
@@ -152,7 +165,7 @@ export const UserManagement = () => {
   function handleDelete() {}
 
   function createData(
-    firtname: string,
+    firstname: string,
     lastname: string,
     idNumber: string,
     role: string,
@@ -169,23 +182,10 @@ export const UserManagement = () => {
         </IconButton>
       </Box>
     );
-    return { firtname, lastname, idNumber, role, grade, actions };
+    return { firstname, lastname, idNumber, role, grade, actions };
   }
 
-  // function base64ImageToTensor(base64: string) {
-  //   //Function to convert jpeg image to tensors
-  //   // console.log('base64 ', base64.split(',')[1])
-  //   const binary_string = window.atob(base64.split(',')[1]);
-  //   const len = binary_string.length;
-  //   const bytes = new Uint8Array(224 * 224 * 3);
-
-  //   for (let i = 0; i < len; i++) {
-  //     bytes[i] = binary_string.charCodeAt(i);
-  //   }
-
-  //   return tf.tensor3d(bytes, [224, 224, 3]);
-  // }
-
+  console.log('context ', context)
   return (
     <Box>
       <Box style={{ width: 150, marginBottom: 20 }}>
@@ -223,7 +223,6 @@ export const UserManagement = () => {
             console.log('values ', values);
 
             tempRows.push(
-              // @ts-ignore
               createData(
                 firstname,
                 lastname,
@@ -236,9 +235,6 @@ export const UserManagement = () => {
             );
 
             setRows(tempRows);
-            // const rows = [
-            //   createData('India', 'IN', '1324171354', '3287263', 'test'),
-            // ];
           }}
         >
           {({
