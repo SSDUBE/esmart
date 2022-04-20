@@ -17,8 +17,9 @@ export = function (app: any) {
   app.post(`${route}/add-new-user`, addNewUser);
   app.post(`${route}/sign-in`, signin);
   app.get(`${route}/user`, authentication, getUser);
+  app.get(`${route}/all-users`, authentication, getUser);
+  app.get(`${route}/grades`, authentication, getAllGrades);
   app.get(`${route}/roles`, authentication, getRoles);
   app.post(`${route}/add-user`, authentication, addUser);
-  app.get(`${route}/users/:schoolId`, authentication, getAllUsers);
-  app.get(`${route}/grades`, authentication, getAllGrades);
+  app.post(`${route}/users/:userId`, authentication, getAllUsers);
 };

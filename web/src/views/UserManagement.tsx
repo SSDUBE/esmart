@@ -133,9 +133,17 @@ export const UserManagement = () => {
   React.useEffect(() => {
     (async function () {
       try {
+        const { schoolId, _id } = context.global.user
+        const tempRows = rows;
+
         const user = new UserService();
         const roles = await user.getRoles();
         const grades = await user.getGrades();
+        const users = await user.getAllUsers(_id, schoolId);
+
+        users.data.forEach((user: any) => {
+          tempRows.push(createData({ ...user }));
+        })
 
         // const net = await mobilenet.load();
         // const classifier = await knnClassifier.create();
@@ -151,6 +159,7 @@ export const UserManagement = () => {
           id: g._id,
         }));
 
+        setRows(tempRows);
         setRoles(fmtRoles);
         setGrades(fmtGrades);
         // setMobilenetModel(net);
@@ -168,6 +177,7 @@ export const UserManagement = () => {
       <Box display="flex" justifyContent="center" alignItems="center">
         <Button style={{ width: 20, height: 25 }}>Edit</Button>
         <IconButton
+          color='inherit'
           className={classes.iconButton}
           onClick={() => setConfirmDeleteUser(true)}
         >
@@ -233,19 +243,19 @@ export const UserManagement = () => {
                 roleType: roleType.type,
                 // @ts-ignore
                 roleId: roleType.id,
-              }
-              const res = await service.addNewUser({...newUser});
+              };
+              const res = await service.addNewUser({ ...newUser });
 
               if (res.success) {
-                swal("Hooray!!!", 'User was successfully added', "success");
+                swal('Hooray!!!', 'User was successfully added', 'success');
                 tempRows.push(createData({ ...res.data }));
                 setRows(tempRows);
-                resetForm()
-                setShowModal(false)
+                resetForm();
+                setShowModal(false);
               } else {
-                swal("Oops!!!", res.message, "error");
+                swal('Oops!!!', res.message, 'error');
               }
-             
+
               setSubmitting(false);
             } catch (err) {
               swal('Oops!!!', 'Something went wrong please try again', 'error');

@@ -144,8 +144,25 @@ export const addUser = async (req: Request, res: Response) => {
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const { schoolId } = req.params;
-    const users = await UserModel.find({ schoolId: schoolId });
+    const { userId } = req.params;
+    const { schoolId } = req.body;
+    let users = [];
+
+    if (!userId) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'userId missing in params',
+      });
+    }
+
+    if (!schoolId) {
+      users = await UserModel.find({ _id: { $ne: userId } });
+    } else {
+      users = await UserModel.find({
+        schoolId: schoolId,
+        _id: { $ne: userId },
+      });
+    }
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
@@ -189,15 +206,14 @@ export const addNewUser = async (req: Request, res: Response) => {
       schoolId,
       schoolName,
       grade,
-      gradeId
+      gradeId,
     } = req.body;
 
     if (roleType === 'STUDENT') {
       if (!grade || !gradeId) {
         return res.status(HTTP_CODES.FORBIDDEN).json({
           success: false,
-          message:
-            'grade, and gradeId are required params',
+          message: 'grade, and gradeId are required params',
         });
       }
     }
@@ -240,7 +256,7 @@ export const addNewUser = async (req: Request, res: Response) => {
         schoolName: schoolName,
         password,
         grade,
-        gradeId
+        gradeId,
       });
 
       const user = await newUser.save();

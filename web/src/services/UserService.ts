@@ -32,6 +32,23 @@ export class UserService extends SecureService {
     }
   };
 
+  public getAllUsers = async (userId: string, schoolId?: string) => {
+    try {
+      const response = await fetch(Config.services.user.all.replace(':userId', userId), {
+        method: 'POST',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+        body: JSON.stringify({schoolId}),
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
+
   public getRoles = async () => {
     try {
       const response = await fetch(Config.services.user.roles, {

@@ -27,12 +27,10 @@ export const signin = async (req: Request, res: Response) => {
 
     if (user) {
       if (!user.active) {
-        return res
-          .status(HTTP_CODES.FORBIDDEN)
-          .json({
-            success: false,
-            message: 'Account is deactivated please speak to your admin',
-          });
+        return res.status(HTTP_CODES.FORBIDDEN).json({
+          success: false,
+          message: 'Account is deactivated please speak to your admin',
+        });
       }
 
       const accessToken = jwt.sign(
@@ -47,8 +45,10 @@ export const signin = async (req: Request, res: Response) => {
         throw new Error('No role found for this user');
       }
 
-      if (!school) {
-        throw new Error('No school found for this user');
+      if (role.type !== 'ADMIN') {
+        if (!school) {
+          throw new Error('No school found for this user');
+        }
       }
 
       return res.json({

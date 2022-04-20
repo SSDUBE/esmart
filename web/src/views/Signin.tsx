@@ -64,6 +64,7 @@ const Signin = () => {
                 }
                 setSubmitting(false);
               } catch (err) {
+                console.log('err ', err)
                 swal(
                   'Oops!!!',
                   'Something went wrong please try again',

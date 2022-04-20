@@ -36,8 +36,8 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
             idNumber: data.user.id_number,
             roleId: data.user.roleId,
             roleName: data.role,
-            schoolId: data.user.schoolId,
-            schoolName: data.school.name,
+            schoolId: data.user ? data.user.schoolId : null,
+            schoolName: data.school ? data.school.name : null,
             _id: data.user._id,
           };
           const contextParams = { ...state.global };
