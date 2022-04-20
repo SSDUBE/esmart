@@ -8,11 +8,11 @@ interface INewUser {
   lastname: String;
   password: String;
   roleType: String;
-  roleId: String
-  schoolId: String
-  schoolName: String
-  grade?: number
-  gradeId?: String
+  roleId: String;
+  schoolId: String;
+  schoolName: String;
+  grade?: number;
+  gradeId?: String;
 }
 
 export class UserService extends SecureService {
@@ -34,14 +34,17 @@ export class UserService extends SecureService {
 
   public getAllUsers = async (userId: string, schoolId?: string) => {
     try {
-      const response = await fetch(Config.services.user.all.replace(':userId', userId), {
-        method: 'POST',
-        headers: {
-          ...this.defaultHeaders,
-          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
-        },
-        body: JSON.stringify({schoolId}),
-      });
+      const response = await fetch(
+        Config.services.user.all.replace(':userId', userId),
+        {
+          method: 'POST',
+          headers: {
+            ...this.defaultHeaders,
+            Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+          },
+          body: JSON.stringify({ schoolId }),
+        }
+      );
 
       return response.json();
     } catch (err: any) {
@@ -91,6 +94,25 @@ export class UserService extends SecureService {
         },
         body: JSON.stringify(user),
       });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
+
+  public deleteUser = async (idNumber: string) => {
+    try {
+      const response = await fetch(
+        Config.services.user.delete.replace(':idNumber', idNumber),
+        {
+          method: 'DELETE',
+          headers: {
+            ...this.defaultHeaders,
+            Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+          },
+        }
+      );
 
       return response.json();
     } catch (err: any) {

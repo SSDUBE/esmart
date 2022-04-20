@@ -63,7 +63,7 @@ interface IColumn {
 
 const useStyles = makeStyles((theme: Theme) => ({
   iconButton: {
-    background: 'rgb(207, 213, 227)',
+    backgroundColor: 'rgb(207, 213, 227)',
     width: theme.spacing(3.2),
     height: theme.spacing(3.2),
     borderRadius: 15,
@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   icon: {
     width: 17,
     height: 17,
-    color: '#fff',
+    color: 'rgb(207, 213, 227)',
   },
 }));
 
@@ -122,6 +122,7 @@ export const UserManagement = () => {
   const [roles, setRoles] = React.useState([]);
   const [grades, setGrades] = React.useState([]);
   const [rows, setRows] = React.useState<ITableData[]>([]);
+  const [deleteUser, setDeleteUser] = React.useState<ITableData | null>(null);
   const context: any = React.useContext(AppContext);
 
   // const [mobilenetModel, setMobilenetModel] =
@@ -133,8 +134,8 @@ export const UserManagement = () => {
   React.useEffect(() => {
     (async function () {
       try {
-        const { schoolId, _id } = context.global.user
-        const tempRows = rows;
+        const { schoolId, _id } = context.global.user;
+        const tempRows = [...rows];
 
         const user = new UserService();
         const roles = await user.getRoles();
@@ -143,7 +144,7 @@ export const UserManagement = () => {
 
         users.data.forEach((user: any) => {
           tempRows.push(createData({ ...user }));
-        })
+        });
 
         // const net = await mobilenet.load();
         // const classifier = await knnClassifier.create();
@@ -170,16 +171,48 @@ export const UserManagement = () => {
     })();
   }, []);
 
-  function handleDelete() {}
+  async function handleDelete() {
+    try {
+      if (deleteUser) {
+        const user = new UserService();
+        const tempRows = [...rows];
+        const index = tempRows.findIndex(
+          (row) => (row.idNumber = deleteUser?.idNumber)
+        );
+
+        const res = await user.deleteUser(deleteUser?.idNumber);
+
+        setConfirmDeleteUser(false);
+
+        if (res.success){
+          swal('Hooray!!!', 'User was successfully deleted', 'success');
+          tempRows.splice(index, 1);
+          setRows(tempRows);
+        }  else {
+          swal('Oops!!!', res.message, 'error');
+        }
+      }
+    } catch (err) {
+      swal('Oops!!!', 'Something went wrong please try again', 'error');
+    }
+  }
 
   function createData(data: ITableData) {
     const actions = (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Button style={{ width: 20, height: 25 }}>Edit</Button>
         <IconButton
-          color='inherit'
+          classes={{
+            root: classes.iconButton,
+            // This gives a warning that "focusVisible" class doesn't exist
+            //   on IconButton (which is true, it comes from ButtonBase).
+            // focusVisible: classes.closeButton
+          }}
           className={classes.iconButton}
-          onClick={() => setConfirmDeleteUser(true)}
+          onClick={() => {
+            setDeleteUser(data);
+            setConfirmDeleteUser(true);
+          }}
         >
           <DeleteIcon className={classes.icon} />
         </IconButton>

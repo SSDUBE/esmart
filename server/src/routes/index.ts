@@ -1,10 +1,11 @@
 import {
   getRoles,
   getUser,
-  addUser,
+  // addUser,
   getAllUsers,
   getAllGrades,
   addNewUser,
+  deleteUser,
 } from '../controllers/user';
 import { authentication } from './aunthentication';
 import { signin } from './signin';
@@ -20,6 +21,7 @@ export = function (app: any) {
   app.get(`${route}/all-users`, authentication, getUser);
   app.get(`${route}/grades`, authentication, getAllGrades);
   app.get(`${route}/roles`, authentication, getRoles);
-  app.post(`${route}/add-user`, authentication, addUser);
+  // app.post(`${route}/add-user`, authentication, addUser);
   app.post(`${route}/users/:userId`, authentication, getAllUsers);
+  app.delete(`${route}/user/:idNumber`, authentication, deleteUser);
 };

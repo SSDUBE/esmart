@@ -12,7 +12,8 @@ export const Config = {
       all: `${domain}/esmart/users/:userId`,
       roles: `${domain}/esmart/roles`,
       grades: `${domain}/esmart/grades`,
-      addNewUser: `${domain}/esmart/add-new-user`
+      addNewUser: `${domain}/esmart/add-new-user`,
+      delete: `${domain}/esmart/user/:idNumber`
     }
   }
 }
