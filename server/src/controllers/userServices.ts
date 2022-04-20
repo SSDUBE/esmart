@@ -12,6 +12,7 @@ export class UserService {
         if (!role) throw new Error('User role not found');
 
         newUser.role_id = role._id;
+        newUser.role_type = role.type
       }
 
       newUser.password = await PasswordBcrypt.encrypt(newUser.password);

@@ -23,17 +23,13 @@ const ValidationSchema = Yup.object().shape({
   firstname: Yup.string().required('Name is required'),
   lastname: Yup.string().required('Last name is required'),
   idNumber: Yup.string().required('Name is required'),
-  loginCode: Yup.string().required('Name is required'),
+  password: Yup.string().required('Password is required'),
   roleType: Yup.object().required('Please select access type'),
+  gradeType: Yup.object().when('roleType', {
+    is: (roleType: any) => roleType && roleType.type === 'STUDENT',
+    then: Yup.object().required('Grade is a required field'),
+  }),
 });
-
-interface IData {
-  username: string;
-  fullName: string;
-  number: string;
-  access: string;
-  actions: JSX.Element;
-}
 
 interface IRole {
   _id: string;
@@ -41,8 +37,14 @@ interface IRole {
   description: string;
 }
 
+interface IGrades {
+  _id: string;
+  grade: Number;
+  wordLength: Number;
+}
+
 interface IColumn {
-  id: 'username' | 'fullName' | 'number' | 'email' | 'access' | 'actions';
+  id: 'firstname' | 'lastname' | 'idNumber' | 'role' | 'grade' | 'actions';
   label: string;
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
@@ -64,31 +66,83 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const columns: readonly IColumn[] = [
+  {
+    id: 'firstname',
+    label: 'First Name',
+    align: 'center',
+    format: (value: number) => value.toLocaleString('en-US'),
+  },
+  {
+    id: 'lastname',
+    label: 'Last Name',
+    align: 'center',
+    format: (value: number) => value.toLocaleString('en-US'),
+  },
+  {
+    id: 'idNumber',
+    label: 'ID Number',
+    align: 'center',
+    format: (value: number) => value.toLocaleString('en-US'),
+  },
+  {
+    id: 'role',
+    label: 'Role',
+    align: 'center',
+    format: (value: number) => value.toLocaleString('en-US'),
+  },
+  {
+    id: 'grade',
+    label: 'Grade',
+    align: 'center',
+    format: (value: number) => value.toFixed(0),
+  },
+  {
+    id: 'actions',
+    label: 'Actions',
+    align: 'center',
+    format: (value: number) => value.toFixed(2),
+  },
+];
+
 export const UserManagement = () => {
   const classes = useStyles();
   const [showModal, setShowModal] = React.useState(false);
   const [confirmDeleteUser, setConfirmDeleteUser] = React.useState(false);
   const [roles, setRoles] = React.useState([]);
-  const [mobilenetModel, setMobilenetModel] =
-    React.useState<mobilenet.MobileNet | null>(null);
+  const [grades, setGrades] = React.useState([]);
+  const [rows, setRows] = React.useState([]);
+  // const [mobilenetModel, setMobilenetModel] =
+  //   React.useState<mobilenet.MobileNet | null>(null);
 
-  const [knnClassifierModel, setKnnClassifierModel] =
-    React.useState<knnClassifier.KNNClassifier | null>(null);
+  // const [knnClassifierModel, setKnnClassifierModel] =
+  //   React.useState<knnClassifier.KNNClassifier | null>(null);
 
   React.useEffect(() => {
     (async function () {
       try {
-        const user = new UserService()
-        const roles = await user.getRoles()
-        const net = await mobilenet.load();
-        const classifier = await knnClassifier.create();
-        const res = roles.data.map((role: IRole)=> (
-          {label: role.type, type: role.type, id: role._id}
-        ))
+        const user = new UserService();
+        const roles = await user.getRoles();
+        const grades = await user.getGrades();
 
-        setRoles(res)
-        setMobilenetModel(net);
-        setKnnClassifierModel(classifier);
+        // const net = await mobilenet.load();
+        // const classifier = await knnClassifier.create();
+        const fmtRoles = roles.data.map((role: IRole) => ({
+          label: role.type,
+          type: role.type,
+          id: role._id,
+        }));
+
+        const fmtGrades = grades.data.map((g: IGrades) => ({
+          label: g.grade,
+          type: g.grade,
+          id: g._id,
+        }));
+
+        setRoles(fmtRoles);
+        setGrades(fmtGrades);
+        // setMobilenetModel(net);
+        // setKnnClassifierModel(classifier);
       } catch (err) {
         console.log('something went wrong loading ', err);
       }
@@ -98,11 +152,12 @@ export const UserManagement = () => {
   function handleDelete() {}
 
   function createData(
-    username: string,
-    fullName: string,
-    number: string,
-    access: string
-  ): IData {
+    firtname: string,
+    lastname: string,
+    idNumber: string,
+    role: string,
+    grade: string
+  ) {
     const actions = (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Button style={{ width: 20, height: 25 }}>Edit</Button>
@@ -114,62 +169,22 @@ export const UserManagement = () => {
         </IconButton>
       </Box>
     );
-    return { username, fullName, number, access, actions };
+    return { firtname, lastname, idNumber, role, grade, actions };
   }
 
-  const rows = [createData('India', 'IN', '1324171354', '3287263')];
+  // function base64ImageToTensor(base64: string) {
+  //   //Function to convert jpeg image to tensors
+  //   // console.log('base64 ', base64.split(',')[1])
+  //   const binary_string = window.atob(base64.split(',')[1]);
+  //   const len = binary_string.length;
+  //   const bytes = new Uint8Array(224 * 224 * 3);
 
-  const columns: readonly IColumn[] = [
-    {
-      id: 'username',
-      label: 'Username',
-      align: 'center',
-    },
-    {
-      id: 'fullName',
-      label: 'Full Name',
-      align: 'center',
-      format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'number',
-      label: 'Number',
-      align: 'center',
-      format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'email',
-      label: 'Email',
-      align: 'center',
-      format: (value: number) => value.toFixed(2),
-    },
-    {
-      id: 'access',
-      label: 'Access',
-      align: 'center',
-      format: (value: number) => value.toFixed(2),
-    },
-    {
-      id: 'actions',
-      label: 'Actions',
-      align: 'center',
-      format: (value: number) => value.toFixed(2),
-    },
-  ];
+  //   for (let i = 0; i < len; i++) {
+  //     bytes[i] = binary_string.charCodeAt(i);
+  //   }
 
-  function base64ImageToTensor(base64: string) {
-    //Function to convert jpeg image to tensors
-    // console.log('base64 ', base64.split(',')[1])
-    const binary_string = window.atob(base64.split(',')[1]);
-    const len = binary_string.length;
-    const bytes = new Uint8Array(224 * 224 * 3);
-
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binary_string.charCodeAt(i);
-    }
-
-    return tf.tensor3d(bytes, [224, 224, 3]);
-  }
+  //   return tf.tensor3d(bytes, [224, 224, 3]);
+  // }
 
   return (
     <Box>
@@ -191,11 +206,39 @@ export const UserManagement = () => {
             lastname: '',
             idNumber: '',
             roleType: '',
-            loginCode: '',
+            gradeType: '',
+            password: '',
           }}
           validationSchema={ValidationSchema}
           onSubmit={(values, { setSubmitting }) => {
+            const tempRows = [...rows];
+            const {
+              firstname,
+              lastname,
+              idNumber,
+              roleType,
+              gradeType,
+              password,
+            } = values;
             console.log('values ', values);
+
+            tempRows.push(
+              // @ts-ignore
+              createData(
+                firstname,
+                lastname,
+                idNumber,
+                // @ts-ignore
+                roleType.type,
+                // @ts-ignore
+                gradeType.type
+              )
+            );
+
+            setRows(tempRows);
+            // const rows = [
+            //   createData('India', 'IN', '1324171354', '3287263', 'test'),
+            // ];
           }}
         >
           {({
@@ -244,12 +287,27 @@ export const UserManagement = () => {
                     }
                   />
                 </Grid>
+                {
+                  //@ts-ignore
+                  values.roleType.type === 'STUDENT' && (
+                    <Grid item xs={12}>
+                      <ComboBox
+                        label="Student Grade"
+                        data={grades}
+                        error={errors.gradeType}
+                        handleChange={(_: any, val: any) =>
+                          setFieldValue('gradeType', val)
+                        }
+                      />
+                    </Grid>
+                  )
+                }
                 <Grid item xs={12}>
                   <FTextField
-                    type="loginCode"
-                    name="loginCode"
-                    label="Login Code"
-                    placeholder="Login Code"
+                    type="password"
+                    name="password"
+                    label="Login Password"
+                    placeholder="Login Password"
                   />
                 </Grid>
                 {/* <Grid>

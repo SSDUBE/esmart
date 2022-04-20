@@ -1,16 +1,20 @@
 import React from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { RouteItems } from './constants';
 import { AppContext } from './context/context';
 
 const AppRoutes = () => {
   const navigate = useNavigate();
+  const location = useLocation()
   const context: any = React.useContext(AppContext);
 
   React.useEffect(() => {
     const isLogin = context.global.user.isLogin;
 
     if (!isLogin) {
+      if (location.pathname.includes('signup')) {
+        return navigate('/signup')
+      }
       return navigate('/signin');
     }
 

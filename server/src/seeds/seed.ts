@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
-import seedData from './seedData.json';
+import { seedData } from './seedData';
 import { Logger } from '../utilities/logger';
 import { DB } from '../globals';
 import { RoleModel } from '../models/role';
+import { GradeModel } from '../models/grade';
 
 const logPrefix = 'seeds.seed';
 
@@ -13,8 +14,9 @@ const logPrefix = 'seeds.seed';
     .then(
       async () => {
         Logger.log('2 Successfully connected to DB');
-        const { roles } = seedData;
+        const { roles, grades } = seedData;
         const seedRoles: any[] = [];
+        const seedGrades: any[] = [];
 
         Logger.log('3 creating roles');
         roles.forEach((role) => {
@@ -27,7 +29,17 @@ const logPrefix = 'seeds.seed';
           );
         });
 
-        await Promise.all(seedRoles);
+        grades.forEach((grade) => {
+          seedGrades.push(
+            GradeModel.updateOne(
+              { grade: grade.grade },
+              { $set: { ...grade } },
+              { upsert: true }
+            )
+          );
+        });
+
+        await Promise.all([...seedRoles, ...seedGrades]);
         Logger.log('5 roles creation complete');
       },
       (err) => {

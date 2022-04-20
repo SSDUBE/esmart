@@ -34,4 +34,20 @@ export class UserService extends SecureService {
       throw new Error(err);
     }
   };
+
+  public getGrades = async () => {
+    try {
+      const response = await fetch(Config.services.user.grades, {
+        method: 'GET',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
 }

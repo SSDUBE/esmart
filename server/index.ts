@@ -9,22 +9,22 @@ import { API } from './src/globals';
 import { Logger } from './src/utilities/logger';
 import { DB } from './src/globals';
 
+// The name of your app/service
+const serviceName = 'Esmart';
+
+// The port which it should listen on
+const port = API.PORT;
+
 const app = express();
 
 const server = http.createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: `http://localhost:${port}`,
     methods: ['GET', 'POST']
   }
 })
-
-// The name of your app/service
-const serviceName = 'Esmart';
-
-// The port which it should listen on
-const port = API.PORT;
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -72,7 +72,7 @@ require('./src/routes')(app);
 app.get('/', (req, res) => res.send('Hello World'));
 
 io.on('connection', (socket) => {
-  console.log('socket ', socket.id)
+  console.log('user connected ', socket.id)
 
   io.on('disconnect', () => {
     console.log('user disconnected ', socket.id)

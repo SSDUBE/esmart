@@ -20,7 +20,7 @@ export const signup = async (req: Request, res: Response) => {
         .status(HTTP_CODES.NOT_ALLOWED)
         .json({ success: false, message: 'User already exists please signin' });
     } else {
-      const { email, role_id, schoolName } = req.body;
+      const { email, role_id, role_type, schoolName } = req.body;
 
       const school = new SchoolModel({ name: schoolName });
       const newSchool = await school.save();
@@ -31,6 +31,8 @@ export const signup = async (req: Request, res: Response) => {
         password,
         role_id,
         school_id: newSchool._id,
+        role_type,
+        school_name: schoolName,
         active: true,
       });
 

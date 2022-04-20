@@ -12,6 +12,8 @@ export interface IUser {
   password: string;
   role_id: mongoose.Types.ObjectId;
   school_id: mongoose.Types.ObjectId;
+  role_type: string;
+  school_name: string;
   active: boolean;
 }
 
@@ -22,6 +24,8 @@ const UserSchema = new mongoose.Schema<IUser>(
     contact_number: { type: String },
     id_number: { type: String, required: true, unique: true },
     email: { type: String },
+    role_type: { type: String, required: true },
+    school_name: { type: String, required: true },
     password: { type: String, required: true },
     role_id: { type: mongoose.Schema.Types.ObjectId, required: true },
     school_id: { type: mongoose.Schema.Types.ObjectId, required: true },

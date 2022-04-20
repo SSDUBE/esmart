@@ -8,6 +8,7 @@ import { Logger } from '../utilities/logger';
 import { decodeUserToken } from '../utilities/util';
 import jwt from 'jsonwebtoken';
 import { PasswordBcrypt } from './passwordBcrypt';
+import { GradeModel } from '../models/grade';
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -149,6 +150,23 @@ export const getAllUsers = async (req: Request, res: Response) => {
     return res.status(HTTP_CODES.OK).json({
       success: true,
       data: users,
+    });
+  } catch (err) {
+    Logger.error('Failed to get all user ');
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const getAllGrades = async (_req: Request, res: Response) => {
+  try {
+    const grades = await GradeModel.find({});
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: grades,
     });
   } catch (err) {
     Logger.error('Failed to get all user ');

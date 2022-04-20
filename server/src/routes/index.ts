@@ -1,4 +1,10 @@
-import { getRoles, getUser, addUser, getAllUsers } from '../controllers/user';
+import {
+  getRoles,
+  getUser,
+  addUser,
+  getAllUsers,
+  getAllGrades,
+} from '../controllers/user';
 import { authentication } from './aunthentication';
 import { signin } from './signin';
 import { signup } from './signup';
@@ -11,5 +17,6 @@ export = function (app: any) {
   app.get(`${route}/user`, authentication, getUser);
   app.get(`${route}/roles`, authentication, getRoles);
   app.post(`${route}/add-user`, authentication, addUser);
-  app.get(`${route}/get-users/:schoolId`, authentication, getAllUsers);
+  app.get(`${route}/users/:schoolId`, authentication, getAllUsers);
+  app.get(`${route}/grades`, authentication, getAllGrades);
 };

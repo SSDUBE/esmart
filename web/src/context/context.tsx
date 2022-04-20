@@ -25,24 +25,26 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
     },
     user: {
       update: async (data: any) => {
-        const newUser = {
-          active: true,
-          isLogin: true,
-          firstName: data.user.first_name,
-          lastName: data.user.last_name,
-          createdAt: data.user.createdAt,
-          email: data.user.email,
-          idNumber: data.user.id_number,
-          roleId: data.user.role_id,
-          roleName: data.role,
-          schoolId: data.user.school_id,
-          schoolName: data.school.name,
-          _id: data.user._id,
-        };
-        const contextParams = { ...state.global };
-        const updateUser = Object.assign({}, contextParams.user, newUser);
+        if (data) {
+          const newUser = {
+            active: true,
+            isLogin: true,
+            firstName: data.user.first_name,
+            lastName: data.user.last_name,
+            createdAt: data.user.createdAt,
+            email: data.user.email,
+            idNumber: data.user.id_number,
+            roleId: data.user.role_id,
+            roleName: data.role,
+            schoolId: data.user.school_id,
+            schoolName: data.school.name,
+            _id: data.user._id,
+          };
+          const contextParams = { ...state.global };
+          const updateUser = Object.assign({}, contextParams.user, newUser);
 
-        updateGlobal({ user: updateUser });
+          updateGlobal({ user: updateUser });
+        }
       },
     },
   });
