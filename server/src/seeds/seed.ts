@@ -17,17 +17,14 @@ const logPrefix = 'seeds.seed';
       async () => {
         Logger.log('2 Successfully connected to DB');
         const { roles, grades, admin } = seedData;
-        const seedRoles: any[] = [];
         const seedGrades: any[] = [];
 
         Logger.log('3 creating roles');
-        roles.forEach((role) => {
-          seedRoles.push(
-            RoleModel.updateOne(
-              { type: role.type },
-              { $set: { ...role } },
-              { upsert: true }
-            )
+        roles.forEach(async (role) => {
+          await RoleModel.updateOne(
+            { type: role.type },
+            { $set: { ...role } },
+            { upsert: true }
           );
         });
 
@@ -41,20 +38,20 @@ const logPrefix = 'seeds.seed';
           );
         });
 
-        const dbRoles = await RoleModel.findOne({type: 'ADMIN'})
+        const dbRoles = await RoleModel.findOne({ type: 'ADMIN' });
 
-        admin.role_type = dbRoles!.type
+        admin.roleType = dbRoles!.type;
         // @ts-ignore
-        admin.role_id = dbRoles!._id
-        admin.password = await PasswordBcrypt.encrypt(admin.password)
+        admin.roleId = dbRoles!._id;
+        admin.password = await PasswordBcrypt.encrypt(admin.password);
 
         const newAdmin = UserModel.updateOne(
-          { id_number: admin.id_number },
+          { idNumber: admin.idNumber },
           { $set: { ...admin } },
           { upsert: true }
-        )
+        );
 
-        await Promise.all([...seedRoles, ...seedGrades, newAdmin]);
+        await Promise.all([...seedGrades, newAdmin]);
         Logger.log('5 roles creation complete');
       },
       (err) => {

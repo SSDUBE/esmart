@@ -69,13 +69,13 @@ export const seedData = {
   ],
   admin: {
     active: true,
-    first_name: 'Sindiso',
-    last_name: 'Dube',
-    contact_number: '0796015904',
+    firstName: 'Sindiso',
+    lastName: 'Dube',
+    contactNumber: '0796015904',
     email: 'admin@gmail.com',
-    id_number: 9402226147089,
-    role_type: '',
+    idNumber: 9402226147089,
+    roleType: '',
     password: 'Admin@123',
-    role_id: ''
+    roleId: ''
   }
 };

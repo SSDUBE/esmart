@@ -24,8 +24,8 @@ export const getUser = async (req: Request, res: Response) => {
     const { id } = decodedUser;
 
     const user = await UserModel.findById(id);
-    const role = await RoleModel.findById(user?.role_id);
-    const school = await SchoolModel.findById(user?.school_id);
+    const role = await RoleModel.findById(user?.roleId);
+    const school = await SchoolModel.findById(user?.schoolId);
 
     return res.json({
       success: true,
@@ -87,19 +87,19 @@ export const addUser = async (req: Request, res: Response) => {
       });
     }
 
-    const addUser = await UserModel.findOne({ id_number: idNumber });
-    const user = await UserModel.findOne({ id_number: decode!.id_number });
+    const addUser = await UserModel.findOne({ idNumber: idNumber });
+    const user = await UserModel.findOne({ idNumber: decode!.idNumber });
 
     if (!addUser) {
       const createNewUser = new UserModel({
         active: true,
-        first_name: firstname,
-        last_name: lastname,
-        id_number: idNumber,
-        role_id: roleId,
-        school_id: user?.school_id,
-        created_by: user?._id,
-        updated_by: user?._id,
+        firstName: firstname,
+        lastName: lastname,
+        idNumber: idNumber,
+        roleId: roleId,
+        schoolId: user?.schoolId,
+        createdBy: user?._id,
+        updatedBy: user?._id,
         password: newPassword,
       });
 
@@ -110,7 +110,7 @@ export const addUser = async (req: Request, res: Response) => {
         message: 'User successfully added',
       });
     } else {
-      if (addUser.school_id.toHexString() === user?.school_id.toHexString()) {
+      if (addUser.schoolId.toHexString() === user?.schoolId.toHexString()) {
         return res.status(HTTP_CODES.NOT_ALLOWED).json({
           success: false,
           message: 'User already exists',
@@ -118,11 +118,11 @@ export const addUser = async (req: Request, res: Response) => {
       }
 
       newUser = Object.assign({}, addUser, {
-        first_name: firstname,
-        last_name: lastname,
-        id_number: idNumber,
-        role_id: roleId,
-        updated_by: user?._id,
+        firstName: firstname,
+        lastName: lastname,
+        idNumber: idNumber,
+        roleId: roleId,
+        updatedBy: user?._id,
         password,
       });
 
@@ -145,7 +145,7 @@ export const addUser = async (req: Request, res: Response) => {
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const { schoolId } = req.params;
-    const users = await UserModel.find({ school_id: schoolId });
+    const users = await UserModel.find({ schoolId: schoolId });
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
@@ -221,7 +221,7 @@ export const addNewUser = async (req: Request, res: Response) => {
 
     try {
       password = await PasswordBcrypt.encrypt(password);
-      const findUser = await UserModel.findOne({ id_number: idNumber });
+      const findUser = await UserModel.findOne({ idNumber: idNumber });
 
       if (findUser) {
         return res.status(HTTP_CODES.NOT_ALLOWED).json({
@@ -231,13 +231,13 @@ export const addNewUser = async (req: Request, res: Response) => {
       }
 
       const newUser = new UserModel({
-        first_name: firstname,
-        id_number: idNumber,
-        last_name: lastname,
-        role_type: roleType,
-        role_id: roleId,
-        school_id: schoolId,
-        school_name: schoolName,
+        firstName: firstname,
+        idNumber: idNumber,
+        lastName: lastname,
+        roleType: roleType,
+        roleId: roleId,
+        schoolId: schoolId,
+        schoolName: schoolName,
         password,
         grade,
         gradeId

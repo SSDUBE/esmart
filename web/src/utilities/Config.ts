@@ -10,7 +10,8 @@ export const Config = {
       signin: `${domain}/esmart/sign-in`,
       get: `${domain}/esmart/user`,
       roles: `${domain}/esmart/roles`,
-      grades: `${domain}/esmart/grades`
+      grades: `${domain}/esmart/grades`,
+      addNewUser: `${domain}/esmart/add-new-user`
     }
   }
 }

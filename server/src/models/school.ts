@@ -13,7 +13,7 @@ const SchoolSchema = new mongoose.Schema<ISchool>(
   },
   {
     timestamps: true,
-    collection: 'schools',
+    collection: 'Schools',
   }
 );
 

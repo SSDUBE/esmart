@@ -17,8 +17,8 @@ export const signin = async (req: Request, res: Response) => {
       encodedCredentials,
       'base64'
     ).toString();
-    const [id_number, password] = decodedCredentials.split(':');
-    let user = await UserModel.findOne({ id_number });
+    const [idNumber, password] = decodedCredentials.split(':');
+    let user = await UserModel.findOne({ idNumber });
 
     if (user) {
       const verify = await PasswordBcrypt.verify(password, user!.password);
@@ -36,12 +36,12 @@ export const signin = async (req: Request, res: Response) => {
       }
 
       const accessToken = jwt.sign(
-        { id_number: user.id_number, id: user._id },
+        { idNumber: user.idNumber, id: user._id },
         secret
       );
 
-      const role = await RoleModel.findById(user.role_id);
-      const school = await SchoolModel.findById(user.school_id);
+      const role = await RoleModel.findById(user.roleId);
+      const school = await SchoolModel.findById(user.schoolId);
 
       if (!role) {
         throw new Error('No role found for this user');

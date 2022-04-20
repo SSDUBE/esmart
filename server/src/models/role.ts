@@ -13,7 +13,7 @@ const RoleSchema = new mongoose.Schema<IRole>(
   },
   {
     timestamps: true,
-    collection: 'roles',
+    collection: 'Roles',
   }
 );
 

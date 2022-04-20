@@ -63,8 +63,9 @@ const Signup = () => {
               idNumber: '',
               schoolName: '',
             }}
+            enableReinitialize={true}
             validationSchema={ValidationSchema}
-            onSubmit={async (values, { setSubmitting }) => {
+            onSubmit={async (values, { setSubmitting, resetForm }) => {
               try {
                 setSubmitting(true);
                 const tempAuthService = new AuthService();
@@ -72,6 +73,7 @@ const Signup = () => {
 
                 if (res.success) {
                   swal("Hooray!!!", res.message, "success");
+                  resetForm()
                 } else {
                   swal("Oops!!!", res.message, "error");
                 }

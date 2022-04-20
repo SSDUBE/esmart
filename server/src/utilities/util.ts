@@ -6,7 +6,7 @@ const secret = AUTH.SECRET;
 
 interface IUser {
   id: string
-  id_number: string
+  idNumber: string
 }
 
 export function decodeUserToken(req: Request) {
@@ -22,7 +22,7 @@ export function decodeUserToken(req: Request) {
           // @ts-ignore
           id: decoded.id,
           // @ts-ignore
-          id_number: decoded.id_number,
+          idNumber: decoded.idNumber,
         };
       }
       jwt.verify(token, secret);

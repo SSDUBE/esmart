@@ -19,6 +19,7 @@ import Camera, { FACING_MODES, IMAGE_TYPES } from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
 import { UserService } from '../services/UserService';
 import { AppContext } from '../context/context';
+import swal from 'sweetalert';
 
 const ValidationSchema = Yup.object().shape({
   firstname: Yup.string().required('Name is required'),
@@ -45,15 +46,15 @@ interface IGrades {
 }
 
 interface ITableData {
-  firstname: string,
-  lastname: string,
-  idNumber: string,
-  role: string,
-  grade: string
+  firstName: string;
+  lastName: string;
+  idNumber: string;
+  roleType: string;
+  grade: string;
 }
 
 interface IColumn {
-  id: 'firstname' | 'lastname' | 'idNumber' | 'role' | 'grade' | 'actions';
+  id: 'firstName' | 'lastName' | 'idNumber' | 'roleType' | 'grade' | 'actions';
   label: string;
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
@@ -77,13 +78,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const columns: readonly IColumn[] = [
   {
-    id: 'firstname',
+    id: 'firstName',
     label: 'First Name',
     align: 'center',
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
-    id: 'lastname',
+    id: 'lastName',
     label: 'Last Name',
     align: 'center',
     format: (value: number) => value.toLocaleString('en-US'),
@@ -95,7 +96,7 @@ const columns: readonly IColumn[] = [
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
-    id: 'role',
+    id: 'roleType',
     label: 'Role',
     align: 'center',
     format: (value: number) => value.toLocaleString('en-US'),
@@ -113,8 +114,6 @@ const columns: readonly IColumn[] = [
     format: (value: number) => value.toFixed(2),
   },
 ];
-
-
 
 export const UserManagement = () => {
   const classes = useStyles();
@@ -164,13 +163,7 @@ export const UserManagement = () => {
 
   function handleDelete() {}
 
-  function createData(
-    firstname: string,
-    lastname: string,
-    idNumber: string,
-    role: string,
-    grade: string
-  ) {
+  function createData(data: ITableData) {
     const actions = (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Button style={{ width: 20, height: 25 }}>Edit</Button>
@@ -182,10 +175,10 @@ export const UserManagement = () => {
         </IconButton>
       </Box>
     );
-    return { firstname, lastname, idNumber, role, grade, actions };
+
+    return { ...data, actions };
   }
 
-  console.log('context ', context)
   return (
     <Box>
       <Box style={{ width: 150, marginBottom: 20 }}>
@@ -209,32 +202,55 @@ export const UserManagement = () => {
             gradeType: '',
             password: '',
           }}
+          enableReinitialize={true}
           validationSchema={ValidationSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            const tempRows = [...rows];
-            const {
-              firstname,
-              lastname,
-              idNumber,
-              roleType,
-              gradeType,
-              password,
-            } = values;
-            console.log('values ', values);
-
-            tempRows.push(
-              createData(
+          onSubmit={async (values, { setSubmitting, resetForm }) => {
+            try {
+              setSubmitting(true);
+              const tempRows = [...rows];
+              const {
                 firstname,
                 lastname,
                 idNumber,
+                roleType,
+                gradeType,
+                password,
+              } = values;
+              const { schoolId, schoolName } = context.global.user;
+              const service = new UserService();
+              const newUser = {
+                firstname,
+                idNumber,
+                lastname,
+                password,
+                schoolId,
+                schoolName,
                 // @ts-ignore
-                roleType.type,
+                grade: gradeType.type,
                 // @ts-ignore
-                gradeType.type
-              )
-            );
+                gradeId: gradeType.id,
+                // @ts-ignore
+                roleType: roleType.type,
+                // @ts-ignore
+                roleId: roleType.id,
+              }
+              const res = await service.addNewUser({...newUser});
 
-            setRows(tempRows);
+              if (res.success) {
+                swal("Hooray!!!", 'User was successfully added', "success");
+                tempRows.push(createData({ ...res.data }));
+                setRows(tempRows);
+                resetForm()
+                setShowModal(false)
+              } else {
+                swal("Oops!!!", res.message, "error");
+              }
+             
+              setSubmitting(false);
+            } catch (err) {
+              swal('Oops!!!', 'Something went wrong please try again', 'error');
+              setSubmitting(false);
+            }
           }}
         >
           {({

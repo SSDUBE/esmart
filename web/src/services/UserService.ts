@@ -2,6 +2,19 @@ import { Config } from '../utilities/Config';
 import { Helpers } from '../utilities/Helpers';
 import { SecureService } from './SecureService';
 
+interface INewUser {
+  firstname: String;
+  idNumber: String;
+  lastname: String;
+  password: String;
+  roleType: String;
+  roleId: String
+  schoolId: String
+  schoolName: String
+  grade?: number
+  gradeId?: String
+}
+
 export class UserService extends SecureService {
   public get = async () => {
     try {
@@ -43,6 +56,23 @@ export class UserService extends SecureService {
           ...this.defaultHeaders,
           Authorization: `Basic ${await Helpers.getInStorage('token')}`,
         },
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
+
+  public addNewUser = async (user: INewUser) => {
+    try {
+      const response = await fetch(Config.services.user.addNewUser, {
+        method: 'Post',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+        body: JSON.stringify(user),
       });
 
       return response.json();

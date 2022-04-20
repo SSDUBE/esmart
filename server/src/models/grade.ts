@@ -13,7 +13,7 @@ const GradeSchema = new mongoose.Schema<IGrades>(
   },
   {
     timestamps: true,
-    collection: 'grades',
+    collection: 'Grades',
   }
 );
 

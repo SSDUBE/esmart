@@ -12,27 +12,27 @@ export const signup = async (req: Request, res: Response) => {
       encodedCredentials,
       'base64'
     ).toString();
-    const [id_number, password] = decodedCredentials.split(':');
-    const user = await UserModel.findOne({ id_number });
+    const [idNumber, password] = decodedCredentials.split(':');
+    const user = await UserModel.findOne({ idNumber });
 
     if (user) {
       return res
         .status(HTTP_CODES.NOT_ALLOWED)
         .json({ success: false, message: 'User already exists please signin' });
     } else {
-      const { email, role_id, role_type, schoolName } = req.body;
+      const { email, roleId, roleType, schoolName } = req.body;
 
       const school = new SchoolModel({ name: schoolName });
       const newSchool = await school.save();
 
       await UserService.registerUser({
-        id_number,
+        idNumber,
         email,
         password,
-        role_id,
-        school_id: newSchool._id,
-        role_type,
-        school_name: schoolName,
+        roleId,
+        schoolId: newSchool._id,
+        roleType,
+        schoolName,
         active: true,
       });
 

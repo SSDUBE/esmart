@@ -29,14 +29,14 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
           const newUser = {
             active: true,
             isLogin: true,
-            firstName: data.user.first_name,
-            lastName: data.user.last_name,
+            firstName: data.user.firstName,
+            lastName: data.user.lastName,
             createdAt: data.user.createdAt,
             email: data.user.email,
             idNumber: data.user.id_number,
-            roleId: data.user.role_id,
+            roleId: data.user.roleId,
             roleName: data.role,
-            schoolId: data.user.school_id,
+            schoolId: data.user.schoolId,
             schoolName: data.school.name,
             _id: data.user._id,
           };
