@@ -4,6 +4,8 @@ import { Logger } from '../utilities/logger';
 import { DB } from '../globals';
 import { RoleModel } from '../models/role';
 import { GradeModel } from '../models/grade';
+import { PasswordBcrypt } from '../controllers/passwordBcrypt';
+import { UserModel } from '../models/user';
 
 const logPrefix = 'seeds.seed';
 
@@ -14,7 +16,7 @@ const logPrefix = 'seeds.seed';
     .then(
       async () => {
         Logger.log('2 Successfully connected to DB');
-        const { roles, grades } = seedData;
+        const { roles, grades, admin } = seedData;
         const seedRoles: any[] = [];
         const seedGrades: any[] = [];
 
@@ -39,7 +41,20 @@ const logPrefix = 'seeds.seed';
           );
         });
 
-        await Promise.all([...seedRoles, ...seedGrades]);
+        const dbRoles = await RoleModel.findOne({type: 'ADMIN'})
+
+        admin.role_type = dbRoles!.type
+        // @ts-ignore
+        admin.role_id = dbRoles!._id
+        admin.password = await PasswordBcrypt.encrypt(admin.password)
+
+        const newAdmin = UserModel.updateOne(
+          { id_number: admin.id_number },
+          { $set: { ...admin } },
+          { upsert: true }
+        )
+
+        await Promise.all([...seedRoles, ...seedGrades, newAdmin]);
         Logger.log('5 roles creation complete');
       },
       (err) => {

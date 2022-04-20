@@ -67,4 +67,15 @@ export const seedData = {
       wordLength: 4,
     },
   ],
+  admin: {
+    active: true,
+    first_name: 'Sindiso',
+    last_name: 'Dube',
+    contact_number: '0796015904',
+    email: 'admin@gmail.com',
+    id_number: 9402226147089,
+    role_type: '',
+    password: 'Admin@123',
+    role_id: ''
+  }
 };

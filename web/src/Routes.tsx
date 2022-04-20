@@ -5,7 +5,7 @@ import { AppContext } from './context/context';
 
 const AppRoutes = () => {
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
   const context: any = React.useContext(AppContext);
 
   React.useEffect(() => {
@@ -13,7 +13,7 @@ const AppRoutes = () => {
 
     if (!isLogin) {
       if (location.pathname.includes('signup')) {
-        return navigate('/signup')
+        return navigate('/signup');
       }
       return navigate('/signin');
     }
@@ -31,19 +31,24 @@ const AppRoutes = () => {
         }
 
         return (
-          <Route path={RouteItems[key].base.path} {...routeExtraProps} key={key}>
+          <Route
+            path={RouteItems[key].base.path}
+            {...routeExtraProps}
+            key={key}
+          >
             {RouteItems[key].routes.map((route, idx) => {
-              const { paths, Component } = route;
+              const { paths, Component, roles } = route;
               const routeComponents = [];
 
               for (let i = 0; i < paths.length; i++) {
-                routeComponents.push(
-                  <Route
-                    key={`${idx}${i}`}
-                    path={paths[i]}
-                    element={<Component name={'this is passed'} />}
-                  />
-                );
+                roles?.includes(context.global.user.roleName) &&
+                  routeComponents.push(
+                    <Route
+                      key={`${idx}${i}`}
+                      path={paths[i]}
+                      element={<Component name={'this is passed'} />}
+                    />
+                  );
               }
 
               return routeComponents;

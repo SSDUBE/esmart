@@ -6,6 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { RouteItems, IRoute } from '../constants';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
+import { AppContext } from '../context/context';
 
 interface ISideMenuNavLinkProps {
   routeName: string;
@@ -45,10 +46,12 @@ const SideMenuNavLink = (props: ISideMenuNavLinkProps) => {
 };
 
 export const SideMenuNav = () => {
+  const context: any = React.useContext(AppContext);
+
   return (
     <List>
       {RouteItems.restricted.routes.map((item: IRoute) => (
-        <SideMenuNavLink
+        item.roles?.includes(context.global.user.roleName) &&<SideMenuNavLink
           key={item.name}
           routeName={item.name}
           paths={item.paths}
