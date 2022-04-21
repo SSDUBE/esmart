@@ -14,4 +14,12 @@ export class Helpers {
       throw new Error('Failed to set key in local storage');
     }
   };
+
+  static removeInStorage = async (key: string) => {
+    try {
+      await localStorage.removeItem(`@esmart:${key}`);
+    } catch (e) {
+      throw new Error('Failed to set key in local storage');
+    }
+  };
 }

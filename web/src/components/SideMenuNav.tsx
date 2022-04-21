@@ -7,6 +7,10 @@ import { RouteItems, IRoute } from '../constants';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import { AppContext } from '../context/context';
+import { theme } from '../Theme';
+import { ConfirmiationModal } from './ConfirmitionModal';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Helpers } from '../utilities/Helpers';
 
 interface ISideMenuNavLinkProps {
   routeName: string;
@@ -18,7 +22,9 @@ const SideMenuNavLink = (props: ISideMenuNavLinkProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentPathName, setCurrentPathName] = React.useState(location.pathname);
+  const [currentPathName, setCurrentPathName] = React.useState(
+    location.pathname
+  );
 
   const getStyles = (paths: string[]) => {
     return paths.includes(currentPathName)
@@ -46,18 +52,46 @@ const SideMenuNavLink = (props: ISideMenuNavLinkProps) => {
 };
 
 export const SideMenuNav = () => {
+  const navigate = useNavigate();
+  const [signout, setSignOut] = React.useState(false)
   const context: any = React.useContext(AppContext);
 
+  async function handleLogout() {
+    await Helpers.removeInStorage('token');
+    navigate('/signin')
+  }
+
   return (
-    <List>
-      {RouteItems.restricted.routes.map((item: IRoute) => (
-        item.roles?.includes(context.global.user.roleName) &&<SideMenuNavLink
-          key={item.name}
-          routeName={item.name}
-          paths={item.paths}
-          Icon={item.Icon}
-        />
-      ))}
-    </List>
+    <>
+      <List>
+        {RouteItems.restricted.routes.map(
+          (item: IRoute) =>
+            item.roles?.includes(context.global.user.roleName) && (
+              <SideMenuNavLink
+                key={item.name}
+                routeName={item.name}
+                paths={item.paths}
+                Icon={item.Icon}
+              />
+            )
+        )}
+      </List>
+      <ListItem
+        button
+        style={{position: 'absolute', bottom: 20}}
+        onClick={() => setSignOut(true)}
+      >
+        <ListItemIcon>
+          <LogoutIcon style={{ color: theme.palette.common.white }} />
+        </ListItemIcon>
+        <ListItemText primary={'Sign out'} />
+      </ListItem>
+      <ConfirmiationModal
+        handleConfirmation={handleLogout}
+        showModal={signout}
+        closeModal={() => setSignOut(false)}
+        title="Are you sure you want sign out"
+      />
+    </>
   );
 };
