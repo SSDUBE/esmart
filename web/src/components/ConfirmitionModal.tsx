@@ -9,7 +9,7 @@ import { makeStyles } from '@mui/styles';
 interface IProps {
   title: string;
   showModal: boolean;
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  closeModal: () => void;
   handleConfirmation: () => void;
 }
 
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const ConfirmiationModal: FunctionComponent<IProps> = ({
   showModal,
-  setShowModal,
+  closeModal,
   title,
   handleConfirmation,
 }) => {
@@ -41,7 +41,7 @@ export const ConfirmiationModal: FunctionComponent<IProps> = ({
   return (
     <MuiModal
       open={showModal}
-      setOnClose={() => setShowModal(false)}
+      setOnClose={closeModal}
       customStyle={{ width: theme.spacing(50), padding: theme.spacing(5) }}
     >
       <Box
@@ -66,7 +66,7 @@ export const ConfirmiationModal: FunctionComponent<IProps> = ({
           marginTop={theme.spacing(2.5)}
         >
           <Button className={classes.yesButton} onClick={handleConfirmation}>Yes</Button>
-          <Button className={classes.cancelButton} onClick={() => setShowModal(false)}>Cancel</Button>
+          <Button className={classes.cancelButton} onClick={closeModal}>Cancel</Button>
         </Box>
       </Box>
     </MuiModal>

@@ -10,6 +10,7 @@ interface IProps {
   data: any[];
   handleChange: any;
   error: string | undefined;
+  defaultValue?: any
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -26,6 +27,7 @@ export const ComboBox: FunctionComponent<IProps> = ({
   data,
   handleChange,
   error,
+  defaultValue
 }) => {
   const classes = useStyles();
 
@@ -35,6 +37,7 @@ export const ComboBox: FunctionComponent<IProps> = ({
         onChange={handleChange}
         disablePortal
         options={data}
+        defaultValue={defaultValue}
         renderInput={(params) => <TextField {...params} label={label} />}
       />
       {error && <Typography className={classes.error}>{error}</Typography>}

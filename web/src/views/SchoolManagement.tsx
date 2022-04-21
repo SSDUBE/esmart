@@ -1,7 +1,4 @@
 import React from 'react';
-import * as tf from '@tensorflow/tfjs';
-import * as mobilenet from '@tensorflow-models/mobilenet';
-import * as knnClassifier from '@tensorflow-models/knn-classifier';
 
 import { Button, Grid, IconButton, Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -15,8 +12,6 @@ import { ComboBox } from '../components/MuiComboBox';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { makeStyles } from '@mui/styles';
 import { ConfirmiationModal } from '../components/ConfirmitionModal';
-import Camera, { FACING_MODES, IMAGE_TYPES } from 'react-html5-camera-photo';
-import 'react-html5-camera-photo/build/css/index.css';
 import { UserService } from '../services/UserService';
 
 const ValidationSchema = Yup.object().shape({
@@ -141,8 +136,6 @@ export const SchoolManagement = () => {
 
         setRoles(fmtRoles);
         setGrades(fmtGrades);
-        // setMobilenetModel(net);
-        // setKnnClassifierModel(classifier);
       } catch (err) {
         console.log('something went wrong loading ', err);
       }
@@ -361,7 +354,7 @@ export const SchoolManagement = () => {
       <ConfirmiationModal
         handleConfirmation={handleDelete}
         showModal={confirmDeleteUser}
-        setShowModal={setConfirmDeleteUser}
+        closeModal={() => setConfirmDeleteUser}
         title="Are you sure you want to delete this user?"
       />
     </Box>

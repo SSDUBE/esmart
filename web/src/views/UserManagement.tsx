@@ -1,8 +1,4 @@
 import React from 'react';
-import * as tf from '@tensorflow/tfjs';
-import * as mobilenet from '@tensorflow-models/mobilenet';
-import * as knnClassifier from '@tensorflow-models/knn-classifier';
-
 import { Button, Grid, IconButton, Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { MuiTable } from '../components/MuiTable';
@@ -15,31 +11,34 @@ import { ComboBox } from '../components/MuiComboBox';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { makeStyles } from '@mui/styles';
 import { ConfirmiationModal } from '../components/ConfirmitionModal';
-import Camera, { FACING_MODES, IMAGE_TYPES } from 'react-html5-camera-photo';
-import 'react-html5-camera-photo/build/css/index.css';
 import { UserService } from '../services/UserService';
 import { AppContext } from '../context/context';
 import swal from 'sweetalert';
 
-const ValidationSchema = Yup.object().shape({
-  firstname: Yup.string().required('Name is required'),
-  lastname: Yup.string().required('Last name is required'),
-  idNumber: Yup.string().required('Name is required'),
-  password: Yup.string().required('Password is required'),
-  roleType: Yup.object().required('Please select access type'),
-  gradeType: Yup.object().when('roleType', {
-    is: (roleType: any) => roleType && roleType.type === 'STUDENT',
-    then: Yup.object().required('Grade is a required field'),
-  }),
-});
+const ValidationSchema = (validatePass: any) =>
+  Yup.object().shape({
+    firstname: Yup.string().required('Name is required'),
+    lastname: Yup.string().required('Last name is required'),
+    idNumber: Yup.string().required('Name is required'),
+    password: !validatePass
+      ? Yup.string().required('Password is required')
+      : Yup.string().optional(),
+    roleType: Yup.object().required('Please select access type'),
+    gradeType: Yup.object().when('roleType', {
+      is: (roleType: any) => roleType && roleType.type === 'STUDENT',
+      then: Yup.object().required('Grade is a required field'),
+    }),
+  });
 
 interface IRole {
+  id: string;
   _id: string;
   type: string;
   description: string;
 }
 
 interface IGrades {
+  id: string;
   _id: string;
   grade: Number;
   wordLength: Number;
@@ -51,6 +50,8 @@ interface ITableData {
   idNumber: string;
   roleType: string;
   grade: string;
+  roleId?: string;
+  gradeId?: string;
 }
 
 interface IColumn {
@@ -123,13 +124,8 @@ export const UserManagement = () => {
   const [grades, setGrades] = React.useState([]);
   const [rows, setRows] = React.useState<ITableData[]>([]);
   const [deleteUser, setDeleteUser] = React.useState<ITableData | null>(null);
+  const [editUser, setEditUser] = React.useState<ITableData | null>(null);
   const context: any = React.useContext(AppContext);
-
-  // const [mobilenetModel, setMobilenetModel] =
-  //   React.useState<mobilenet.MobileNet | null>(null);
-
-  // const [knnClassifierModel, setKnnClassifierModel] =
-  //   React.useState<knnClassifier.KNNClassifier | null>(null);
 
   React.useEffect(() => {
     (async function () {
@@ -146,8 +142,6 @@ export const UserManagement = () => {
           tempRows.push(createData({ ...user }));
         });
 
-        // const net = await mobilenet.load();
-        // const classifier = await knnClassifier.create();
         const fmtRoles = roles.data.map((role: IRole) => ({
           label: role.type,
           type: role.type,
@@ -163,13 +157,32 @@ export const UserManagement = () => {
         setRows(tempRows);
         setRoles(fmtRoles);
         setGrades(fmtGrades);
-        // setMobilenetModel(net);
-        // setKnnClassifierModel(classifier);
       } catch (err) {
         console.log('something went wrong loading ', err);
       }
     })();
   }, []);
+
+  async function handleEdit(newUser: any) {
+    try {
+      if (deleteUser) {
+        // const user = new UserService();
+        // const tempRows = [...rows];
+        // const index = tempRows.findIndex(
+        //   (row) => (row.idNumber = editUser?.idNumber)
+        // );
+        // if (res.success){
+        //   swal('Hooray!!!', 'User was successfully deleted', 'success');
+        //   tempRows.splice(index, 1);
+        //   setRows(tempRows);
+        // }  else {
+        //   swal('Oops!!!', res.message, 'error');
+        // }
+      }
+    } catch (err) {
+      swal('Oops!!!', 'Something went wrong please try again', 'error');
+    }
+  }
 
   async function handleDelete() {
     try {
@@ -179,16 +192,15 @@ export const UserManagement = () => {
         const index = tempRows.findIndex(
           (row) => (row.idNumber = deleteUser?.idNumber)
         );
-
         const res = await user.deleteUser(deleteUser?.idNumber);
 
         setConfirmDeleteUser(false);
 
-        if (res.success){
+        if (res.success) {
           swal('Hooray!!!', 'User was successfully deleted', 'success');
           tempRows.splice(index, 1);
           setRows(tempRows);
-        }  else {
+        } else {
           swal('Oops!!!', res.message, 'error');
         }
       }
@@ -200,7 +212,15 @@ export const UserManagement = () => {
   function createData(data: ITableData) {
     const actions = (
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Button style={{ width: 20, height: 25 }}>Edit</Button>
+        <Button
+          style={{ width: 20, height: 25 }}
+          onClick={() => {
+            setShowModal(true);
+            setEditUser(data);
+          }}
+        >
+          Edit
+        </Button>
         <IconButton
           classes={{
             root: classes.iconButton,
@@ -222,6 +242,9 @@ export const UserManagement = () => {
     return { ...data, actions };
   }
 
+  const role = roles.find((role: IRole) => role.id === editUser?.roleId);
+  const grade = grades.find((grade: IGrades) => grade.id === editUser?.gradeId);
+
   return (
     <Box>
       <Box style={{ width: 150, marginBottom: 20 }}>
@@ -238,15 +261,15 @@ export const UserManagement = () => {
         </Typography>
         <Formik
           initialValues={{
-            firstname: '',
-            lastname: '',
-            idNumber: '',
-            roleType: '',
-            gradeType: '',
+            firstname: editUser?.firstName || '',
+            lastname: editUser?.lastName || '',
+            idNumber: editUser?.idNumber || '',
+            roleType: role || '',
+            gradeType: grade || '',
             password: '',
           }}
           enableReinitialize={true}
-          validationSchema={ValidationSchema}
+          validationSchema={() => ValidationSchema(editUser)}
           onSubmit={async (values, { setSubmitting, resetForm }) => {
             try {
               setSubmitting(true);
@@ -277,16 +300,21 @@ export const UserManagement = () => {
                 // @ts-ignore
                 roleId: roleType.id,
               };
-              const res = await service.addNewUser({ ...newUser });
 
-              if (res.success) {
-                swal('Hooray!!!', 'User was successfully added', 'success');
-                tempRows.push(createData({ ...res.data }));
-                setRows(tempRows);
-                resetForm();
-                setShowModal(false);
+              if (editUser) {
+                await handleEdit(newUser) 
               } else {
-                swal('Oops!!!', res.message, 'error');
+                const res = await service.addNewUser({ ...newUser });
+
+                if (res.success) {
+                  swal('Hooray!!!', 'User was successfully added', 'success');
+                  tempRows.push(createData({ ...res.data }));
+                  setRows(tempRows);
+                  resetForm();
+                  setShowModal(false);
+                } else {
+                  swal('Oops!!!', res.message, 'error');
+                }
               }
 
               setSubmitting(false);
@@ -336,6 +364,7 @@ export const UserManagement = () => {
                   <ComboBox
                     label="User Role"
                     data={roles}
+                    defaultValue={values.roleType}
                     error={errors.roleType}
                     handleChange={(_: any, val: any) =>
                       setFieldValue('roleType', val)
@@ -349,6 +378,7 @@ export const UserManagement = () => {
                       <ComboBox
                         label="Student Grade"
                         data={grades}
+                        defaultValue={values.gradeType}
                         error={errors.gradeType}
                         handleChange={(_: any, val: any) =>
                           setFieldValue('gradeType', val)
@@ -401,7 +431,10 @@ export const UserManagement = () => {
                 >
                   <Grid item xs={2} marginRight={2}>
                     <Button
-                      onClick={() => setShowModal(false)}
+                      onClick={() => {
+                        setShowModal(false);
+                        setEditUser(null);
+                      }}
                       style={{
                         background: 'rgb(238, 239, 240)',
                         color: '#000',
@@ -422,7 +455,10 @@ export const UserManagement = () => {
       <ConfirmiationModal
         handleConfirmation={handleDelete}
         showModal={confirmDeleteUser}
-        setShowModal={setConfirmDeleteUser}
+        closeModal={() => {
+          setDeleteUser(null);
+          setConfirmDeleteUser(false);
+        }}
         title="Are you sure you want to delete this user?"
       />
     </Box>
