@@ -1,5 +1,11 @@
 import React, { FunctionComponent } from 'react';
-import { View, Image, Modal, StyleSheet } from 'react-native';
+import {
+  View,
+  Image,
+  Modal,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import { colors } from '../constants/Colors';
 
 interface ILoader {
@@ -15,10 +21,7 @@ export const Loader: FunctionComponent<ILoader> = ({
     <Modal animationType={animationType} transparent visible={modalVisible}>
       <View style={styles.wrapper}>
         <View style={styles.loaderContainer}>
-          {/* <Image
-            style={styles.loaderImage}
-            source={require('../../assets/img/greenLoader.gif')}
-          /> */}
+          <ActivityIndicator size='large' color='#0000ff' />
         </View>
       </View>
     </Modal>
@@ -45,6 +48,9 @@ const styles = StyleSheet.create({
     top: '50%',
     marginLeft: -45,
     marginTop: -45,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loaderImage: {
     width: 70,

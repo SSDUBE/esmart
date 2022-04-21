@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { GetStarted } from '../views/GetStarted';
 import { Home } from '../views/Home';
-import { Login } from '../views/Login';
+import { Signin } from '../views/Signin';
 import { NavigationProps } from './RootStackParamList';
 import { LeaderBoard } from '../views/LeaderBoard';
 import { Profile } from '../views/Profile';
@@ -30,7 +30,7 @@ function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name='GetStarted' component={GetStarted} />
-      <Stack.Screen name='Login' component={Login} />
+      <Stack.Screen name='Signin' component={Signin} />
     </Stack.Navigator>
   );
 }
@@ -38,7 +38,7 @@ function AuthStack() {
 export const AppStack = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {/* <Stack.Screen name='AuthStack' component={AuthStack} /> */}
+      <Stack.Screen name='AuthStack' component={AuthStack} />
       <Stack.Screen name='HomeStack' component={HomeStack} />
       <Stack.Screen name='Game' component={Game} />
     </Stack.Navigator>

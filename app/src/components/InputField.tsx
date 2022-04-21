@@ -39,6 +39,7 @@ interface IInputField {
   inputStyle?: any;
   placeholder?: string;
   defaultValue?: string;
+  error: string | undefined;
 }
 
 export const InputField: FunctionComponent<IInputField> = ({
@@ -57,6 +58,7 @@ export const InputField: FunctionComponent<IInputField> = ({
   autoCapitalize,
   placeholder,
   defaultValue,
+  error,
 }) => {
   const [secureInput, setSecureInput] = React.useState(
     !(inputType === 'text' || inputType === 'email')
@@ -141,11 +143,16 @@ export const InputField: FunctionComponent<IInputField> = ({
         defaultValue={inputValue}
         value={inputValue}
       />
+      {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  error: {
+    color: 'red',
+    fontSize: 12,
+  },
   wrapper: {
     display: 'flex',
   },

@@ -27,7 +27,7 @@ export const GetStarted = (props: any) => {
         <RoundedButton
           text='Get Started'
           textColor={colors.white}
-          handleOnPress={() => navigation.navigate('Login')}
+          handleOnPress={() => navigation.navigate('Signin')}
         />
 
         {/* <TouchableHighlight
