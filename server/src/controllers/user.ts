@@ -365,8 +365,11 @@ export const updateUser = async (req: Request, res: Response) => {
       contactNumber,
       email,
       idNumber,
-      schoolName,
       password,
+      roleType,
+      roleId,
+      grade,
+      gradeId,
     } = req.body;
 
     if (!firstName || !lastName || !contactNumber || !email || !idNumber) {
@@ -386,6 +389,11 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
+    user.roleType = roleType ? roleType : user.roleType;
+    user.roleId = roleId ? roleId : user.roleId;
+    user.grade = roleType ? grade : user.grade;
+    user.roleType = gradeId ? roleType : user.gradeId;
+    //
     user!.firstName = firstName;
     user!.lastName = lastName;
     user!.contactNumber = contactNumber;

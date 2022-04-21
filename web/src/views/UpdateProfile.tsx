@@ -20,7 +20,7 @@ const ValidationSchema = Yup.object().shape({
       'Please enter a valid ID number'
     ),
   email: Yup.string()
-    .required('Name is required')
+    .required('Email is required')
     .email('Please enter a valid email'),
   password: Yup.string().optional(),
   repeatPassword: Yup.string().oneOf(

@@ -15,11 +15,19 @@ import { UserService } from '../services/UserService';
 import { AppContext } from '../context/context';
 import swal from 'sweetalert';
 
-const ValidationSchema = (validatePass: any) =>
+const ValidationSchema = (validatePass: any, isEditing: boolean) =>
   Yup.object().shape({
     firstname: Yup.string().required('Name is required'),
     lastname: Yup.string().required('Last name is required'),
     idNumber: Yup.string().required('Name is required'),
+    contactNumber: isEditing
+      ? Yup.string().required('Email is required')
+      : Yup.string().optional(),
+    email: isEditing
+      ? Yup.string()
+          .required('Email is required')
+          .email('Please enter a valid email')
+      : Yup.string().optional(),
     password: !validatePass
       ? Yup.string().required('Password is required')
       : Yup.string().optional(),
@@ -45,6 +53,7 @@ interface IGrades {
 }
 
 interface ITableData {
+  active: string;
   firstName: string;
   lastName: string;
   idNumber: string;
@@ -52,10 +61,19 @@ interface ITableData {
   grade: string;
   roleId?: string;
   gradeId?: string;
+  contactNumber?: string;
+  email?: string;
 }
 
 interface IColumn {
-  id: 'firstName' | 'lastName' | 'idNumber' | 'roleType' | 'grade' | 'actions';
+  id:
+    | 'firstName'
+    | 'lastName'
+    | 'idNumber'
+    | 'roleType'
+    | 'grade'
+    | 'active'
+    | 'actions';
   label: string;
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
@@ -109,6 +127,12 @@ const columns: readonly IColumn[] = [
     format: (value: number) => value.toFixed(0),
   },
   {
+    id: 'active',
+    label: 'Active',
+    align: 'center',
+    format: (value: number) => value.toFixed(2),
+  },
+  {
     id: 'actions',
     label: 'Actions',
     align: 'center',
@@ -119,6 +143,7 @@ const columns: readonly IColumn[] = [
 export const UserManagement = () => {
   const classes = useStyles();
   const [showModal, setShowModal] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
   const [confirmDeleteUser, setConfirmDeleteUser] = React.useState(false);
   const [roles, setRoles] = React.useState([]);
   const [grades, setGrades] = React.useState([]);
@@ -139,6 +164,7 @@ export const UserManagement = () => {
         const users = await user.getAllUsers(_id, schoolId);
 
         users.data.forEach((user: any) => {
+          user.active = user.active ? 'True' : 'False';
           tempRows.push(createData({ ...user }));
         });
 
@@ -165,19 +191,34 @@ export const UserManagement = () => {
 
   async function handleEdit(newUser: any) {
     try {
-      if (deleteUser) {
-        // const user = new UserService();
-        // const tempRows = [...rows];
-        // const index = tempRows.findIndex(
-        //   (row) => (row.idNumber = editUser?.idNumber)
-        // );
-        // if (res.success){
-        //   swal('Hooray!!!', 'User was successfully deleted', 'success');
-        //   tempRows.splice(index, 1);
-        //   setRows(tempRows);
-        // }  else {
-        //   swal('Oops!!!', res.message, 'error');
-        // }
+      const tempRows = [...rows];
+      const user = new UserService();
+      const addUser = {
+        active: newUser.active,
+        roleType: newUser.roleType,
+        roleId: newUser.roleId,
+        grade: newUser.grade,
+        gradeId: newUser.gradeId,
+        firstName: newUser.firstname,
+        lastName: newUser.lastname,
+        idNumber: newUser.idNumber,
+        contactNumber: newUser.contactNumber,
+        email: newUser.email,
+        password: newUser.password,
+      };
+
+      const res = await user.updateUser(addUser);
+      const index = tempRows.findIndex(
+        // @ts-ignore
+        (row) => (row.idNumber = editUser?.idNumber)
+      );
+
+      if (res.success) {
+        swal('Hooray!!!', 'User was successfully updated', 'success');
+        tempRows[index] = createData(addUser);
+        setRows(tempRows);
+      } else {
+        swal('Oops!!!', res.message, 'error');
       }
     } catch (err) {
       swal('Oops!!!', 'Something went wrong please try again', 'error');
@@ -215,6 +256,7 @@ export const UserManagement = () => {
         <Button
           style={{ width: 20, height: 25 }}
           onClick={() => {
+            setIsEditing(true);
             setShowModal(true);
             setEditUser(data);
           }}
@@ -224,9 +266,6 @@ export const UserManagement = () => {
         <IconButton
           classes={{
             root: classes.iconButton,
-            // This gives a warning that "focusVisible" class doesn't exist
-            //   on IconButton (which is true, it comes from ButtonBase).
-            // focusVisible: classes.closeButton
           }}
           className={classes.iconButton}
           onClick={() => {
@@ -249,7 +288,12 @@ export const UserManagement = () => {
     <Box>
       {context.global.user.roleName !== 'ADMIN' && (
         <Box style={{ width: 150, marginBottom: 20 }}>
-          <Button onClick={() => setShowModal(true)}>
+          <Button
+            onClick={() => {
+              setShowModal(true);
+              setIsEditing(false);
+            }}
+          >
             <AddCircleOutlineIcon style={{ marginRight: 10 }} />
             Add User
           </Button>
@@ -257,7 +301,9 @@ export const UserManagement = () => {
       )}
       <MuiTable rows={rows} columns={columns} />
       <MuiModal open={showModal} setOnClose={setShowModal}>
-        <Typography variant="h5">Add User</Typography>
+        <Typography variant="h5">
+          {isEditing ? 'Update User' : 'Add User'}
+        </Typography>
         <Typography style={{ marginTop: 10, marginBottom: 15 }} component="div">
           Fill in all fields and click save to add a new user
         </Typography>
@@ -266,12 +312,14 @@ export const UserManagement = () => {
             firstname: editUser?.firstName || '',
             lastname: editUser?.lastName || '',
             idNumber: editUser?.idNumber || '',
+            contactNumber: editUser?.contactNumber || '',
+            email: editUser?.email || '',
             roleType: role || '',
             gradeType: grade || '',
             password: '',
           }}
           enableReinitialize={true}
-          validationSchema={() => ValidationSchema(editUser)}
+          validationSchema={() => ValidationSchema(editUser, isEditing)}
           onSubmit={async (values, { setSubmitting, resetForm }) => {
             try {
               setSubmitting(true);
@@ -304,7 +352,12 @@ export const UserManagement = () => {
               };
 
               if (editUser) {
-                await handleEdit(newUser);
+                await handleEdit({
+                  ...newUser,
+                  active: editUser.active,
+                  email: values.email,
+                  contactNumber: values.contactNumber,
+                });
               } else {
                 const res = await service.addNewUser({ ...newUser });
 
@@ -340,7 +393,7 @@ export const UserManagement = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <FTextField
-                    type="firstname"
+                    type="text"
                     name="firstname"
                     label="First Name"
                     placeholder="Last Name"
@@ -348,15 +401,35 @@ export const UserManagement = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <FTextField
-                    type="lastname"
+                    type="text"
                     name="lastname"
                     label="Last Name"
                     placeholder="Last Name"
                   />
                 </Grid>
+                {isEditing && (
+                  <Grid item xs={12}>
+                    <FTextField
+                      type="text"
+                      name="contactNumber"
+                      label="Contact Number"
+                      placeholder="Contact Number"
+                    />
+                  </Grid>
+                )}
+                {isEditing && (
+                  <Grid item xs={12}>
+                    <FTextField
+                      type="email"
+                      name="email"
+                      label="Email"
+                      placeholder="Email"
+                    />
+                  </Grid>
+                )}
                 <Grid item xs={12}>
                   <FTextField
-                    type="idNumber"
+                    type="text"
                     name="idNumber"
                     label="ID Number"
                     placeholder="ID Number"
