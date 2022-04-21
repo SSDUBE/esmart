@@ -1,20 +1,19 @@
-import { Theme, Typography } from '@mui/material';
+import { Theme } from '@mui/material';
 import { Box } from '@mui/system';
 import { MuiTable } from '../components/MuiTable';
-import { BitStatusColor } from '../constants';
 import { makeStyles } from '@mui/styles';
 
 interface IData {
-  serial: string;
-  size: string;
-  currentRig: string;
-  lastUser: string;
-  meters: string;
-  status: JSX.Element;
+  firstName: string;
+  lastName: string;
+  idNumber: string;
+  score: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface IColumn {
-  id: 'serial' | 'currentRig' | 'size' | 'lastUser' | 'meters' | 'status';
+  id: 'firstName' | 'lastName' | 'idNumber' | 'score' | 'createdAt' | 'updatedAt';
   label: string;
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
@@ -37,66 +36,56 @@ export const Dashboard = () => {
   const classes = useStyles();
 
   function createData(
-    serial: string,
-    size: string,
-    currentRig: string,
-    lastUser: string,
-    meters: string,
-    status: string
+    firstName: string,
+    lastName: string,
+    idNumber: string,
+    score: string,
+    createdAt: string,
+    updatedAt: string
   ): IData {
-    const statusData = (
-      <Box display="flex" alignItems="center" justifyContent="center">
-        <Box
-          className={classes.statusColor}
-          // @ts-ignore
-          style={{ background: BitStatusColor[status.toLowerCase()] }}
-        />
-        <Typography>{status}</Typography>
-      </Box>
-    );
-    return { serial, size, currentRig, lastUser, meters, status: statusData };
+    return { firstName, lastName, idNumber, score, createdAt, updatedAt };
   }
 
   const rows = [
-    createData('India', 'IN', '1324171354', '3287263', '111', 'New'),
+    createData('Sindiso', 'Dube', '9402226147089', '30', '2022/04/20', '2022/04/20'),
   ];
 
   const columns: readonly IColumn[] = [
     {
-      id: 'serial',
-      label: 'Serial',
+      id: 'firstName',
+      label: 'Fist Name',
       align: 'center',
     },
     {
-      id: 'size',
-      label: 'Size',
+      id: 'lastName',
+      label: 'Last Name',
       align: 'center',
       format: (value: number) => value.toLocaleString('en-US'),
     },
     {
-      id: 'currentRig',
-      label: 'Current Rig',
+      id: 'idNumber',
+      label: 'ID Number',
       align: 'center',
       format: (value: number) => value.toLocaleString('en-US'),
     },
     {
-      id: 'lastUser',
-      label: 'Last User',
+      id: 'score',
+      label: 'Score',
       align: 'center',
       format: (value: number) => value.toFixed(2),
     },
     {
-      id: 'meters',
-      label: 'Meters',
+      id: 'createdAt',
+      label: 'Created At',
       align: 'center',
       format: (value: number) => value.toFixed(2),
     },
     {
-      id: 'status',
-      label: 'Status',
+      id: 'updatedAt',
+      label: 'Updated At',
       align: 'center',
       format: (value: number) => value.toFixed(2),
-    },
+    }
   ];
 
   return (

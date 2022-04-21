@@ -11,15 +11,16 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
       user: {
         isLogin: false,
         active: true,
-        firstName: null,
-        lastName: null,
-        createdAt: null,
-        email: null,
-        idNumber: null,
+        firstName: '',
+        lastName: '',
+        createdAt: '',
+        email: '',
+        idNumber: '',
         roleId: null,
         roleName: null,
         schoolId: null,
-        schoolName: null,
+        schoolName: '',
+        contactNumber: '',
         _id: null,
       },
     },
@@ -33,15 +34,25 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
             lastName: data.user.lastName,
             createdAt: data.user.createdAt,
             email: data.user.email,
-            idNumber: data.user.id_number,
+            idNumber: data.user.idNumber,
             roleId: data.user.roleId,
             roleName: data.role,
+            contactNumber: data.user.contactNumber,
             schoolId: data.user ? data.user.schoolId : null,
             schoolName: data.school ? data.school.name : null,
             _id: data.user._id,
           };
           const contextParams = { ...state.global };
           const updateUser = Object.assign({}, contextParams.user, newUser);
+
+          updateGlobal({ user: updateUser });
+        }
+      },
+
+      updateProfile: async (data: any) => {
+        if (data) {
+          const contextParams = { ...state.global };
+          const updateUser = Object.assign({}, contextParams.user, data);
 
           updateGlobal({ user: updateUser });
         }

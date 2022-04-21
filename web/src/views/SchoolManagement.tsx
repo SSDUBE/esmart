@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Button, Grid, IconButton, Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { MuiTable } from '../components/MuiTable';
@@ -13,33 +12,50 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { makeStyles } from '@mui/styles';
 import { ConfirmiationModal } from '../components/ConfirmitionModal';
 import { UserService } from '../services/UserService';
+import { AppContext } from '../context/context';
+import swal from 'sweetalert';
+import { SchoolService } from '../services/SchoolService';
+import dayjs from 'dayjs';
 
-const ValidationSchema = Yup.object().shape({
-  firstname: Yup.string().required('Name is required'),
-  lastname: Yup.string().required('Last name is required'),
-  idNumber: Yup.string().required('Name is required'),
-  password: Yup.string().required('Password is required'),
-  roleType: Yup.object().required('Please select access type'),
-  gradeType: Yup.object().when('roleType', {
-    is: (roleType: any) => roleType && roleType.type === 'STUDENT',
-    then: Yup.object().required('Grade is a required field'),
-  }),
-});
+const ValidationSchema = (validatePass: any) =>
+  Yup.object().shape({
+    firstname: Yup.string().required('Name is required'),
+    lastname: Yup.string().required('Last name is required'),
+    idNumber: Yup.string().required('Name is required'),
+    password: !validatePass
+      ? Yup.string().required('Password is required')
+      : Yup.string().optional(),
+    roleType: Yup.object().required('Please select access type'),
+    gradeType: Yup.object().when('roleType', {
+      is: (roleType: any) => roleType && roleType.type === 'STUDENT',
+      then: Yup.object().required('Grade is a required field'),
+    }),
+  });
 
 interface IRole {
+  id: string;
   _id: string;
   type: string;
   description: string;
 }
 
 interface IGrades {
+  id: string;
   _id: string;
   grade: Number;
   wordLength: Number;
 }
 
+interface ITableData {
+  schoolName: string;
+  active: string;
+  createdAt: string;
+  updateAt: string;
+  _id?: string;
+}
+
 interface IColumn {
-  id: 'firstname' | 'lastname' | 'idNumber' | 'role' | 'grade' | 'actions';
+  id: 'schoolName' | 'active' | 'createdAt' | 'updateAt' | 'actions';
   label: string;
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
@@ -48,7 +64,7 @@ interface IColumn {
 
 const useStyles = makeStyles((theme: Theme) => ({
   iconButton: {
-    background: 'rgb(207, 213, 227)',
+    backgroundColor: 'rgb(207, 213, 227)',
     width: theme.spacing(3.2),
     height: theme.spacing(3.2),
     borderRadius: 15,
@@ -57,40 +73,34 @@ const useStyles = makeStyles((theme: Theme) => ({
   icon: {
     width: 17,
     height: 17,
-    color: '#fff',
+    color: 'rgb(207, 213, 227)',
   },
 }));
 
 const columns: readonly IColumn[] = [
   {
-    id: 'firstname',
-    label: 'First Name',
+    id: 'schoolName',
+    label: 'School Name',
     align: 'center',
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
-    id: 'lastname',
-    label: 'Last Name',
+    id: 'active',
+    label: 'Active',
     align: 'center',
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
-    id: 'idNumber',
-    label: 'ID Number',
+    id: 'createdAt',
+    label: 'Created At',
     align: 'center',
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
-    id: 'role',
-    label: 'Role',
+    id: 'updateAt',
+    label: 'Updated At',
     align: 'center',
     format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'grade',
-    label: 'Grade',
-    align: 'center',
-    format: (value: number) => value.toFixed(0),
   },
   {
     id: 'actions',
@@ -106,256 +116,122 @@ export const SchoolManagement = () => {
   const [confirmDeleteUser, setConfirmDeleteUser] = React.useState(false);
   const [roles, setRoles] = React.useState([]);
   const [grades, setGrades] = React.useState([]);
-  const [rows, setRows] = React.useState([]);
-  // const [mobilenetModel, setMobilenetModel] =
-  //   React.useState<mobilenet.MobileNet | null>(null);
-
-  // const [knnClassifierModel, setKnnClassifierModel] =
-  //   React.useState<knnClassifier.KNNClassifier | null>(null);
+  const [rows, setRows] = React.useState<ITableData[]>([]);
+  const [activateSchool, setActivateSchool] = React.useState(false);
+  const [deactivateSchool, setDeactivateSchool] = React.useState(false);
+  const [editUser, setEditUser] = React.useState<ITableData | null>(null);
+  const context: any = React.useContext(AppContext);
 
   React.useEffect(() => {
     (async function () {
       try {
-        const user = new UserService();
-        const roles = await user.getRoles();
-        const grades = await user.getGrades();
+        const tempRows: ITableData[] = [];
 
-        // const net = await mobilenet.load();
-        // const classifier = await knnClassifier.create();
-        const fmtRoles = roles.data.map((role: IRole) => ({
-          label: role.type,
-          type: role.type,
-          id: role._id,
-        }));
+        const school = new SchoolService();
+        const schools = await school.all();
 
-        const fmtGrades = grades.data.map((g: IGrades) => ({
-          label: g.grade,
-          type: g.grade,
-          id: g._id,
-        }));
+        schools.data.forEach((school: any) => {
+          tempRows.push(
+            createData({
+              schoolName: school.name,
+              active: school.active ? "True" : "False",
+              createdAt: dayjs(school.createdAt).format('YYYY/MM/DD mm:ss'),
+              updateAt: dayjs(school.updatedAt).format('YYYY/MM/DD mm:ss'),
+            })
+          );
+        });
 
-        setRoles(fmtRoles);
-        setGrades(fmtGrades);
+        setRows(tempRows);
       } catch (err) {
         console.log('something went wrong loading ', err);
       }
     })();
   }, []);
 
-  function handleDelete() {}
+  async function handleEdit(newUser: any) {
+    try {
+      // if (deleteUser) {
+        // const user = new UserService();
+        // const tempRows = [...rows];
+        // const index = tempRows.findIndex(
+        //   (row) => (row.idNumber = editUser?.idNumber)
+        // );
+        // if (res.success){
+        //   swal('Hooray!!!', 'User was successfully deleted', 'success');
+        //   tempRows.splice(index, 1);
+        //   setRows(tempRows);
+        // }  else {
+        //   swal('Oops!!!', res.message, 'error');
+        // }
+      // }
+    } catch (err) {
+      swal('Oops!!!', 'Something went wrong please try again', 'error');
+    }
+  }
 
-  function createData(
-    firtname: string,
-    lastname: string,
-    idNumber: string,
-    role: string,
-    grade: string
-  ) {
+  async function handleAction(action: string, actionType: boolean) {
+    try {
+      // if (deleteUser) {
+      //   const user = new UserService();
+      //   const tempRows = [...rows];
+      //   const index = tempRows.findIndex(
+      //     (row) => (row.idNumber = deleteUser?.idNumber)
+      //   );
+      //   const res = await user.deleteUser(deleteUser?.idNumber);
+
+      //   setConfirmDeleteUser(false);
+
+      //   if (res.success) {
+      //     swal('Hooray!!!', 'User was successfully deleted', 'success');
+      //     tempRows.splice(index, 1);
+      //     setRows(tempRows);
+      //   } else {
+      //     swal('Oops!!!', res.message, 'error');
+      //   }
+      // }
+    } catch (err) {
+      swal('Oops!!!', 'Something went wrong please try again', 'error');
+    }
+  }
+
+  function createData(data: ITableData) {
     const actions = (
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Button style={{ width: 20, height: 25 }}>Edit</Button>
+        <Button
+          style={{ width: 30, height: 25, fontSize: 10 }}
+          onClick={() => setActivateSchool(true)}
+        >
+          Activate
+        </Button>
         <IconButton
+          classes={{
+            root: classes.iconButton,
+          }}
           className={classes.iconButton}
-          onClick={() => setConfirmDeleteUser(true)}
+          onClick={() => setDeactivateSchool(true)}
         >
           <DeleteIcon className={classes.icon} />
         </IconButton>
       </Box>
     );
-    return { firtname, lastname, idNumber, role, grade, actions };
+
+    return { ...data, actions };
   }
-
-  // function base64ImageToTensor(base64: string) {
-  //   //Function to convert jpeg image to tensors
-  //   // console.log('base64 ', base64.split(',')[1])
-  //   const binary_string = window.atob(base64.split(',')[1]);
-  //   const len = binary_string.length;
-  //   const bytes = new Uint8Array(224 * 224 * 3);
-
-  //   for (let i = 0; i < len; i++) {
-  //     bytes[i] = binary_string.charCodeAt(i);
-  //   }
-
-  //   return tf.tensor3d(bytes, [224, 224, 3]);
-  // }
 
   return (
     <Box>
       <MuiTable rows={rows} columns={columns} />
-      <MuiModal open={showModal} setOnClose={setShowModal}>
-        <Typography variant="h5">Add User</Typography>
-        <Typography style={{ marginTop: 10, marginBottom: 15 }} component="div">
-          Fill in all fields and click save to add a new user
-        </Typography>
-        <Formik
-          initialValues={{
-            firstname: '',
-            lastname: '',
-            idNumber: '',
-            roleType: '',
-            gradeType: '',
-            password: '',
-          }}
-          validationSchema={ValidationSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            const tempRows = [...rows];
-            const {
-              firstname,
-              lastname,
-              idNumber,
-              roleType,
-              gradeType,
-              password,
-            } = values;
-            console.log('values ', values);
-
-            tempRows.push(
-              // @ts-ignore
-              createData(
-                firstname,
-                lastname,
-                idNumber,
-                // @ts-ignore
-                roleType.type,
-                // @ts-ignore
-                gradeType.type
-              )
-            );
-
-            setRows(tempRows);
-            // const rows = [
-            //   createData('India', 'IN', '1324171354', '3287263', 'test'),
-            // ];
-          }}
-        >
-          {({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            isSubmitting,
-            setFieldValue,
-          }) => (
-            <form onSubmit={handleSubmit} style={{ flex: 1 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <FTextField
-                    type="firstname"
-                    name="firstname"
-                    label="First Name"
-                    placeholder="Last Name"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FTextField
-                    type="lastname"
-                    name="lastname"
-                    label="Last Name"
-                    placeholder="Last Name"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FTextField
-                    type="idNumber"
-                    name="idNumber"
-                    label="ID Number"
-                    placeholder="ID Number"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <ComboBox
-                    label="User Role"
-                    data={roles}
-                    error={errors.roleType}
-                    handleChange={(_: any, val: any) =>
-                      setFieldValue('roleType', val)
-                    }
-                  />
-                </Grid>
-                {
-                  //@ts-ignore
-                  values.roleType.type === 'STUDENT' && (
-                    <Grid item xs={12}>
-                      <ComboBox
-                        label="Student Grade"
-                        data={grades}
-                        error={errors.gradeType}
-                        handleChange={(_: any, val: any) =>
-                          setFieldValue('gradeType', val)
-                        }
-                      />
-                    </Grid>
-                  )
-                }
-                <Grid item xs={12}>
-                  <FTextField
-                    type="password"
-                    name="password"
-                    label="Login Password"
-                    placeholder="Login Password"
-                  />
-                </Grid>
-                {/* <Grid>
-                  <Camera
-                    idealFacingMode={FACING_MODES.USER}
-                    imageType={IMAGE_TYPES.JPG}
-                    isMaxResolution={true}
-                    isImageMirror={false}
-                    isSilentMode={false}
-                    isDisplayStartCameraError={true}
-                    isFullscreen={false}
-                    sizeFactor={1}
-                    imageCompression={0.75}
-                    idealResolution={{ width: 640, height: 480 }}
-                    onTakePhoto={async (dataUri) => {
-                      const imageTensor = base64ImageToTensor(dataUri);
-                      const embeddings = await mobilenetModel!.infer(
-                        imageTensor,
-                        true
-                      );
-                      knnClassifierModel!.addExample(
-                        embeddings,
-                        'Class A'
-                      );
-                      console.log('data ', knnClassifierModel);
-                    }}
-                  />
-                </Grid> */}
-                <Box
-                  style={{
-                    display: 'flex',
-                    width: '100%',
-                    justifyContent: 'flex-end',
-                    marginTop: 30,
-                  }}
-                >
-                  <Grid item xs={2} marginRight={2}>
-                    <Button
-                      onClick={() => setShowModal(false)}
-                      style={{
-                        background: 'rgb(238, 239, 240)',
-                        color: '#000',
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </Grid>
-                  <Grid item xs={2}>
-                    <Button type="submit">Save</Button>
-                  </Grid>
-                </Box>
-              </Grid>
-            </form>
-          )}
-        </Formik>
-      </MuiModal>
       <ConfirmiationModal
-        handleConfirmation={handleDelete}
-        showModal={confirmDeleteUser}
-        closeModal={() => setConfirmDeleteUser}
-        title="Are you sure you want to delete this user?"
+        handleConfirmation={() => handleAction('deactivate', true)}
+        showModal={activateSchool}
+        closeModal={() => setActivateSchool(false)}
+        title="Are you sure you want to activate school?"
+      />
+       <ConfirmiationModal
+        handleConfirmation={() => handleAction('deactivate', true)}
+        showModal={deactivateSchool}
+        closeModal={() => setDeactivateSchool(false)}
+        title="Are you sure you want to deactivate school?"
       />
     </Box>
   );

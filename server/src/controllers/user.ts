@@ -356,3 +356,59 @@ export const deleteUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      contactNumber,
+      email,
+      idNumber,
+      schoolName,
+      password,
+    } = req.body;
+
+    if (!firstName || !lastName || !contactNumber || !email || !idNumber) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message:
+          'firstName, lastName, contactNumber, email and idNumber missing in params',
+      });
+    }
+
+    const user = await UserModel.findOne({ idNumber });
+
+    if (!user) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    user!.firstName = firstName;
+    user!.lastName = lastName;
+    user!.contactNumber = contactNumber;
+    user!.email = email;
+    user!.idNumber = idNumber;
+    user!.password = password
+      ? await PasswordBcrypt.encrypt(password)
+      : user!.password;
+
+    const updateUser = await UserModel.updateOne(
+      { idNumber },
+      { $set: { ...user } }
+    );
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: updateUser,
+    });
+  } catch (err) {
+    Logger.error('Failed to get all user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};

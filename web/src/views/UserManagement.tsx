@@ -131,7 +131,7 @@ export const UserManagement = () => {
     (async function () {
       try {
         const { schoolId, _id } = context.global.user;
-        const tempRows = [...rows];
+        const tempRows: ITableData[] = [];
 
         const user = new UserService();
         const roles = await user.getRoles();
@@ -247,12 +247,14 @@ export const UserManagement = () => {
 
   return (
     <Box>
-      <Box style={{ width: 150, marginBottom: 20 }}>
-        <Button onClick={() => setShowModal(true)}>
-          <AddCircleOutlineIcon style={{ marginRight: 10 }} />
-          Add User
-        </Button>
-      </Box>
+      {context.global.user.roleName !== 'ADMIN' && (
+        <Box style={{ width: 150, marginBottom: 20 }}>
+          <Button onClick={() => setShowModal(true)}>
+            <AddCircleOutlineIcon style={{ marginRight: 10 }} />
+            Add User
+          </Button>
+        </Box>
+      )}
       <MuiTable rows={rows} columns={columns} />
       <MuiModal open={showModal} setOnClose={setShowModal}>
         <Typography variant="h5">Add User</Typography>
@@ -302,7 +304,7 @@ export const UserManagement = () => {
               };
 
               if (editUser) {
-                await handleEdit(newUser) 
+                await handleEdit(newUser);
               } else {
                 const res = await service.addNewUser({ ...newUser });
 

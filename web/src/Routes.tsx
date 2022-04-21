@@ -19,7 +19,7 @@ const AppRoutes = () => {
     }
 
     navigate('/dashboard');
-  }, [context.global.user]);
+  }, [context.global.user.isLogin]);
 
   return (
     <Routes>

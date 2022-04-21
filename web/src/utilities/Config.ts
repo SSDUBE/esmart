@@ -5,6 +5,9 @@ let domain = Domains[env]
 
 export const Config = {
   services: {
+    school: {
+      all: `${domain}/esmart/schools`,
+    },
     user: {
       signup: `${domain}/esmart/sign-up`,
       signin: `${domain}/esmart/sign-in`,
@@ -13,7 +16,8 @@ export const Config = {
       roles: `${domain}/esmart/roles`,
       grades: `${domain}/esmart/grades`,
       addNewUser: `${domain}/esmart/add-new-user`,
-      delete: `${domain}/esmart/user/:idNumber`
+      delete: `${domain}/esmart/user/:idNumber`,
+      update: `${domain}/esmart/update-user`,
     }
   }
 }

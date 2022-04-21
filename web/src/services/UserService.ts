@@ -119,4 +119,21 @@ export class UserService extends SecureService {
       throw new Error(err);
     }
   };
+
+  public updateUser = async (data: any) => {
+    try {
+      const response = await fetch(Config.services.user.update, {
+        method: 'PUT',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+        body: JSON.stringify({ ...data }),
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
 }
