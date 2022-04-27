@@ -15,14 +15,14 @@ export class Principal extends BaseModel {
   static tableName: string = 'Principal';
   static idColumn: string = 'idNumber';
 
-  // static relationMappings = {
-  //   School: {
-  //     relation: BaseModel.HasOneRelation,
-  //     modelClass: School,
-  //     join: {
-  //       from: 'Principal.schoolID',
-  //       to: 'School.schoolID',
-  //     },
-  //   },
-  // };
+  static relationMappings = {
+    school: {
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: School,
+      join: {
+        from: 'Principal.schoolID',
+        to: 'School.schoolID',
+      },
+    },
+  };
 }

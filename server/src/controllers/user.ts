@@ -25,7 +25,12 @@ export const getUser = async (req: Request, res: Response) => {
     }
 
     const { idNumber } = decodedUser;
-    const user = await Principal.query().findOne({ idNumber });
+    const user = await Principal.query()
+      .select('principal.*', 'school.*')
+      .from('Principal as principal')
+      .leftJoin('School as school', 'school.schoolID', 'principal.schoolID')
+      .where('principal.idNumber', '=', idNumber)
+      .first();
 
     return res.json({
       success: true,
@@ -382,13 +387,13 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
-    // const user = await UserModel.findOne({ idNumber });
     const teacher = await Teacher.query().findOne({ idNumber });
     const student = await Student.query().findOne({ idNumber });
-    // const principal = await Principal.query().findOne({ idNumber });
+    const principal = await Principal.query().findOne({ idNumber });
+
     let user: any = {};
 
-    if (!teacher && !student) {
+    if (!teacher && !student && !principal) {
       return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: 'User not found',
@@ -473,26 +478,25 @@ export const updateUser = async (req: Request, res: Response) => {
           email,
         });
       }
+    } else if (roleType === 'PRINCIPAL') {
+      password = password
+        ? await PasswordBcrypt.encrypt(password)
+        : principal?.password;
+
+      user = await Principal.query()
+        .patch({
+          idNumber,
+          password,
+          firstName,
+          lastName,
+          schoolID,
+          contactNumber,
+          email,
+        })
+        .where({ idNumber })
+        .returning('*')
+        .first();
     }
-
-    // user.roleType = roleType ? roleType : user.roleType;
-    // user.roleId = roleId ? roleId : user.roleId;
-    // user.grade = roleType ? grade : user.grade;
-    // user.roleType = gradeId ? roleType : user.gradeId;
-    // //
-    // user!.firstName = firstName;
-    // user!.lastName = lastName;
-    // user!.contactNumber = contactNumber;
-    // user!.email = email;
-    // user!.idNumber = idNumber;
-    // user!.password = password
-    //   ? await PasswordBcrypt.encrypt(password)
-    //   : user!.password;
-
-    // const updateUser = await UserModel.updateOne(
-    //   { idNumber },
-    //   { $set: { ...user } }
-    // );
 
     return res.status(HTTP_CODES.OK).json({
       success: true,

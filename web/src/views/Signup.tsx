@@ -34,7 +34,7 @@ const ValidationSchema = Yup.object().shape({
   schoolName: Yup.string()
     .matches(
       /^[^\s][A-Za-z0-9\s]*[^\s]$/,
-      'The contact school name cannot include leading and trailing spaces'
+      'School name cannot include leading and trailing spaces'
     )
     .required('School Name is required'),
 });

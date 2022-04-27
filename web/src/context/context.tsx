@@ -18,9 +18,8 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
         idNumber: '',
         roleType: null,
         schoolId: null,
-        // schoolName: '',
+        schoolName: '',
         contactNumber: '',
-        // _id: null,
       },
     },
     user: {
@@ -37,10 +36,10 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
             roleType: data.roleType,
             contactNumber: data.contactNumber,
             schoolId: data.schoolID,
-            // schoolName: data.school ? data.school.name : null,
+            schoolName: data.schoolName ? data.schoolName : null,
           };
           const contextParams = { ...state.global };
-          const updateUser = Object.assign({}, contextParams.user, newUser);
+          const updateUser = Object.assign(contextParams.user, newUser);
 
           updateGlobal({ user: updateUser });
         }

@@ -27,9 +27,20 @@ const ValidationSchema = Yup.object().shape({
     [Yup.ref('password'), null],
     'Passwords do not match'
   ),
-  schoolName: Yup.string().required('School Name is required'),
-  firstName: Yup.string().required('School Name is required'),
-  lastName: Yup.string().required('School Name is required'),
+  schoolName: Yup.string()
+    .required('School Name is required'),
+  firstName: Yup.string()
+    .matches(
+      /^[^\s][A-Za-z0-9\s]*[^\s]$/,
+      'First Name cannot include leading and trailing spaces'
+    )
+    .required('School Name is required'),
+  lastName: Yup.string()
+    .matches(
+      /^[^\s][A-Za-z0-9\s]*[^\s]$/,
+      'Last Name cannot include leading and trailing spaces'
+    )
+    .required('School Name is required'),
   contactNumber: Yup.string().required('School Name is required'),
 });
 
@@ -55,6 +66,7 @@ export const UpdateProfile = () => {
   const context: any = React.useContext(AppContext);
   const { user, global } = context;
 
+  console.log('usersssss ', global.user)
   return (
     <Box className={classes.formContainer}>
       <Box className={classes.subContainer}>
@@ -123,7 +135,7 @@ export const UpdateProfile = () => {
                   <FTextField
                     type="text"
                     name="lastName"
-                    label="lastName"
+                    label="last Name"
                     placeholder="Last Name"
                   />
                 </Grid>
