@@ -13,6 +13,7 @@ import { Helpers } from '../utilities/Helpers';
 import BounceLoader from 'react-spinners/BounceLoader';
 import { theme } from '../Theme';
 import { useNavigate } from 'react-router-dom';
+import { UserService } from '../services/UserService';
 
 const ValidationSchema = Yup.object().shape({
   idNumber: Yup.string()
@@ -57,7 +58,11 @@ const Signin = () => {
 
                 if (res.success) {
                   await Helpers.setInStorage('token', res.accessToken);
-                  context.user.update(res.data);
+
+                  const service = new UserService()
+                  const user = await service.get()
+
+                  context.user.update(user.data);
                   navigate('/dashboard')
                 } else {
                   swal('Oops!!!', res.message, 'error');

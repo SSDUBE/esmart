@@ -95,6 +95,7 @@ export const UpdateProfile = () => {
                 email: values.email,
                 idNumber: values.idNumber,
                 password: values.password,
+                roleType: global.user.roleType
               };
 
               const res = await service.updateUser(newUser);
