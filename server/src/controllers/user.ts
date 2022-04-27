@@ -194,9 +194,9 @@ export const getAllGrades = async (_req: Request, res: Response) => {
 
 export const addNewUser = async (req: Request, res: Response) => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader!.split(' ')[1];
-    const decode: any = jwt.decode(token);
+    // const authHeader = req.headers.authorization;
+    // const token = authHeader!.split(' ')[1];
+    // const decode: any = jwt.decode(token);
     let {
       firstname,
       idNumber,
@@ -360,7 +360,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const {
+    let {
       firstName,
       lastName,
       contactNumber,
@@ -371,6 +371,7 @@ export const updateUser = async (req: Request, res: Response) => {
       roleId,
       grade,
       gradeId,
+      schoolID,
     } = req.body;
 
     if (!firstName || !lastName || !contactNumber || !email || !idNumber) {
@@ -381,37 +382,121 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await UserModel.findOne({ idNumber });
+    // const user = await UserModel.findOne({ idNumber });
+    const teacher = await Teacher.query().findOne({ idNumber });
+    const student = await Student.query().findOne({ idNumber });
+    // const principal = await Principal.query().findOne({ idNumber });
+    let user: any = {};
 
-    if (!user) {
-      return res.status(HTTP_CODES.FORBIDDEN).json({
+    if (!teacher && !student) {
+      return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: 'User not found',
       });
     }
 
-    user.roleType = roleType ? roleType : user.roleType;
-    user.roleId = roleId ? roleId : user.roleId;
-    user.grade = roleType ? grade : user.grade;
-    user.roleType = gradeId ? roleType : user.gradeId;
-    //
-    user!.firstName = firstName;
-    user!.lastName = lastName;
-    user!.contactNumber = contactNumber;
-    user!.email = email;
-    user!.idNumber = idNumber;
-    user!.password = password
-      ? await PasswordBcrypt.encrypt(password)
-      : user!.password;
+    if (roleType == 'STUDENT') {
+      if (teacher) {
+        await Teacher.query().delete().where('idNumber', '=', idNumber);
+      }
 
-    const updateUser = await UserModel.updateOne(
-      { idNumber },
-      { $set: { ...user } }
-    );
+      if (student) {
+        password = password
+          ? await PasswordBcrypt.encrypt(password)
+          : student.password;
+
+        user = await Student.query()
+          .patch({
+            idNumber,
+            password,
+            firstName,
+            lastName,
+            schoolID,
+            contactNumber,
+            email,
+            classID: gradeId,
+          })
+          .where({ idNumber })
+          .returning('*')
+          .first();
+      } else {
+        password = password
+          ? await PasswordBcrypt.encrypt(password)
+          : teacher?.password;
+
+        user = await Student.query().insertAndFetch({
+          idNumber,
+          password,
+          firstName,
+          lastName,
+          schoolID,
+          contactNumber,
+          email,
+          classID: gradeId,
+        });
+      }
+    } else if (roleType === 'TEACHER') {
+      if (student) {
+        await Student.query().delete().where('idNumber', '=', idNumber);
+      }
+
+      if (teacher) {
+        password = password
+          ? await PasswordBcrypt.encrypt(password)
+          : teacher.password;
+
+        user = await Teacher.query()
+          .patch({
+            idNumber,
+            password,
+            firstName,
+            lastName,
+            schoolID,
+            contactNumber,
+            email,
+          })
+          .where({ idNumber })
+          .returning('*')
+          .first();
+      } else {
+        password = password
+          ? await PasswordBcrypt.encrypt(password)
+          : student?.password;
+
+        user = await Teacher.query().insertAndFetch({
+          idNumber,
+          password,
+          firstName,
+          lastName,
+          schoolID,
+          contactNumber,
+          email,
+        });
+      }
+    }
+
+    // user.roleType = roleType ? roleType : user.roleType;
+    // user.roleId = roleId ? roleId : user.roleId;
+    // user.grade = roleType ? grade : user.grade;
+    // user.roleType = gradeId ? roleType : user.gradeId;
+    // //
+    // user!.firstName = firstName;
+    // user!.lastName = lastName;
+    // user!.contactNumber = contactNumber;
+    // user!.email = email;
+    // user!.idNumber = idNumber;
+    // user!.password = password
+    //   ? await PasswordBcrypt.encrypt(password)
+    //   : user!.password;
+
+    // const updateUser = await UserModel.updateOne(
+    //   { idNumber },
+    //   { $set: { ...user } }
+    // );
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
-      data: updateUser,
+      data: user,
     });
   } catch (err) {
     Logger.error('Failed to get all user ' + err);

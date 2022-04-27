@@ -186,23 +186,27 @@ export const UserManagement = () => {
 
   async function handleEdit(newUser: any) {
     try {
+      const { schoolId } = context.global.user;
       const tempRows = [...rows];
       const user = new UserService();
+
       const addUser = {
         active: newUser.active,
         roleType: newUser.roleType,
         roleId: newUser.roleId,
         grade: newUser.grade,
-        gradeId: newUser.classID,
+        gradeId: newUser.gradeId,
         firstName: newUser.firstname,
         lastName: newUser.lastname,
         idNumber: newUser.idNumber,
         contactNumber: newUser.contactNumber,
         email: newUser.email,
         password: newUser.password,
+        schoolID: schoolId,
       };
 
       const res = await user.updateUser(addUser);
+
       const index = tempRows.findIndex(
         // @ts-ignore
         (row) => (row.idNumber = editUser?.idNumber)
@@ -211,6 +215,7 @@ export const UserManagement = () => {
       if (res.success) {
         swal('Hooray!!!', 'User was successfully updated', 'success');
         tempRows[index] = createData(addUser);
+
         setRows(tempRows);
       } else {
         swal('Oops!!!', res.message, 'error');
@@ -246,6 +251,7 @@ export const UserManagement = () => {
   }
 
   function createData(data: ITableData) {
+    const { roleType } = context.global.user;
     const actions = (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Button
@@ -258,18 +264,20 @@ export const UserManagement = () => {
         >
           Edit
         </Button>
-        <IconButton
-          classes={{
-            root: classes.iconButton,
-          }}
-          className={classes.iconButton}
-          onClick={() => {
-            setDeleteUser(data);
-            setConfirmDeleteUser(true);
-          }}
-        >
-          <DeleteIcon className={classes.icon} />
-        </IconButton>
+        {roleType === 'ADMIN' && (
+          <IconButton
+            classes={{
+              root: classes.iconButton,
+            }}
+            className={classes.iconButton}
+            onClick={() => {
+              setDeleteUser(data);
+              setConfirmDeleteUser(true);
+            }}
+          >
+            <DeleteIcon className={classes.icon} />
+          </IconButton>
+        )}
       </Box>
     );
 
@@ -277,7 +285,9 @@ export const UserManagement = () => {
   }
 
   const role = roles.find((role: IRole) => role.type === editUser?.roleType);
-  const grade = grades.find((grade: ISelect) => grade.type === editUser?.classID);
+  const grade = grades.find(
+    (grade: ISelect) => grade.type === editUser?.classID
+  );
 
   return (
     <Box>
@@ -339,7 +349,7 @@ export const UserManagement = () => {
                 // @ts-ignore
                 // grade: gradeType.type,
                 // @ts-ignore
-                gradeId: gradeType.id,
+                gradeId: gradeType.type,
                 // @ts-ignore
                 roleType: roleType.type,
                 // @ts-ignore
