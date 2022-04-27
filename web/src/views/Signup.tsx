@@ -21,12 +21,22 @@ const ValidationSchema = Yup.object().shape({
   email: Yup.string()
     .required('Email is required')
     .email('Please enter a valid email'),
-  password: Yup.string().required('Password is required'),
+  password: Yup.string()
+    .matches(
+      /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8,}$/,
+      'Password must have atleast 1 upper character, one special character, one digit and must be lenght of 8'
+    )
+    .required('Password is required'),
   repeatPassword: Yup.string().oneOf(
     [Yup.ref('password'), null],
     'Passwords do not match'
   ),
-  schoolName: Yup.string().required('School Name is required')
+  schoolName: Yup.string()
+    .matches(
+      /^[^\s][A-Za-z0-9\s]*[^\s]$/,
+      'The contact school name cannot include leading and trailing spaces'
+    )
+    .required('School Name is required'),
 });
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -72,14 +82,18 @@ const Signup = () => {
                 const res = await tempAuthService.signupUser(values);
 
                 if (res.success) {
-                  swal("Hooray!!!", res.message, "success");
+                  swal('Hooray!!!', res.message, 'success');
                   resetForm()
                 } else {
-                  swal("Oops!!!", res.message, "error");
+                  swal('Oops!!!', res.message, 'error');
                 }
                 setSubmitting(false);
               } catch (err) {
-                swal("Oops!!!", 'Something went wrong please try again', "error");
+                swal(
+                  'Oops!!!',
+                  'Something went wrong please try again',
+                  'error'
+                );
                 setSubmitting(false);
               }
             }}

@@ -6,7 +6,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 
 import { API } from './src/globals';
-import { Logger } from './src/utilities/logger';
+import { Logger } from './src/utils/logger';
 import { DB } from './src/globals';
 
 // The name of your app/service

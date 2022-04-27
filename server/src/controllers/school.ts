@@ -1,15 +1,15 @@
-import { Logger } from "../utilities/logger";
+import { Logger } from "../utils/logger";
 import { Request, Response } from 'express';
 import { HTTP_CODES } from "../globals";
-import { SchoolModel } from "../models/school";
+// import { SchoolModel } from "../models/school";
 
 export const GetallSchools = async (_req: Request, res: Response) => {
   try {
-    const schools = await SchoolModel.find()
+    // const schools = await SchoolModel.find()
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
-      data: schools,
+      data: null,
     });
   } catch (err) {
     Logger.error('Failed to get all user ' + err);

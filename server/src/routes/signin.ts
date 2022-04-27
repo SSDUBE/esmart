@@ -1,11 +1,9 @@
 import { Response, Request } from 'express';
 import jwt from 'jsonwebtoken';
-import { UserModel } from '../models/user';
 import { PasswordBcrypt } from '../controllers/passwordBcrypt';
-import { RoleModel } from '../models/role';
-import { Logger } from '../utilities/logger';
+import { Logger } from '../utils/logger';
 import { AUTH, HTTP_CODES } from '../globals';
-import { SchoolModel } from '../models/school';
+import { Principal } from '../models/principal';
 
 const secret = AUTH.SECRET;
 
@@ -18,11 +16,13 @@ export const signin = async (req: Request, res: Response) => {
       'base64'
     ).toString();
     const [idNumber, password] = decodedCredentials.split(':');
-    let user = await UserModel.findOne({ idNumber });
+    let user = await Principal.query().findOne({ idNumber });
 
     if (user) {
       const verify = await PasswordBcrypt.verify(password, user!.password);
-      if (!verify) user = null;
+      if (!verify) {
+        user = undefined;
+      }
     }
 
     if (user) {
@@ -34,31 +34,14 @@ export const signin = async (req: Request, res: Response) => {
       }
 
       const accessToken = jwt.sign(
-        { idNumber: user.idNumber, id: user._id },
+        { idNumber: user.idNumber, email: user.email },
         secret
       );
-
-      const role = await RoleModel.findById(user.roleId);
-      const school = await SchoolModel.findById(user.schoolId);
-
-      if (!role) {
-        throw new Error('No role found for this user');
-      }
-
-      if (role.type !== 'ADMIN') {
-        if (!school) {
-          throw new Error('No school found for this user');
-        }
-      }
 
       return res.json({
         success: true,
         accessToken,
-        data: {
-          user,
-          school,
-          role: role?.type,
-        },
+        data: user,
       });
     } else {
       res

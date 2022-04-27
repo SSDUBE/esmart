@@ -8,9 +8,9 @@ interface INewUser {
   lastname: String;
   password: String;
   roleType: String;
-  roleId: String;
+  // roleId: String;
   schoolId: String;
-  schoolName: String;
+  // schoolName: String;
   grade?: number;
   gradeId?: String;
 }
@@ -32,10 +32,10 @@ export class UserService extends SecureService {
     }
   };
 
-  public getAllUsers = async (userId: string, schoolId?: string) => {
+  public getAllUsers = async (userId: string, schoolId: string) => {
     try {
       const response = await fetch(
-        Config.services.user.all.replace(':userId', userId),
+        Config.services.user.all.replace(':idNumber', userId),
         {
           method: 'POST',
           headers: {

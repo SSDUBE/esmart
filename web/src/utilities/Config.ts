@@ -12,7 +12,7 @@ export const Config = {
       signup: `${domain}/esmart/sign-up`,
       signin: `${domain}/esmart/sign-in`,
       get: `${domain}/esmart/user`,
-      all: `${domain}/esmart/users/:userId`,
+      all: `${domain}/esmart/users/:idNumber`,
       roles: `${domain}/esmart/roles`,
       grades: `${domain}/esmart/grades`,
       addNewUser: `${domain}/esmart/add-new-user`,

@@ -1,8 +1,8 @@
 import { Response, Request } from 'express';
-import { UserModel } from '../models/user';
 import { UserService } from '../controllers/userServices';
 import { HTTP_CODES } from '../globals';
-import { SchoolModel } from '../models/school';
+import { Principal } from '../models/principal';
+import { Logger } from '../utils/logger';
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -13,25 +13,19 @@ export const signup = async (req: Request, res: Response) => {
       'base64'
     ).toString();
     const [idNumber, password] = decodedCredentials.split(':');
-    const user = await UserModel.findOne({ idNumber });
+    const user = await Principal.query().findOne({ idNumber })
 
     if (user) {
       return res
         .status(HTTP_CODES.NOT_ALLOWED)
         .json({ success: false, message: 'User already exists please signin' });
     } else {
-      const { email, roleId, roleType, schoolName } = req.body;
-
-      const school = new SchoolModel({ name: schoolName });
-      const newSchool = await school.save();
+      const { email, schoolName } = req.body;
 
       await UserService.registerUser({
         idNumber,
         email,
         password,
-        roleId,
-        schoolId: newSchool._id,
-        roleType,
         schoolName,
         active: true,
       });
@@ -42,6 +36,7 @@ export const signup = async (req: Request, res: Response) => {
       });
     }
   } catch (err) {
+    Logger.error('signup: something went wrong ' + err)
     return res.status(HTTP_CODES.SERVER_ERROR).json({
       success: false,
       message: 'Something went wrong creating the user',

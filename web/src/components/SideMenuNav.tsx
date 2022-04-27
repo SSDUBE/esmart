@@ -66,7 +66,7 @@ export const SideMenuNav = () => {
       <List>
         {RouteItems.restricted.routes.map(
           (item: IRoute) =>
-            item.roles?.includes(context.global.user.roleName) && (
+            item.roles?.includes(context.global.user.roleType) && (
               <SideMenuNavLink
                 key={item.name}
                 routeName={item.name}

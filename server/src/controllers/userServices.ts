@@ -1,27 +1,34 @@
-import { RoleModel } from '../models/role';
-import { IUser, UserModel } from '../models/user';
-import { Logger } from '../utilities/logger';
+import { Class } from '../models/class';
+import { School } from '../models/school';
+import { SchoolClass } from '../models/schoolClass';
+import { Logger } from '../utils/logger';
 import { PasswordBcrypt } from './passwordBcrypt';
 
 export class UserService {
-  public static async registerUser(newUser: IUser) {
+  public static async registerUser(user: any) {
     try {
-      if (!newUser.roleId) {
-        const role = await RoleModel.findOne({ type: 'PRINCIPAL' });
+      user.password = await PasswordBcrypt.encrypt(user.password);
+      const classes = await Class.query()
+      const createClass: any = [];
 
-        if (!role) throw new Error('User role not found');
+      const res = await School.query().insertGraphAndFetch({
+        schoolName: user.schoolName,
+        principal: {
+          idNumber: user.idNumber,
+          email: user.email,
+          password: user.password,
+        },
+      });
 
-        newUser.roleId = role._id;
-        newUser.roleType = role.type
-      }
+      classes.forEach((item) => {
+        createClass.push(SchoolClass.query().insertGraph({ classID: item.classID, schoolID: res.schoolID }));
+      });
 
-      newUser.password = await PasswordBcrypt.encrypt(newUser.password);
-      const user = new UserModel(newUser);
-      const res = await user.save();
+      await Promise.all(createClass);
 
-      return res;
+      return null;
     } catch (err: any) {
-      Logger.error(err.message);
+      Logger.error('registerUser ' + err.message);
       throw new Error('Oops!!!, Something went wrong');
     }
   }

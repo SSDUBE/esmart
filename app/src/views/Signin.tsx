@@ -137,7 +137,7 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
                 inputType='password'
                 customStyle={{ marginBottom: 30 }}
                 onChangeText={(val) => setFieldValue('password', val)}
-                showCheckmark={errors.password ? true : false}
+                showCheckmark={!errors.password ? true : false}
                 error={errors.password}
               />
             </ScrollView>

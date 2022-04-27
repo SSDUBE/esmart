@@ -28,6 +28,6 @@ export = function (app: any) {
   app.get(`${route}/schools`, authentication, GetallSchools);
   // app.post(`${route}/add-user`, authentication, addUser);
   app.post(`${route}/add-new-user`, authentication, addNewUser);
-  app.post(`${route}/users/:userId`, authentication, getAllUsers);
+  app.post(`${route}/users/:idNumber`, authentication, getAllUsers);
   app.delete(`${route}/user/:idNumber`, authentication, deleteUser);
 };

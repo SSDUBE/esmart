@@ -1,20 +1,59 @@
-import mongoose from 'mongoose';
+import { BaseModel } from './base';
+import { Class } from './class';
+import { Principal } from './principal';
+import { SchoolClass } from './schoolClass';
+import { Student } from './student';
+import { Teacher } from './teacher';
 
-export interface ISchool {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  active: boolean;
+export class School extends BaseModel {
+  public readonly schoolID!: string;
+  public schoolName!: string;
+  public active!: boolean;
+  public principal!: Partial<Principal>;
+  public teacher!: Partial<Teacher>;
+  public school!: Partial<School>;
+  public class!: Partial<Class>;
+
+  static tableName: string = 'School';
+  static idColumn: string = 'schoolID';
+
+  static relationMappings = {
+    principal: {
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: Principal,
+      join: {
+        from: 'School.schoolID',
+        to: 'Principal.schoolID',
+      },
+    },
+    teacher: {
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: Teacher,
+      join: {
+        from: 'School.schoolID',
+        to: 'Teacher.schoolID',
+      },
+    },
+    student: {
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: Student,
+      join: {
+        from: 'School.schoolID',
+        to: 'Student.schoolID',
+      },
+    },
+    schoolClass: {
+      relation: BaseModel.ManyToManyRelation,
+      modelClass: SchoolClass,
+      join: {
+        from: 'School.schoolID',
+        through: {
+          modelClass: Class,
+          from: 'SchoolClass.classID',
+          to: 'Class.classID',
+        },
+        to: 'SchoolClass.schoolID',
+      },
+    },
+  };
 }
-
-const SchoolSchema = new mongoose.Schema<ISchool>(
-  {
-    name: { type: String, required: true },
-    active: { type: Boolean, required: true, default: true },
-  },
-  {
-    timestamps: true,
-    collection: 'Schools',
-  }
-);
-
-export const SchoolModel = mongoose.model<ISchool>('School', SchoolSchema);

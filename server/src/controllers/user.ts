@@ -1,14 +1,17 @@
-import moongose from 'mongoose';
-import { Request, Response } from 'express';
+import { query, Request, Response } from 'express';
 import { HTTP_CODES } from '../globals';
 import { RoleModel } from '../models/role';
-import { SchoolModel } from '../models/school';
+// import { SchoolModel } from '../models/school';
 import { UserModel } from '../models/user';
-import { Logger } from '../utilities/logger';
-import { decodeUserToken } from '../utilities/util';
+import { Logger } from '../utils/logger';
+import { decodeUserToken } from '../utils/util';
 import jwt from 'jsonwebtoken';
 import { PasswordBcrypt } from './passwordBcrypt';
-import { GradeModel } from '../models/grade';
+import { Principal } from '../models/principal';
+import { Class } from '../models/class';
+import { Teacher } from '../models/teacher';
+import { Student } from '../models/student';
+import { School } from '../models/school';
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -21,19 +24,12 @@ export const getUser = async (req: Request, res: Response) => {
       });
     }
 
-    const { id } = decodedUser;
-
-    const user = await UserModel.findById(id);
-    const role = await RoleModel.findById(user?.roleId);
-    const school = await SchoolModel.findById(user?.schoolId);
+    const { idNumber } = decodedUser;
+    const user = await Principal.query().findOne({ idNumber });
 
     return res.json({
       success: true,
-      data: {
-        user,
-        school,
-        role: role?.type,
-      },
+      data: user,
     });
   } catch (err: any) {
     Logger.error('Failed to get user ', err);
@@ -147,32 +143,28 @@ export const getRoles = async (_req: Request, res: Response) => {
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const { idNumber } = req.params;
     const { schoolId } = req.body;
-    let users = [];
 
-    if (!userId) {
+    if (!idNumber || !schoolId) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,
-        message: 'userId missing in params',
+        message: 'idNumber and schoolId missing in params',
       });
     }
 
-    if (!schoolId) {
-      users = await UserModel.find({
-        _id: { $ne: userId },
-        schoolId: { $ne: null },
-      });
-    } else {
-      users = await UserModel.find({
-        schoolId: schoolId,
-        _id: { $ne: userId },
-      });
-    }
+    const users = await Promise.all([
+      Teacher.query().whereNot('idNumber', '=', idNumber),
+      Student.query()
+        .select('student.*', 'class.*')
+        .from('Student as student')
+        .leftJoin('Class as class', 'class.classID', 'student.classID')
+        .whereNot('idNumber', '=', idNumber),
+    ]);
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
-      data: users,
+      data: [...users[0], ...users[1]],
     });
   } catch (err) {
     Logger.error('Failed to get all user ' + err);
@@ -185,7 +177,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
 
 export const getAllGrades = async (_req: Request, res: Response) => {
   try {
-    const grades = await GradeModel.find({});
+    const grades = await Class.query();
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
@@ -211,97 +203,106 @@ export const addNewUser = async (req: Request, res: Response) => {
       lastname,
       password,
       roleType,
-      roleId,
       schoolId,
-      schoolName,
-      grade,
+      // grade,
       gradeId,
     } = req.body;
 
-    if (roleType === 'STUDENT') {
-      if (!grade || !gradeId) {
-        return res.status(HTTP_CODES.FORBIDDEN).json({
-          success: false,
-          message: 'grade, and gradeId are required params',
-        });
-      }
-    }
+    // if (roleType === 'STUDENT') {
+    //   if (!grade || !gradeId) {
+    //     return res.status(HTTP_CODES.FORBIDDEN).json({
+    //       success: false,
+    //       message: 'grade, and gradeId are required params',
+    //     });
+    //   }
+    // }
 
     if (
       !firstname ||
       !lastname ||
       !idNumber ||
-      !roleId ||
       !password ||
       !roleType ||
-      !schoolId ||
-      !schoolName
+      !schoolId
+      // !schoolName
     ) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,
         message:
-          'firstname, lastname, idNumber, roleId, roleType, gradeType, schoolId, schoolName and password are required params',
+          'firstname, lastname, idNumber, roleType, gradeType, schoolId, schoolName and password are required params',
       });
     }
 
-    try {
-      password = await PasswordBcrypt.encrypt(password);
-      const findUser = await UserModel.findOne({ idNumber: idNumber });
-      const currUser = await UserModel.findOne({ idNumber: decode!.idNumber });
+    if (roleType === 'STUDENT') {
+      if (!gradeId) {
+        return res.status(HTTP_CODES.FORBIDDEN).json({
+          success: false,
+          message: 'gradeId is required params',
+        });
+      }
+    }
 
-      if (findUser) {
-        if (
-          findUser?.schoolId?.toHexString() ===
-          currUser?.schoolId?.toHexString()
-        ) {
+    try {
+      let createUser: Teacher | Student | undefined = undefined;
+
+      password = await PasswordBcrypt.encrypt(password);
+
+      if (roleType === 'TEACHER') {
+        const teacher = await Teacher.query().findOne({ idNumber });
+
+        if (teacher?.schoolID === schoolId) {
           return res.status(HTTP_CODES.NOT_ALLOWED).json({
             success: false,
-            message: 'User already exists',
+            message: 'Teacher already exists',
           });
         }
 
-        const newUser = Object.assign(findUser, {
-          firstName: firstname,
-          lastName: lastname,
-          idNumber,
-          schoolName,
-          schoolId,
-          roleType,
-          roleId,
-          grade,
-          gradeId,
-          updatedBy: currUser?._id,
-          password,
-        });
+        if (teacher) {
+          createUser = await Teacher.query()
+            .patch({ schoolID: schoolId })
+            .where({ idNumber })
+            .returning('*')
+            .first();
+        } else {
+          createUser = await Teacher.query().insertAndFetch({
+            idNumber,
+            password,
+            firstName: firstname,
+            lastName: lastname,
+            schoolID: schoolId,
+          });
+        }
+      } else if (roleType === 'STUDENT') {
+        const student = await Student.query().findOne({ idNumber });
 
-        await UserModel.findByIdAndUpdate(findUser?._id, {
-          $set: { ...newUser },
-        });
+        if (student?.schoolID === schoolId) {
+          return res.status(HTTP_CODES.NOT_ALLOWED).json({
+            success: false,
+            message: 'Student already exists',
+          });
+        }
 
-        return res.status(HTTP_CODES.OK).json({
-          success: true,
-          data: newUser,
-        });
+        if (student) {
+          createUser = await Student.query()
+            .patch({ schoolID: schoolId, classID: gradeId })
+            .where({ idNumber })
+            .returning('*')
+            .first();
+        } else {
+          createUser = await Student.query().insertAndFetch({
+            idNumber,
+            password,
+            firstName: firstname,
+            lastName: lastname,
+            schoolID: schoolId,
+            classID: gradeId,
+          });
+        }
       }
-
-      const newUser = new UserModel({
-        firstName: firstname,
-        lastName: lastname,
-        idNumber,
-        roleType,
-        roleId,
-        schoolId,
-        schoolName,
-        password,
-        grade,
-        gradeId,
-      });
-
-      const user = await newUser.save();
 
       return res.status(HTTP_CODES.OK).json({
         success: true,
-        data: user,
+        data: createUser,
       });
     } catch (err) {
       Logger.error('Failed to add user ' + err);

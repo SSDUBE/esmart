@@ -39,17 +39,13 @@ const ValidationSchema = (validatePass: any, isEditing: boolean) =>
   });
 
 interface IRole {
-  id: string;
-  _id: string;
+  label: string;
   type: string;
-  description: string;
 }
 
-interface IGrades {
-  id: string;
-  _id: string;
-  grade: Number;
-  wordLength: Number;
+interface ISelect {
+  type: string;
+  label: Number;
 }
 
 interface ITableData {
@@ -60,7 +56,7 @@ interface ITableData {
   roleType: string;
   grade: string;
   roleId?: string;
-  gradeId?: string;
+  classID?: string;
   contactNumber?: string;
   email?: string;
 }
@@ -145,8 +141,8 @@ export const UserManagement = () => {
   const [showModal, setShowModal] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
   const [confirmDeleteUser, setConfirmDeleteUser] = React.useState(false);
-  const [roles, setRoles] = React.useState([]);
-  const [grades, setGrades] = React.useState([]);
+  const [roles, setRoles] = React.useState<any>([]);
+  const [grades, setGrades] = React.useState<ISelect[]>([]);
   const [rows, setRows] = React.useState<ITableData[]>([]);
   const [deleteUser, setDeleteUser] = React.useState<ITableData | null>(null);
   const [editUser, setEditUser] = React.useState<ITableData | null>(null);
@@ -155,29 +151,28 @@ export const UserManagement = () => {
   React.useEffect(() => {
     (async function () {
       try {
-        const { schoolId, _id } = context.global.user;
+        const { schoolId, idNumber } = context.global.user;
         const tempRows: ITableData[] = [];
-
         const user = new UserService();
-        const roles = await user.getRoles();
+
+        const roles = ['TEACHER', 'STUDENT'];
+
         const grades = await user.getGrades();
-        const users = await user.getAllUsers(_id, schoolId);
+        const users = await user.getAllUsers(idNumber, schoolId);
 
         users.data.forEach((user: any) => {
           user.active = user.active ? 'True' : 'False';
           tempRows.push(createData({ ...user }));
         });
 
-        const fmtRoles = roles.data.map((role: IRole) => ({
-          label: role.type,
-          type: role.type,
-          id: role._id,
+        const fmtRoles = roles.map((role) => ({
+          label: role,
+          type: role,
         }));
 
-        const fmtGrades = grades.data.map((g: IGrades) => ({
-          label: g.grade,
+        const fmtGrades = grades.data.map((g: any) => ({
+          label: g.classID,
           type: g.grade,
-          id: g._id,
         }));
 
         setRows(tempRows);
@@ -198,7 +193,7 @@ export const UserManagement = () => {
         roleType: newUser.roleType,
         roleId: newUser.roleId,
         grade: newUser.grade,
-        gradeId: newUser.gradeId,
+        gradeId: newUser.classID,
         firstName: newUser.firstname,
         lastName: newUser.lastname,
         idNumber: newUser.idNumber,
@@ -281,8 +276,8 @@ export const UserManagement = () => {
     return { ...data, actions };
   }
 
-  const role = roles.find((role: IRole) => role.id === editUser?.roleId);
-  const grade = grades.find((grade: IGrades) => grade.id === editUser?.gradeId);
+  const role = roles.find((role: IRole) => role.type === editUser?.roleType);
+  const grade = grades.find((grade: ISelect) => grade.type === editUser?.classID);
 
   return (
     <Box>
@@ -340,15 +335,15 @@ export const UserManagement = () => {
                 lastname,
                 password,
                 schoolId,
-                schoolName,
+                // schoolName,
                 // @ts-ignore
-                grade: gradeType.type,
+                // grade: gradeType.type,
                 // @ts-ignore
                 gradeId: gradeType.id,
                 // @ts-ignore
                 roleType: roleType.type,
                 // @ts-ignore
-                roleId: roleType.id,
+                // roleId: roleType.id,
               };
 
               if (editUser) {
@@ -440,6 +435,7 @@ export const UserManagement = () => {
                     label="User Role"
                     data={roles}
                     defaultValue={values.roleType}
+                    // @ts-ignore
                     error={errors.roleType}
                     handleChange={(_: any, val: any) =>
                       setFieldValue('roleType', val)
