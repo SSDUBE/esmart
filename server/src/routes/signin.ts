@@ -4,6 +4,7 @@ import { PasswordBcrypt } from '../controllers/passwordBcrypt';
 import { Logger } from '../utils/logger';
 import { AUTH, HTTP_CODES } from '../globals';
 import { Principal } from '../models/principal';
+import { Teacher } from '../models/teacher';
 
 const secret = AUTH.SECRET;
 
@@ -16,17 +17,36 @@ export const signin = async (req: Request, res: Response) => {
       'base64'
     ).toString();
     const [idNumber, password] = decodedCredentials.split(':');
-    let user = await Principal.query().findOne({ idNumber });
+    let users = await Promise.all([
+      Principal.query().findOne({ idNumber }),
+      await Teacher.query().findOne({ idNumber }),
+    ]);
+    let index = 0
+    // let [principal, teacher] = user;
 
-    if (user) {
-      const verify = await PasswordBcrypt.verify(password, user!.password);
-      if (!verify) {
-        user = undefined;
+    for (let i = 0; i < users.length; i++) {
+      if (users[i]) {
+        const verify = await PasswordBcrypt.verify(
+          password,
+          users[i]!.password
+        );
+        if (!verify) {
+          users[i] = undefined;
+        }
+        index = i
+        break;
       }
     }
 
-    if (user) {
-      if (!user.active) {
+    if (!users[index]) {
+      return res.status(HTTP_CODES.NOT_FOUND).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+  
+    if (users[index]) {
+      if (!users[index]?.active) {
         return res.status(HTTP_CODES.FORBIDDEN).json({
           success: false,
           message: 'Account is deactivated please speak to your admin',
@@ -34,14 +54,14 @@ export const signin = async (req: Request, res: Response) => {
       }
 
       const accessToken = jwt.sign(
-        { idNumber: user.idNumber, email: user.email },
+        { idNumber: users[index]?.idNumber, email: users[index]?.email },
         secret
       );
 
       return res.json({
         success: true,
         accessToken,
-        data: user,
+        data: users[index],
       });
     } else {
       res
