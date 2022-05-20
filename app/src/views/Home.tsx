@@ -1,12 +1,12 @@
 import React from 'react'
-import { SafeAreaView, Text } from 'react-native'
+import { SafeAreaView, Text, TouchableOpacity } from 'react-native'
 // import { StatusBar } from 'expo-status-bar';
 import * as Location from 'expo-location';
 // import { Maps } from '../components/Maps';
 // import { Biomatric } from '../components/Biomatric';
 // import { FaceRecognation } from '../components/FaceRecognation';
 
-export const Home = () => {
+export const Home = ({navigation}: any) => {
   const [location, setLocation] = React.useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [mapRegion, setmapRegion] = React.useState({
@@ -42,6 +42,9 @@ export const Home = () => {
       {/* <Maps region={mapRegion} /> */}
       {/* <Biomatric /> */}
       <Text>hello</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Game')} style={{marginLeft: 20, marginTop: 50}}>
+        <Text>Play Game</Text>
+      </TouchableOpacity>
       {/* <FaceRecognation /> */}
     </SafeAreaView>
   );

@@ -5,6 +5,7 @@ import { Logger } from '../utils/logger';
 import { AUTH, HTTP_CODES } from '../globals';
 import { Principal } from '../models/principal';
 import { Teacher } from '../models/teacher';
+import { Student } from '../models/student';
 
 const secret = AUTH.SECRET;
 
@@ -19,7 +20,8 @@ export const signin = async (req: Request, res: Response) => {
     const [idNumber, password] = decodedCredentials.split(':');
     let users = await Promise.all([
       Principal.query().findOne({ idNumber }),
-      await Teacher.query().findOne({ idNumber }),
+      Student.query().findOne({ idNumber }),
+      Teacher.query().findOne({ idNumber }),
     ]);
     let index = 0
     // let [principal, teacher] = user;

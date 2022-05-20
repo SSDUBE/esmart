@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import {
   KeyboardAvoidingView,
   StyleSheet,
@@ -20,6 +20,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import * as Keychain from 'react-native-keychain';
 import keypair from 'keypair';
 import { AuthService } from '../services/AuthService';
+import { AppContext } from '../context/context';
 
 interface ISignin {
   login: any;
@@ -37,6 +38,8 @@ const ValidationSchema = Yup.object().shape({
 });
 
 export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
+  const context: any = React.useContext(AppContext);
+
   const [formValid, setFormValid] = React.useState(true);
 
   function handleCloseNotification() {
@@ -59,9 +62,11 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
             const auth = new AuthService();
             const res = await auth.signinUser(values);
 
+            console.log('res::: ', res)
             if (res.success) {
               // context.user.update(res.data);
               // TODO to dispatch actions to context
+              context.user.update(res.data)
               navigation.navigate('HomeStack');
             } else {
               Alert.alert('Oops!!!', res.message);
