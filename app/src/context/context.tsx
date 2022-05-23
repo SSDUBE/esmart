@@ -20,7 +20,7 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
         schoolId: null,
         schoolName: '',
         contactNumber: '',
-        classId: null,
+        classId: '',
       },
     },
     user: {

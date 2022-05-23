@@ -1,3 +1,4 @@
+// import { playGame } from '../controllers/game';
 import { GetallSchools } from '../controllers/school';
 import {
   getRoles,
@@ -30,4 +31,5 @@ export = function (app: any) {
   app.post(`${route}/add-new-user`, authentication, addNewUser);
   app.post(`${route}/users/:idNumber`, authentication, getAllUsers);
   app.delete(`${route}/user/:idNumber`, authentication, deleteUser);
+  // app.post(`${route}/play-game/`, authentication, playGame);
 };

@@ -17,14 +17,14 @@ const port = API.PORT;
 
 const app = express();
 
-const server = http.createServer(app)
+const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
     origin: `http://localhost:${port}`,
-    methods: ['GET', 'POST']
-  }
-})
+    methods: ['GET', 'POST'],
+  },
+});
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -71,12 +71,19 @@ require('./src/routes')(app);
 
 app.get('/', (req, res) => res.send('Hello World'));
 
-io.on('connection', (socket) => {
-  console.log('user connected ', socket.id)
+io.on('connection', async(socket) => {
+  console.log('user connected ', socket.id);
+
+  socket.on('chat message', (msg) => {
+    console.log('msg ', msg);
+    io.emit('chat message', msg);
+  });
 
   io.on('disconnect', () => {
-    console.log('user disconnected ', socket.id)
-  })
-})
+    console.log('user disconnected ', socket.id);
+  });
+});
 
-server.listen(port, () => Logger.log(`${serviceName} listening on port ${port}!`));
+server.listen(port, () =>
+  Logger.log(`${serviceName} listening on port ${port}!`)
+);
