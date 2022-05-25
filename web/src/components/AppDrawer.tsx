@@ -94,11 +94,11 @@ export const AppDrawer: FunctionComponent<IProps> = ({ children }) => {
         >
           {!open ? (
             <IconButton onClick={handleDrawerOpen}>
-              <MenuIcon />
+              <MenuIcon style={{ color: theme.palette.common.white }} />
             </IconButton>
           ) : (
             <IconButton onClick={handleDrawerClose} edge="start">
-              <ChevronLeftIcon />
+              <ChevronLeftIcon style={{ color: theme.palette.common.white }} />
             </IconButton>
           )}
         </DrawerHeader>

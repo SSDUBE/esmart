@@ -1,50 +1,13 @@
 import React from 'react';
-import { Button, IconButton, Theme } from '@mui/material';
+import { Button, IconButton, Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { MuiTable } from '../components/MuiTable';
-// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-// import { MuiModal } from '../components/MuiModal';
-// import { FTextField } from '../components/FTextField';
-// import { Formik } from 'formik';
-// import * as Yup from 'yup';
-// import { ComboBox } from '../components/MuiComboBox';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { makeStyles } from '@mui/styles';
 import { ConfirmiationModal } from '../components/ConfirmitionModal';
-// import { UserService } from '../services/UserService';
-// import { AppContext } from '../context/context';
 import swal from 'sweetalert';
 import { SchoolService } from '../services/SchoolService';
 import dayjs from 'dayjs';
-
-// const ValidationSchema = (validatePass: any) =>
-//   Yup.object().shape({
-//     firstname: Yup.string().required('Name is required'),
-//     lastname: Yup.string().required('Last name is required'),
-//     idNumber: Yup.string().required('Name is required'),
-//     password: !validatePass
-//       ? Yup.string().required('Password is required')
-//       : Yup.string().optional(),
-//     roleType: Yup.object().required('Please select access type'),
-//     gradeType: Yup.object().when('roleType', {
-//       is: (roleType: any) => roleType && roleType.type === 'STUDENT',
-//       then: Yup.object().required('Grade is a required field'),
-//     }),
-//   });
-
-// interface IRole {
-//   id: string;
-//   _id: string;
-//   type: string;
-//   description: string;
-// }
-
-// interface IGrades {
-//   id: string;
-//   _id: string;
-//   grade: Number;
-//   wordLength: Number;
-// }
 
 interface ITableData {
   schoolName: string;
@@ -112,15 +75,9 @@ const columns: readonly IColumn[] = [
 
 export const SchoolManagement = () => {
   const classes = useStyles();
-  // const [showModal, setShowModal] = React.useState(false);
-  // const [confirmDeleteUser, setConfirmDeleteUser] = React.useState(false);
-  // const [roles, setRoles] = React.useState([]);
-  // const [grades, setGrades] = React.useState([]);
   const [rows, setRows] = React.useState<ITableData[]>([]);
   const [activateSchool, setActivateSchool] = React.useState(false);
   const [deactivateSchool, setDeactivateSchool] = React.useState(false);
-  // const [editUser, setEditUser] = React.useState<ITableData | null>(null);
-  // const context: any = React.useContext(AppContext);
 
   React.useEffect(() => {
     (async function () {
@@ -133,8 +90,8 @@ export const SchoolManagement = () => {
         schools.data.forEach((school: any) => {
           tempRows.push(
             createData({
-              schoolName: school.name,
-              active: school.active ? "True" : "False",
+              schoolName: school.schoolName,
+              active: school.active ? 'True' : 'False',
               createdAt: dayjs(school.createdAt).format('YYYY/MM/DD mm:ss'),
               updateAt: dayjs(school.updatedAt).format('YYYY/MM/DD mm:ss'),
             })
@@ -148,27 +105,6 @@ export const SchoolManagement = () => {
     })();
   }, []);
 
-  // async function handleEdit(newUser: any) {
-  //   try {
-  //     // if (deleteUser) {
-  //       // const user = new UserService();
-  //       // const tempRows = [...rows];
-  //       // const index = tempRows.findIndex(
-  //       //   (row) => (row.idNumber = editUser?.idNumber)
-  //       // );
-  //       // if (res.success){
-  //       //   swal('Hooray!!!', 'User was successfully deleted', 'success');
-  //       //   tempRows.splice(index, 1);
-  //       //   setRows(tempRows);
-  //       // }  else {
-  //       //   swal('Oops!!!', res.message, 'error');
-  //       // }
-  //     // }
-  //   } catch (err) {
-  //     swal('Oops!!!', 'Something went wrong please try again', 'error');
-  //   }
-  // }
-
   async function handleAction(action: string, actionType: boolean) {
     try {
       // if (deleteUser) {
@@ -178,9 +114,7 @@ export const SchoolManagement = () => {
       //     (row) => (row.idNumber = deleteUser?.idNumber)
       //   );
       //   const res = await user.deleteUser(deleteUser?.idNumber);
-
       //   setConfirmDeleteUser(false);
-
       //   if (res.success) {
       //     swal('Hooray!!!', 'User was successfully deleted', 'success');
       //     tempRows.splice(index, 1);
@@ -220,6 +154,9 @@ export const SchoolManagement = () => {
 
   return (
     <Box>
+      <Typography variant="h4" style={{ marginBottom: 14 }}>
+        Schools
+      </Typography>
       <MuiTable rows={rows} columns={columns} />
       <ConfirmiationModal
         handleConfirmation={() => handleAction('deactivate', true)}
@@ -227,7 +164,7 @@ export const SchoolManagement = () => {
         closeModal={() => setActivateSchool(false)}
         title="Are you sure you want to activate school?"
       />
-       <ConfirmiationModal
+      <ConfirmiationModal
         handleConfirmation={() => handleAction('deactivate', true)}
         showModal={deactivateSchool}
         closeModal={() => setDeactivateSchool(false)}

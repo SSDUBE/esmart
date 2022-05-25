@@ -15,13 +15,13 @@ interface IProps {
 
 const useStyles = makeStyles((theme: Theme) => ({
   yesButton: {
-    width: theme.spacing(2),
-    height: theme.spacing(3),
+    width: theme.spacing(1),
+    height: theme.spacing(2),
     fontSize: 11,
   },
   cancelButton: {
-    width: theme.spacing(2),
-    height: theme.spacing(3),
+    width: theme.spacing(1),
+    height: theme.spacing(1),
     fontSize: 11,
     background: 'rgb(207, 213, 227)',
     marginLeft: theme.spacing(1),
@@ -65,8 +65,29 @@ export const ConfirmiationModal: FunctionComponent<IProps> = ({
           justifyContent="flex-end"
           marginTop={theme.spacing(2.5)}
         >
-          <Button className={classes.yesButton} onClick={handleConfirmation}>Yes</Button>
-          <Button className={classes.cancelButton} onClick={closeModal}>Cancel</Button>
+          <Button
+            style={{
+              width: theme.spacing(3),
+              height: theme.spacing(3),
+              fontSize: 11,
+            }}
+            onClick={handleConfirmation}
+          >
+            Yes
+          </Button>
+          <Button
+            style={{
+              width: theme.spacing(3),
+              height: theme.spacing(3),
+              fontSize: 11,
+              background: 'rgb(207, 213, 227)',
+              marginLeft: theme.spacing(1),
+              color: '#000',
+            }}
+            onClick={closeModal}
+          >
+            Cancel
+          </Button>
         </Box>
       </Box>
     </MuiModal>

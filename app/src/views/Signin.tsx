@@ -6,7 +6,7 @@ import {
   View,
   Text,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import { InputField } from '../components/InputField';
 import { Loader } from '../components/Loader';
@@ -33,7 +33,9 @@ const ValidationSchema = Yup.object().shape({
     .matches(
       /(((\d{2}((0[13578]|1[02])(0[1-9]|[12]\d|3[01])|(0[13456789]|1[012])(0[1-9]|[12]\d|30)|02(0[1-9]|1\d|2[0-8])))|([02468][048]|[13579][26])0229))(( |-)(\d{4})( |-)(\d{3})|(\d{7}))/,
       'Please enter a valid ID number'
-    ),
+    )
+    .min(13, 'ID number must contain a minimum of 13 digits')
+    .max(13, 'ID number must contain a minimum of 13 digits'),
   password: Yup.string().required('Password is required'),
 });
 
@@ -55,34 +57,34 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
 
         if (isSaveBiomatric) {
           let result = await LocalAuthentication.authenticateAsync({
-            promptMessage: 'Scan your finger.'
+            promptMessage: 'Scan your finger.',
           });
           if (result) {
             const pair = keypair();
             const auth = new AuthService();
             const res = await auth.signinUser(values);
 
-            console.log('res::: ', res)
+            console.log('res::: ', res);
             if (res.success) {
               // context.user.update(res.data);
               // TODO to dispatch actions to context
-              context.user.update(res.data)
+              context.user.update(res.data);
               navigation.navigate('HomeStack');
             } else {
               Alert.alert('Oops!!!', res.message);
             }
           } else {
-            Alert.alert('Failed to validate finger print')
+            Alert.alert('Failed to validate finger print');
           }
         } else {
-          Alert.alert('Ooops!!', 'Please add finger print to your device')
+          Alert.alert('Ooops!!', 'Please add finger print to your device');
         }
         //do something fingerprint specific
       } else {
-        Alert.alert('Oops!!!', 'Device does not have biomatric')
+        Alert.alert('Oops!!!', 'Device does not have biomatric');
       }
     })();
-  };
+  }
 
   const showNotification = !formValid;
   const background = formValid ? colors.green01 : colors.darkOrange;
@@ -99,7 +101,7 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
         onSubmit={async (values, { setSubmitting }) => {
           try {
             setSubmitting(true);
-            await biomatric(values, setSubmitting)
+            await biomatric(values, setSubmitting);
           } catch (err) {
             console.log('err ', err);
             Alert.alert('Oops!!!', 'Something went wrong please try again');
@@ -115,7 +117,7 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
           handleBlur,
           handleSubmit,
           isSubmitting,
-          setFieldValue
+          setFieldValue,
         }) => (
           <View style={styles.scrollViewWrapper}>
             <ScrollView style={styles.scrollView}>
@@ -146,9 +148,7 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
                 error={errors.password}
               />
             </ScrollView>
-            <NextArrowButton
-              handleNextButton={handleSubmit}
-            />
+            <NextArrowButton handleNextButton={handleSubmit} />
             <Loader modalVisible={isSubmitting} animationType='fade' />
           </View>
         )}

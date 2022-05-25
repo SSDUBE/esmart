@@ -17,9 +17,26 @@ import swal from 'sweetalert';
 
 const ValidationSchema = (validatePass: any, isEditing: boolean) =>
   Yup.object().shape({
-    firstname: Yup.string().required('Name is required'),
-    lastname: Yup.string().required('Last name is required'),
-    idNumber: Yup.string().required('Name is required'),
+    firstname: Yup.string()
+      .required('First Name is required')
+      .matches(
+        /^[^\s][A-Za-z0-9\s]*[^\s]$/,
+        'First Name cannot include leading and trailing spaces'
+      ),
+    lastname: Yup.string()
+      .required('Last Name is required')
+      .matches(
+        /^[^\s][A-Za-z0-9\s]*[^\s]$/,
+        'Last Name cannot include leading and trailing spaces'
+      ),
+    idNumber: Yup.string()
+      .required('ID Number is a required field')
+      .matches(
+        /(((\d{2}((0[13578]|1[02])(0[1-9]|[12]\d|3[01])|(0[13456789]|1[012])(0[1-9]|[12]\d|30)|02(0[1-9]|1\d|2[0-8])))|([02468][048]|[13579][26])0229))(( |-)(\d{4})( |-)(\d{3})|(\d{7}))/,
+        'Please enter a valid ID number'
+      )
+      .min(13, 'ID number must contain a minimum of 13 digits')
+      .max(13, 'ID number must contain a minimum of 13 digits'),
     contactNumber: isEditing
       ? Yup.string().required('Email is required')
       : Yup.string().optional(),
@@ -29,7 +46,10 @@ const ValidationSchema = (validatePass: any, isEditing: boolean) =>
           .email('Please enter a valid email')
       : Yup.string().optional(),
     password: !validatePass
-      ? Yup.string().required('Password is required')
+      ? Yup.string().matches(
+          /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8,}$/,
+          'Password must have atleast 1 upper character, one special character, one digit and must be lenght of 8'
+        )
       : Yup.string().optional(),
     roleType: Yup.object().required('Please select access type'),
     gradeType: Yup.object().when('roleType', {
@@ -202,7 +222,7 @@ export const UserManagement = () => {
         contactNumber: newUser.contactNumber,
         email: newUser.email,
         password: newUser.password,
-        schoolID: schoolId,
+        schoolID: schoolId || newUser.schoolID,
       };
 
       const res = await user.updateUser(addUser);
@@ -291,7 +311,8 @@ export const UserManagement = () => {
 
   return (
     <Box>
-      {context.global.user.roleName !== 'ADMIN' && (
+      <Typography variant='h4'  style={{ marginBottom: 10 }}>Users</Typography>
+      {context.global.user.roleType !== 'ADMIN' && (
         <Box style={{ width: 150, marginBottom: 20 }}>
           <Button
             onClick={() => {
@@ -476,32 +497,6 @@ export const UserManagement = () => {
                     placeholder="Login Password"
                   />
                 </Grid>
-                {/* <Grid>
-                  <Camera
-                    idealFacingMode={FACING_MODES.USER}
-                    imageType={IMAGE_TYPES.JPG}
-                    isMaxResolution={true}
-                    isImageMirror={false}
-                    isSilentMode={false}
-                    isDisplayStartCameraError={true}
-                    isFullscreen={false}
-                    sizeFactor={1}
-                    imageCompression={0.75}
-                    idealResolution={{ width: 640, height: 480 }}
-                    onTakePhoto={async (dataUri) => {
-                      const imageTensor = base64ImageToTensor(dataUri);
-                      const embeddings = await mobilenetModel!.infer(
-                        imageTensor,
-                        true
-                      );
-                      knnClassifierModel!.addExample(
-                        embeddings,
-                        'Class A'
-                      );
-                      console.log('data ', knnClassifierModel);
-                    }}
-                  />
-                </Grid> */}
                 <Box
                   style={{
                     display: 'flex',

@@ -11,6 +11,7 @@ export class Principal extends BaseModel {
   public schoolID!: string;
   public password!: string;
   public active!: string;
+  public school!: Partial<School>;
 
   static tableName: string = 'Principal';
   static idColumn: string = 'idNumber';
@@ -20,9 +21,17 @@ export class Principal extends BaseModel {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: School,
       join: {
-        from: 'Principal.schoolID',
-        to: 'School.schoolID',
+        from: 'School.schoolID',
+        to: 'Principal.schoolID',
       },
     },
+    // school: {
+    //   relation: BaseModel.HasOneRelation,
+    //   modelClass: School,
+    //   join: {
+    //     from: 'Principal.schoolID',
+    //     to: 'School.schoolID',
+    //   },
+    // },
   };
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Theme, Button, Link } from '@mui/material';
+import { Box, Theme, Button, Link, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { makeStyles } from '@mui/styles';
 import { Formik } from 'formik';
@@ -18,7 +18,9 @@ const ValidationSchema = Yup.object().shape({
     .matches(
       /(((\d{2}((0[13578]|1[02])(0[1-9]|[12]\d|3[01])|(0[13456789]|1[012])(0[1-9]|[12]\d|30)|02(0[1-9]|1\d|2[0-8])))|([02468][048]|[13579][26])0229))(( |-)(\d{4})( |-)(\d{3})|(\d{7}))/,
       'Please enter a valid ID number'
-    ),
+    )
+    .min(13, 'ID number must contain a minimum of 13 digits')
+    .max(13, 'ID number must contain a minimum of 13 digits'),
   email: Yup.string()
     .required('Email is required')
     .email('Please enter a valid email'),
@@ -27,8 +29,12 @@ const ValidationSchema = Yup.object().shape({
     [Yup.ref('password'), null],
     'Passwords do not match'
   ),
-  schoolName: Yup.string()
-    .required('School Name is required'),
+  // schoolName: Yup.string()
+  //   .required('School Name is required')
+  //   .matches(
+  //     /^[^\s][A-Za-z0-9\s]*[^\s]$/,
+  //     'First Name cannot include leading and trailing spaces'
+  //   ),
   firstName: Yup.string()
     .matches(
       /^[^\s][A-Za-z0-9\s]*[^\s]$/,
@@ -66,10 +72,12 @@ export const UpdateProfile = () => {
   const context: any = React.useContext(AppContext);
   const { user, global } = context;
 
-  console.log('usersssss ', global.user)
   return (
     <Box className={classes.formContainer}>
       <Box className={classes.subContainer}>
+        <Typography variant="h4" style={{ marginBottom: 15 }}>
+          Profile
+        </Typography>
         <Formik
           initialValues={{
             firstName: global.user.firstName,
@@ -95,7 +103,7 @@ export const UpdateProfile = () => {
                 email: values.email,
                 idNumber: values.idNumber,
                 password: values.password,
-                roleType: global.user.roleType
+                roleType: global.user.roleType,
               };
 
               const res = await service.updateUser(newUser);

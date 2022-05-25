@@ -1,17 +1,15 @@
-import { query, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { HTTP_CODES } from '../globals';
 import { RoleModel } from '../models/role';
-// import { SchoolModel } from '../models/school';
-import { UserModel } from '../models/user';
 import { Logger } from '../utils/logger';
 import { decodeUserToken } from '../utils/util';
-import jwt from 'jsonwebtoken';
 import { PasswordBcrypt } from './passwordBcrypt';
 import { Principal } from '../models/principal';
 import { Class } from '../models/class';
 import { Teacher } from '../models/teacher';
 import { Student } from '../models/student';
 import { School } from '../models/school';
+import { Admin } from '../models/admin';
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -25,16 +23,37 @@ export const getUser = async (req: Request, res: Response) => {
     }
 
     const { idNumber } = decodedUser;
-    const user = await Principal.query()
-      .select('principal.*', 'school.*')
-      .from('Principal as principal')
-      .leftJoin('School as school', 'school.schoolID', 'principal.schoolID')
-      .where('principal.idNumber', '=', idNumber)
-      .first();
+
+    const [principal, teacher, student, admin] = await Promise.all([
+      Principal.query()
+        .select('principal.*', 'school.*')
+        .from('Principal as principal')
+        .leftJoin('School as school', 'school.schoolID', 'principal.schoolID')
+        .where('principal.idNumber', '=', idNumber)
+        .first(),
+      Teacher.query()
+        .select('teacher.*', 'school.*')
+        .from('Teacher as teacher')
+        .leftJoin('School as school', 'school.schoolID', 'teacher.schoolID')
+        .where('teacher.idNumber', '=', idNumber)
+        .first(),
+      Student.query()
+        .select('student.*', 'school.*')
+        .from('Student as student')
+        .leftJoin('School as school', 'school.schoolID', 'student.schoolID')
+        .where('student.idNumber', '=', idNumber)
+        .first(),
+      Admin.query()
+        .select('admin.*', 'school.*')
+        .from('Admin as admin')
+        .leftJoin('School as school', 'school.schoolID', 'admin.schoolID')
+        .where('admin.idNumber', '=', idNumber)
+        .first(),
+    ]);
 
     return res.json({
       success: true,
-      data: user,
+      data: principal || teacher || student || admin,
     });
   } catch (err: any) {
     Logger.error('Failed to get user ', err);
@@ -151,15 +170,16 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const { idNumber } = req.params;
     const { schoolId } = req.body;
 
-    if (!idNumber || !schoolId) {
+    if (!idNumber) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,
         message: 'idNumber and schoolId missing in params',
       });
     }
 
-    const users = await Promise.all([
+    const user = await Promise.all([
       Teacher.query().whereNot('idNumber', '=', idNumber),
+      Principal.query().whereNot('idNumber', '=', idNumber),
       Student.query()
         .select('student.*', 'class.*')
         .from('Student as student')
@@ -169,7 +189,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
-      data: [...users[0], ...users[1]],
+      data: [...user[0], ...user[1], ...user[2]],
     });
   } catch (err) {
     Logger.error('Failed to get all user ' + err);
@@ -336,19 +356,26 @@ export const deleteUser = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await UserModel.findOne({ idNumber });
+    const [teacher, student, principal] = await Promise.all([
+      Teacher.query().findOne({ idNumber }),
+      Student.query().findOne({ idNumber }),
+      Principal.query().findOne({ idNumber }),
+    ]);
 
-    if (!user) {
+    if (!teacher && !student && !principal) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,
         message: 'User not found',
       });
     }
 
-    user!.schoolName = null;
-    user!.schoolId = null;
-
-    await UserModel.updateOne({ idNumber }, { $set: { ...user } });
+    if (teacher) {
+      await Teacher.query().delete().where('idNumber', '=', idNumber)
+    } else if(student) {
+      await Student.query().delete().where('idNumber', '=', idNumber)
+    } else if (principal) {
+      await Principal.query().delete().where('idNumber', '=', idNumber)
+    }
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
@@ -387,13 +414,16 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
-    const teacher = await Teacher.query().findOne({ idNumber });
-    const student = await Student.query().findOne({ idNumber });
-    const principal = await Principal.query().findOne({ idNumber });
+    const [teacher, student, principal, admin] = await Promise.all([
+      Teacher.query().findOne({ idNumber }),
+      Student.query().findOne({ idNumber }),
+      Principal.query().findOne({ idNumber }),
+      Admin.query().findOne({ idNumber }),
+    ]);
 
     let user: any = {};
 
-    if (!teacher && !student && !principal) {
+    if (!teacher && !student && !principal && !admin) {
       return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
         message: 'User not found',

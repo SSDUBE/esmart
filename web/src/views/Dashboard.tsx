@@ -1,4 +1,4 @@
-import { Theme } from '@mui/material';
+import { Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { MuiTable } from '../components/MuiTable';
 import { makeStyles } from '@mui/styles';
@@ -90,8 +90,9 @@ export const Dashboard = () => {
 
   return (
     <Box>
+      <Typography variant='h4'>Dashboard</Typography>
       <Box className={classes.tableContainer}>
-        <MuiTable rows={rows} columns={columns} tableHeader="Leader board" />
+        <MuiTable rows={rows} columns={columns} />
       </Box>
     </Box>
   );

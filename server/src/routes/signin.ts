@@ -6,6 +6,7 @@ import { AUTH, HTTP_CODES } from '../globals';
 import { Principal } from '../models/principal';
 import { Teacher } from '../models/teacher';
 import { Student } from '../models/student';
+import { Admin } from '../models/admin';
 
 const secret = AUTH.SECRET;
 
@@ -22,6 +23,7 @@ export const signin = async (req: Request, res: Response) => {
       Principal.query().findOne({ idNumber }),
       Student.query().findOne({ idNumber }),
       Teacher.query().findOne({ idNumber }),
+      Admin.query().findOne({ idNumber }),
     ]);
     let index = 0
     // let [principal, teacher] = user;

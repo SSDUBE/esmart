@@ -21,7 +21,9 @@ const ValidationSchema = Yup.object().shape({
     .matches(
       /(((\d{2}((0[13578]|1[02])(0[1-9]|[12]\d|3[01])|(0[13456789]|1[012])(0[1-9]|[12]\d|30)|02(0[1-9]|1\d|2[0-8])))|([02468][048]|[13579][26])0229))(( |-)(\d{4})( |-)(\d{3})|(\d{7}))/,
       'Please enter a valid ID number'
-    ),
+    )
+    .min(13, 'ID number must contain a minimum of 13 digits')
+    .max(13, 'ID number must contain a minimum of 13 digits'),
   password: Yup.string().required('Password is required'),
 });
 
@@ -59,17 +61,28 @@ const Signin = () => {
                 if (res.success) {
                   await Helpers.setInStorage('token', res.accessToken);
 
-                  const service = new UserService()
-                  const user = await service.get()
+                  const service = new UserService();
+                  const user = await service.get();
+
+                  console.log('user ', user)
+                  if (user.data.roleType === 'STUDENT') {
+                    await Helpers.removeInStorage('token')
+                    swal(
+                      'Oops!!!',
+                      'User not authorized to access this platform',
+                      'error'
+                    )
+                    return
+                  }
 
                   context.user.update(user.data);
-                  navigate('/dashboard')
+                  navigate('/dashboard');
                 } else {
                   swal('Oops!!!', res.message, 'error');
                 }
                 setSubmitting(false);
               } catch (err) {
-                console.log('err ', err)
+                console.log('err ', err);
                 swal(
                   'Oops!!!',
                   'Something went wrong please try again',
