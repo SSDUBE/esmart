@@ -55,6 +55,21 @@ export async function up(knex: Knex): Promise<void> {
     auditing(knex, table);
   });
 
+  await knex.schema.createTable('Game', (table: Knex.TableBuilder) => {
+    table.increments('gameID').notNullable().unique().primary();
+    table.integer('word').notNullable();
+    table.integer('complete').notNullable();
+    table.integer('classID').references('Class.classID').notNullable();
+    auditing(knex, table);
+  });
+
+  await knex.schema.createTable('Anagrams', (table: Knex.TableBuilder) => {
+    table.increments('anagramID').notNullable().unique().primary();
+    table.integer('anagram').notNullable();
+    table.integer('gameID').references('Game.gameID').notNullable();
+    auditing(knex, table);
+  });
+
   await knex.schema.createTable('Student', (table: Knex.TableBuilder) => {
     table.string('idNumber', 13).notNullable().unique().primary();
     table.string('firstName', 50).notNullable();
@@ -93,5 +108,7 @@ export async function down(knex: Knex): Promise<void> {
     .dropTable('Admin')
     .dropTable('SchoolClass')
     .dropTable('School')
+    .dropTable('Anagrams')
+    .dropTable('Game')
     .dropTable('Class');
 }

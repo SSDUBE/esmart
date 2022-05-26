@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: '#fff',
-    fontFamily: 'Montserrat-Medium',
+    // fontFamily: 'Montserrat-Medium',
     fontSize: 18,
   },
   cardFooterTitle: {

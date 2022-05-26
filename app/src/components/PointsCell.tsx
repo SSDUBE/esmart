@@ -84,7 +84,7 @@ export class PointsCell extends Component {
 const styles = StyleSheet.create({
   points: {
     fontSize: width / 12,
-    fontFamily: 'Montserrat-Light',
+    // fontFamily: 'Montserrat-Light',
   },
   circle: {
     alignSelf: 'flex-start',
@@ -123,6 +123,6 @@ const styles = StyleSheet.create({
     top: 1,
     fontSize: width / 45,
     lineHeight: width / 11,
-    fontFamily: 'Montserrat-Light',
+    // fontFamily: 'Montserrat-Light',
   },
 });
