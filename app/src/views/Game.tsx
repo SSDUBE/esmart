@@ -3,6 +3,18 @@ import { View, Text, SafeAreaView, StyleSheet, TextInput } from 'react-native';
 import { io, Socket } from 'socket.io-client';
 import { AppContext } from '../context/context';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
+import { FaceRecognation } from '../components/FaceRecognation';
+import { db } from '../utilities/Firebase';
+import {
+  doc,
+  setDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  limit,
+  collection,
+  getDocs,
+} from 'firebase/firestore';
 
 const socket = io('http://192.168.8.127:4000');
 
@@ -24,32 +36,40 @@ export const Game = () => {
 
   const [messages, setMessages] = React.useState<IMessage[]>([]);
 
-  React.useEffect(() => {
-    (function () {
-      // const is = socket.connect()
-      // console.log('issss ', is)
-    })();
+  // React.useEffect(() => {
+  //   // socket.on('chat message', (message = []) => {
+  //   //   const tempMsg = [...messages];
+  //   //   const msg = message[0];
+  //   //   console.log('msg ', msg.user);
 
-    socket.on('chat message', (msg = []) => {
-      console.log('msg ', msg);
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, msg)
-      );
-      // setMessages([
-      //   {
-      //     _id: msg._id,
-      //     text: msg.text,
-      //     createdAt: msg.createdAt,
-      //     user: {
-      //       _id: msg.user._id,
-      //       name: 'React Native',
-      //       avatar: 'https://placeimg.com/140/140/any',
-      //     },
-      //   },
-      // ]);
-      // setChatMsgs([...chatMsgs, msg]);
-    });
-  }, []);
+  //   //   if (msg) {
+  //   //     tempMsg.push({
+  //   //       _id: msg._id,
+  //   //       text: msg.text,
+  //   //       createdAt: msg.createdAt,
+  //   //       user: {
+  //   //         _id: msg.user._id,
+  //   //         name: 'React Native',
+  //   //         avatar: 'https://placeimg.com/140/140/any',
+  //   //       },
+  //   //     });
+
+  //   //     setMessages(tempMsg);
+  //   //   }
+  //   // });
+  //   setMessages([
+  //     {
+  //       _id: 1,
+  //       text: 'Hello developer',
+  //       createdAt: new Date(),
+  //       user: {
+  //         _id: 2,
+  //         name: 'React Native',
+  //         avatar: 'https://placeimg.com/140/140/any',
+  //       },
+  //     },
+  //   ]);
+  // }, []);
 
   function submitChagMsg() {
     // socket.emit('chat message', chatMsg);
@@ -70,15 +90,62 @@ export const Game = () => {
   //   socket.emit('chat message', messages[0]);
   // };
 
-  function onSend(messages: IMessage[] = []) {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages)
-    );
-    socket.emit('chat message', messages);
-  };
+  // function onSend(messages: IMessage[] = []) {
+  //   setMessages((previousMessages) =>
+  //     GiftedChat.append(previousMessages, messages)
+  //   );
+  //   socket.emit('chat message', messages);
+  // }
+
+  React.useLayoutEffect(() => {
+    let unsub: any = '';
+
+    (async function () {
+      const ref = collection(db, 'chats');
+      unsub = onSnapshot(
+        query(ref, orderBy('createdAt', 'desc')),
+        async (querySnapshot) => {
+          const chats: IMessage[] = [];
+
+          querySnapshot.forEach((doc) => {
+            chats.push({
+              _id: doc.data()?._id,
+              createdAt: doc.data()?.createdAt.toDate(),
+              text: doc.data()?.text,
+              user: doc.data()?.user,
+            });
+          });
+
+          setMessages(chats)
+        }
+      );
+    })();
+
+    return unsub;
+  }, []);
+
+  const onSend = React.useCallback(async (messages: IMessage[] = []) => {
+    try {
+      const { _id, createdAt, text, user } = messages[0];
+
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, messages)
+      );
+
+      await setDoc(doc(db, 'chats', _id.toString()), {
+        _id,
+        createdAt,
+        text,
+        user,
+      });
+    } catch (err) {
+      console.log('Something went wrong ', err);
+    }
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      {/* <FaceRecognation /> */}
       {/* <View style={styles.container}>
         <TextInput
           style={{ height: 40, borderWidth: 2, marginTop: 50 }}
@@ -89,11 +156,24 @@ export const Game = () => {
         />
         {chatMessages}
       </View> */}
+      {/* <GiftedChat
+        messages={messages}
+        // showAvatarForEveryMessage
+        onSend={(messages) => onSend(messages)}
+        user={{
+          _id: context.global.user.idNumber,
+          // avatar: 'https://placeimg.com/140/140/any',
+        }}
+      /> */}
       <GiftedChat
         messages={messages}
         showAvatarForEveryMessage={true}
         onSend={(messages) => onSend(messages)}
-        user={{ _id: context.global.user.idNumber }}
+        user={{
+          _id: context.global.user.idNumber,
+          name: context.global.user.firstName,
+          avatar: 'https://placeimg.com/140/140/any',
+        }}
       />
     </SafeAreaView>
   );

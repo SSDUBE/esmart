@@ -1,10 +1,10 @@
 import React from 'react';
 import { Text, View, StyleSheet, SafeAreaView } from 'react-native';
-import * as tf from '@tensorflow/tfjs';
+// import * as tf from '@tensorflow/tfjs';
 import { Camera, FaceDetectionResult } from 'expo-camera';
 import * as FaceDetector from 'expo-face-detector';
 import { Face } from 'expo-camera/build/Camera.types';
-import * as facemesh from '@tensorflow/tfjs'
+// import * as facemesh from '@tensorflow/tfjs'
 
 export const FaceRecognation = () => {
   const camRef = React.useRef(null)
@@ -14,7 +14,7 @@ export const FaceRecognation = () => {
 
   React.useEffect(() => {
     (async function () {
-      await tf.ready();
+      // await tf.ready();
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermissions(status === 'granted');
       setIsTfReady(true);

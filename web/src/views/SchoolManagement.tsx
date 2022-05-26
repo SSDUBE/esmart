@@ -89,6 +89,7 @@ export const SchoolManagement = () => {
 
         schools.data.forEach((school: any) => {
           tempRows.push(
+            // @ts-ignore
             createData({
               schoolName: school.schoolName,
               active: school.active ? 'True' : 'False',

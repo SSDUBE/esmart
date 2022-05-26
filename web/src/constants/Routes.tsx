@@ -2,11 +2,11 @@ import { lazy } from 'react';
 import {
   Speed as SpeedIcon,
   PeopleAlt as PeopleAltIcon,
-  Build as BuildIcon,
+  // Build as BuildIcon,
 } from '@mui/icons-material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
+// import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { Outlet } from 'react-router-dom';
 import { AppDrawer } from '../components/AppDrawer';
 import { UpdateProfile } from '../views/UpdateProfile';

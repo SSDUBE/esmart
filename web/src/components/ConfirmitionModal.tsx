@@ -3,8 +3,8 @@ import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import { MuiModal } from './MuiModal';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { Button, Theme, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Button, Typography } from '@mui/material';
+// import { makeStyles } from '@mui/styles';
 
 interface IProps {
   title: string;
@@ -13,21 +13,21 @@ interface IProps {
   handleConfirmation: () => void;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
-  yesButton: {
-    width: theme.spacing(1),
-    height: theme.spacing(2),
-    fontSize: 11,
-  },
-  cancelButton: {
-    width: theme.spacing(1),
-    height: theme.spacing(1),
-    fontSize: 11,
-    background: 'rgb(207, 213, 227)',
-    marginLeft: theme.spacing(1),
-    color: '#000',
-  },
-}));
+// const useStyles = makeStyles((theme: Theme) => ({
+//   yesButton: {
+//     width: theme.spacing(1),
+//     height: theme.spacing(2),
+//     fontSize: 11,
+//   },
+//   cancelButton: {
+//     width: theme.spacing(1),
+//     height: theme.spacing(1),
+//     fontSize: 11,
+//     background: 'rgb(207, 213, 227)',
+//     marginLeft: theme.spacing(1),
+//     color: '#000',
+//   },
+// }));
 
 export const ConfirmiationModal: FunctionComponent<IProps> = ({
   showModal,
@@ -35,7 +35,7 @@ export const ConfirmiationModal: FunctionComponent<IProps> = ({
   title,
   handleConfirmation,
 }) => {
-  const classes = useStyles();
+  // const classes = useStyles();
   const theme = useTheme();
 
   return (
