@@ -9,6 +9,15 @@ import swal from 'sweetalert';
 import { SchoolService } from '../services/SchoolService';
 import dayjs from 'dayjs';
 import { UserService } from '../services/UserService';
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  PDFViewer,
+  PDFDownloadLink,
+} from '@react-pdf/renderer';
 
 interface ITableData {
   schoolName: string;
@@ -40,6 +49,29 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: 'rgb(207, 213, 227)',
   },
 }));
+
+const styles = StyleSheet.create({
+  text: {
+    fontSize: 8,
+    marginRight: 15,
+  },
+  page: {
+    flexDirection: 'column',
+    backgroundColor: '#E4E4E4',
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+    flexGrow: 1,
+  },
+  tableContainer: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    marginBottom: 12,
+    marginLeft: 12,
+  },
+});
 
 const columns: readonly IColumn[] = [
   {
@@ -180,11 +212,50 @@ export const SchoolManagement = () => {
     return { ...data, actions };
   }
 
+  function PDF() {
+    console.log('rows ', rows);
+    return (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <View style={[styles.tableContainer, { marginTop: 15 }]}>
+            <Text style={[styles.text, { width: '6%' }]}>Number</Text>
+            <Text style={[styles.text, { width: '17%' }]}>School Name</Text>
+            <Text style={[styles.text, { width: '6%' }]}>Active</Text>
+            <Text style={[styles.text, { width: '12%' }]}>Created at</Text>
+            <Text style={[styles.text, { width: '12%' }]}>Update at</Text>
+          </View>
+          {rows.map((row, index) => (
+            <View key={row.schoolId} style={styles.tableContainer}>
+              <Text style={[styles.text, { width: '6%' }]}>{index + 1}</Text>
+              <Text style={[styles.text, { width: '17%' }]}>
+                {row.schoolName}
+              </Text>
+              <Text style={[styles.text, { width: '6%' }]}>{row.active}</Text>
+              <Text style={[styles.text, { width: '12%' }]}>
+                {row.createdAt}
+              </Text>
+              <Text style={[styles.text, { width: '12%' }]}>
+                {row.updateAt}
+              </Text>
+            </View>
+          ))}
+        </Page>
+      </Document>
+    );
+  }
+
   return (
     <Box>
       <Typography variant="h4" style={{ marginBottom: 14 }}>
         Schools
       </Typography>
+      <Box display="flex" justifyContent="flex-end">
+        <PDFDownloadLink document={<PDF />} fileName="report.pdf">
+          {({ blob, url, loading, error }) =>
+            loading ? 'Loading document...' : 'Download Report!'
+          }
+        </PDFDownloadLink>
+      </Box>
       <MuiTable rows={rows} columns={columns} />
       <ConfirmiationModal
         handleConfirmation={() => handleAction('activate', true, 1)}
