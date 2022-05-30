@@ -10,6 +10,7 @@ import {
   addNewUser,
   deleteUser,
   updateUser,
+  activateOrDeactivateSchool,
 } from '../controllers/user';
 import { authentication } from './aunthentication';
 import { signin } from './signin';
@@ -20,7 +21,7 @@ const route = '/esmart';
 export = function (app: any) {
   app.post(`${route}/sign-up`, signup);
   app.post(`${route}/sign-in`, signin);
-  
+
   app.put(`${route}/update-user`, authentication, updateUser);
 
   app.get(`${route}/user`, authentication, getUser);
@@ -33,5 +34,10 @@ export = function (app: any) {
   app.post(`${route}/users/:idNumber`, authentication, getAllUsers);
   app.delete(`${route}/user/:idNumber`, authentication, deleteUser);
   app.post(`${route}/leaderboard`, authentication, getLeaderboard);
+  app.put(
+    `${route}/school/activate-or-deactivate`,
+    authentication,
+    activateOrDeactivateSchool
+  );
   // app.post(`${route}/play-game/`, authentication, playGame);
 };

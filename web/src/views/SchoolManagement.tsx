@@ -8,13 +8,14 @@ import { ConfirmiationModal } from '../components/ConfirmitionModal';
 import swal from 'sweetalert';
 import { SchoolService } from '../services/SchoolService';
 import dayjs from 'dayjs';
+import { UserService } from '../services/UserService';
 
 interface ITableData {
   schoolName: string;
   active: string;
   createdAt: string;
   updateAt: string;
-  _id?: string;
+  schoolId: number;
 }
 
 interface IColumn {
@@ -78,6 +79,7 @@ export const SchoolManagement = () => {
   const [rows, setRows] = React.useState<ITableData[]>([]);
   const [activateSchool, setActivateSchool] = React.useState(false);
   const [deactivateSchool, setDeactivateSchool] = React.useState(false);
+  const [deactivateActivateId, setDeactivateActivateId] = React.useState(0);
 
   React.useEffect(() => {
     (async function () {
@@ -91,6 +93,7 @@ export const SchoolManagement = () => {
           tempRows.push(
             // @ts-ignore
             createData({
+              schoolId: school.schoolID,
               schoolName: school.schoolName,
               active: school.active ? 'True' : 'False',
               createdAt: dayjs(school.createdAt).format('YYYY/MM/DD mm:ss'),
@@ -106,25 +109,43 @@ export const SchoolManagement = () => {
     })();
   }, []);
 
-  async function handleAction(action: string, actionType: boolean) {
+  async function handleAction(
+    action: string,
+    actionType: boolean,
+    schoolId: number
+  ) {
     try {
-      // if (deleteUser) {
-      //   const user = new UserService();
-      //   const tempRows = [...rows];
-      //   const index = tempRows.findIndex(
-      //     (row) => (row.idNumber = deleteUser?.idNumber)
-      //   );
-      //   const res = await user.deleteUser(deleteUser?.idNumber);
-      //   setConfirmDeleteUser(false);
-      //   if (res.success) {
-      //     swal('Hooray!!!', 'User was successfully deleted', 'success');
-      //     tempRows.splice(index, 1);
-      //     setRows(tempRows);
-      //   } else {
-      //     swal('Oops!!!', res.message, 'error');
-      //   }
-      // }
+      const tempRows = [...rows];
+      const user = new UserService();
+      const res: any = {};
+
+      const index = tempRows.findIndex(
+        (row) => row.schoolId === deactivateActivateId
+      );
+
+      if (action === 'activate') {
+        const activate = await user.activateOrDeactivateSchool(
+          true,
+          deactivateActivateId
+        );
+
+        tempRows[index].active = 'True';
+        swal('Hooray!!!', 'School was successfully activate', 'success');
+      } else {
+        const deactivate = await user.activateOrDeactivateSchool(
+          false,
+          deactivateActivateId
+        );
+
+        tempRows[index].active = 'False';
+        swal('Hooray!!!', 'School was successfully deactivated', 'success');
+      }
+
+      setActivateSchool(false);
+      setDeactivateSchool(false);
+      setRows(tempRows);
     } catch (err) {
+      setDeactivateSchool(false);
       swal('Oops!!!', 'Something went wrong please try again', 'error');
     }
   }
@@ -134,7 +155,10 @@ export const SchoolManagement = () => {
       <Box display="flex" justifyContent="center" alignItems="center">
         <Button
           style={{ width: 30, height: 25, fontSize: 10 }}
-          onClick={() => setActivateSchool(true)}
+          onClick={() => {
+            setActivateSchool(true);
+            setDeactivateActivateId(data.schoolId);
+          }}
         >
           Activate
         </Button>
@@ -143,7 +167,10 @@ export const SchoolManagement = () => {
             root: classes.iconButton,
           }}
           className={classes.iconButton}
-          onClick={() => setDeactivateSchool(true)}
+          onClick={() => {
+            setDeactivateSchool(true);
+            setDeactivateActivateId(data.schoolId);
+          }}
         >
           <DeleteIcon className={classes.icon} />
         </IconButton>
@@ -160,13 +187,13 @@ export const SchoolManagement = () => {
       </Typography>
       <MuiTable rows={rows} columns={columns} />
       <ConfirmiationModal
-        handleConfirmation={() => handleAction('deactivate', true)}
+        handleConfirmation={() => handleAction('activate', true, 1)}
         showModal={activateSchool}
         closeModal={() => setActivateSchool(false)}
         title="Are you sure you want to activate school?"
       />
       <ConfirmiationModal
-        handleConfirmation={() => handleAction('deactivate', true)}
+        handleConfirmation={() => handleAction('deactivate', true, 1)}
         showModal={deactivateSchool}
         closeModal={() => setDeactivateSchool(false)}
         title="Are you sure you want to deactivate school?"

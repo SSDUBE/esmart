@@ -369,11 +369,11 @@ export const deleteUser = async (req: Request, res: Response) => {
     }
 
     if (teacher) {
-      await Teacher.query().delete().where('idNumber', '=', idNumber)
-    } else if(student) {
-      await Student.query().delete().where('idNumber', '=', idNumber)
+      await Teacher.query().delete().where('idNumber', '=', idNumber);
+    } else if (student) {
+      await Student.query().delete().where('idNumber', '=', idNumber);
     } else if (principal) {
-      await Principal.query().delete().where('idNumber', '=', idNumber)
+      await Principal.query().delete().where('idNumber', '=', idNumber);
     }
 
     return res.status(HTTP_CODES.OK).json({
@@ -530,6 +530,39 @@ export const updateUser = async (req: Request, res: Response) => {
     return res.status(HTTP_CODES.OK).json({
       success: true,
       data: user,
+    });
+  } catch (err) {
+    Logger.error('Failed to get all user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const activateOrDeactivateSchool = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { schoolId, status } = req.body;
+
+    if (!schoolId || status === undefined || status === null) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'schoolId and status are missing in params',
+      });
+    }
+
+    const update = await School.query()
+      .patch({ active: status })
+      .where({ schoolID: schoolId })
+      .returning('*')
+      .first();
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: update,
     });
   } catch (err) {
     Logger.error('Failed to get all user ' + err);

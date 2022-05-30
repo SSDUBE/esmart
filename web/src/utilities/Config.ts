@@ -19,6 +19,7 @@ export const Config = {
       delete: `${domain}/esmart/user/:idNumber`,
       update: `${domain}/esmart/update-user`,
       leaderboard: `${domain}/esmart/leaderboard`,
+      activateOrDeactivateSchool: `${domain}/esmart/school/activate-or-deactivate`,
     }
   }
 }

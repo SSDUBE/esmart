@@ -153,4 +153,21 @@ export class UserService extends SecureService {
       throw new Error(err);
     }
   };
+
+  public activateOrDeactivateSchool = async (status: boolean, schoolId?: number) => {
+    try {
+      const response = await fetch(Config.services.user.activateOrDeactivateSchool, {
+        method: 'PUT',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+        body: JSON.stringify({ status, schoolId }),
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
 }
