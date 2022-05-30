@@ -14,6 +14,7 @@ import { ConfirmiationModal } from '../components/ConfirmitionModal';
 import { UserService } from '../services/UserService';
 import { AppContext } from '../context/context';
 import swal from 'sweetalert';
+import dayjs from 'dayjs';
 
 const ValidationSchema = (validatePass: any, isEditing: boolean) =>
   Yup.object().shape({
@@ -89,6 +90,7 @@ interface IColumn {
     | 'roleType'
     | 'grade'
     | 'active'
+    | 'createdAt'
     | 'actions';
   label: string;
   minWidth?: number;
@@ -149,6 +151,12 @@ const columns: readonly IColumn[] = [
     format: (value: number) => value.toFixed(2),
   },
   {
+    id: 'createdAt',
+    label: 'Created At',
+    align: 'center',
+    format: (value: number) => value.toFixed(2),
+  },
+  {
     id: 'actions',
     label: 'Actions',
     align: 'center',
@@ -182,6 +190,7 @@ export const UserManagement = () => {
 
         users.data.forEach((user: any) => {
           user.active = user.active ? 'True' : 'False';
+          user.createdAt = dayjs(user.createdAt).format('YYYY/MM/DD mm:ss')
           tempRows.push(createData({ ...user }));
         });
 
@@ -311,7 +320,9 @@ export const UserManagement = () => {
 
   return (
     <Box>
-      <Typography variant='h4'  style={{ marginBottom: 10 }}>Users</Typography>
+      <Typography variant="h4" style={{ marginBottom: 10 }}>
+        Users
+      </Typography>
       {context.global.user.roleType !== 'ADMIN' && (
         <Box style={{ width: 150, marginBottom: 20 }}>
           <Button

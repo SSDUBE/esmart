@@ -1,7 +1,8 @@
 // import { playGame } from '../controllers/game';
+import { getLeaderboard } from '../controllers/game';
 import { GetallSchools } from '../controllers/school';
 import {
-  getRoles,
+  // getRoles,
   getUser,
   // addUser,
   getAllUsers,
@@ -25,11 +26,12 @@ export = function (app: any) {
   app.get(`${route}/user`, authentication, getUser);
   app.get(`${route}/all-users`, authentication, getUser);
   app.get(`${route}/grades`, authentication, getAllGrades);
-  app.get(`${route}/roles`, authentication, getRoles);
+  // app.get(`${route}/roles`, authentication, getRoles);
   app.get(`${route}/schools`, authentication, GetallSchools);
   // app.post(`${route}/add-user`, authentication, addUser);
   app.post(`${route}/add-new-user`, authentication, addNewUser);
   app.post(`${route}/users/:idNumber`, authentication, getAllUsers);
   app.delete(`${route}/user/:idNumber`, authentication, deleteUser);
+  app.post(`${route}/leaderboard`, authentication, getLeaderboard);
   // app.post(`${route}/play-game/`, authentication, playGame);
 };

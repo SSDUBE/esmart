@@ -57,15 +57,15 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.schema.createTable('Game', (table: Knex.TableBuilder) => {
     table.increments('gameID').notNullable().unique().primary();
-    table.integer('word').notNullable();
-    table.integer('complete').notNullable();
+    table.string('word', 50).notNullable();
+    table.boolean('complete').notNullable().defaultTo(false);
     table.integer('classID').references('Class.classID').notNullable();
     auditing(knex, table);
   });
 
   await knex.schema.createTable('Anagrams', (table: Knex.TableBuilder) => {
     table.increments('anagramID').notNullable().unique().primary();
-    table.integer('anagram').notNullable();
+    table.string('anagram').notNullable();
     table.integer('gameID').references('Game.gameID').notNullable();
     auditing(knex, table);
   });
@@ -84,7 +84,14 @@ export async function up(knex: Knex): Promise<void> {
     auditing(knex, table);
   });
 
-  await knex.schema.createTable('SchoolClass', (table: Knex.TableBuilder) => {
+  await knex.schema.createTable('Leaderboard', (table: Knex.TableBuilder) => {
+    table.increments('leaderboardID').notNullable().unique().primary();
+    table.integer('score', 50).notNullable();
+    table.string('studentIdNumber').references('Student.idNumber').notNullable();
+    auditing(knex, table);
+  });
+
+  await knex.schema.createTable('SchoolClassRoom', (table: Knex.TableBuilder) => {
     table.increments().unsigned().index().primary();
     table
       .integer('classID')
@@ -102,11 +109,12 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   return knex.schema
+    .dropTable('Leaderboard')
     .dropTable('Student')
     .dropTable('Principal')
     .dropTable('Teacher')
     .dropTable('Admin')
-    .dropTable('SchoolClass')
+    .dropTable('SchoolClassRoom')
     .dropTable('School')
     .dropTable('Anagrams')
     .dropTable('Game')

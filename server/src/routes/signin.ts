@@ -45,7 +45,7 @@ export const signin = async (req: Request, res: Response) => {
     if (!users[index]) {
       return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
-        message: 'User not found',
+        message: 'Username or password incorrect',
       });
     }
   

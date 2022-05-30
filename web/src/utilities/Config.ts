@@ -18,6 +18,7 @@ export const Config = {
       addNewUser: `${domain}/esmart/add-new-user`,
       delete: `${domain}/esmart/user/:idNumber`,
       update: `${domain}/esmart/update-user`,
+      leaderboard: `${domain}/esmart/leaderboard`,
     }
   }
 }

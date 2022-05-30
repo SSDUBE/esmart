@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -30,15 +29,6 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(cors());
-
-// connect to mongoose
-mongoose.connect(DB.DB_STRING, { autoIndex: false }).then(
-  () => Logger.log('Successfully connected to DB'),
-  (err) => {
-    Logger.log('Mongoose connection error:', err);
-    throw new Error(err);
-  }
-);
 
 // app.use((req: any, res: Response, next: NextFunction) => {
 //   const authHeader: string = req.headers.authorization!;

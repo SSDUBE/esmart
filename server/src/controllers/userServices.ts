@@ -1,7 +1,7 @@
 import { Class } from '../models/class';
 import { Principal } from '../models/principal';
 import { School } from '../models/school';
-import { SchoolClass } from '../models/schoolClass';
+import { SchoolClassRoom } from '../models/schoolClassRoom';
 import { Logger } from '../utils/logger';
 import { PasswordBcrypt } from './passwordBcrypt';
 
@@ -25,7 +25,7 @@ export class UserService {
 
       classes.forEach((item) => {
         createClass.push(
-          SchoolClass.query().insertGraph({
+          SchoolClassRoom.query().insertGraph({
             classID: item.classID,
             schoolID: school.schoolID,
           })

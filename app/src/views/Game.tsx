@@ -66,7 +66,7 @@ export const Game = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{width: 150, height: 250}}>
-        {/* <FaceRecognation /> */}
+        <FaceRecognation />
       </View>
       <GiftedChat
         messages={messages}

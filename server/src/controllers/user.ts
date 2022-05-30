@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { HTTP_CODES } from '../globals';
-import { RoleModel } from '../models/role';
 import { Logger } from '../utils/logger';
 import { decodeUserToken } from '../utils/util';
 import { PasswordBcrypt } from './passwordBcrypt';
@@ -64,22 +63,22 @@ export const getUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getRoles = async (_req: Request, res: Response) => {
-  try {
-    const roles = await RoleModel.find({ type: { $ne: 'ADMIN' } });
+// export const getRoles = async (_req: Request, res: Response) => {
+//   try {
+//     const roles = await RoleModel.find({ type: { $ne: 'ADMIN' } });
 
-    return res.json({
-      success: true,
-      data: roles,
-    });
-  } catch (err: any) {
-    Logger.error('Failed to get roles ', err);
-    return res.status(HTTP_CODES.SERVER_ERROR).json({
-      success: false,
-      message: 'Something went wrong please try again',
-    });
-  }
-};
+//     return res.json({
+//       success: true,
+//       data: roles,
+//     });
+//   } catch (err: any) {
+//     Logger.error('Failed to get roles ', err);
+//     return res.status(HTTP_CODES.SERVER_ERROR).json({
+//       success: false,
+//       message: 'Something went wrong please try again',
+//     });
+//   }
+// };
 
 // export const addUser = async (req: Request, res: Response) => {
 //   try {

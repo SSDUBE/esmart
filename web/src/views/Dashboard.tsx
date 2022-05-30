@@ -1,19 +1,31 @@
+import React from 'react';
 import { Theme, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { MuiTable } from '../components/MuiTable';
 import { makeStyles } from '@mui/styles';
+import { AppContext } from '../context/context';
+import { UserService } from '../services/UserService';
+import dayjs from 'dayjs';
 
 interface IData {
   firstName: string;
   lastName: string;
   idNumber: string;
-  score: string;
+  score: number;
+  classID: string;
   createdAt: string;
-  updatedAt: string;
 }
 
+interface ITableData {
+  firstName: string;
+  lastName: string;
+  idNumber: string;
+  score: string;
+  createdAt: string;
+  classID: number;
+}
 interface IColumn {
-  id: 'firstName' | 'lastName' | 'idNumber' | 'score' | 'createdAt' | 'updatedAt';
+  id: 'firstName' | 'lastName' | 'idNumber' | 'score' | 'classID' | 'createdAt';
   label: string;
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
@@ -33,22 +45,47 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export const Dashboard = () => {
+  const context: any = React.useContext(AppContext);
   const classes = useStyles();
+  const [rows, setRows] = React.useState<ITableData[]>([]);
 
-  function createData(
-    firstName: string,
-    lastName: string,
-    idNumber: string,
-    score: string,
-    createdAt: string,
-    updatedAt: string
-  ): IData {
-    return { firstName, lastName, idNumber, score, createdAt, updatedAt };
+  React.useEffect(() => {
+    (async function () {
+      const { schoolId } = context.global.user;
+      const user = new UserService();
+      const leaderboard = await user.getLeaderboard(schoolId);
+      const tempRows: ITableData[] = [];
+
+      leaderboard.data.forEach((board: any) => {
+        const createdAt = dayjs(board.createdAt).format('YYYY/MM/DD mm:ss')
+
+        tempRows.push(
+          // @ts-ignore
+          createData({
+            firstName: board.firstName,
+            lastName: board.lastName,
+            idNumber: board.idNumber,
+            score: board.score,
+            classID: board.classID,
+            createdAt: createdAt,
+          })
+        );
+      });
+
+      setRows(tempRows);
+    })();
+  }, []);
+
+  function createData({
+    firstName,
+    lastName,
+    idNumber,
+    score,
+    classID,
+    createdAt,
+  }: IData) {
+    return { firstName, lastName, idNumber, score, classID, createdAt };
   }
-
-  const rows = [
-    createData('Sindiso', 'Dube', '9402226147089', '30', '2022/04/20', '2022/04/20'),
-  ];
 
   const columns: readonly IColumn[] = [
     {
@@ -75,22 +112,22 @@ export const Dashboard = () => {
       format: (value: number) => value.toFixed(2),
     },
     {
+      id: 'classID',
+      label: 'Class',
+      align: 'center',
+      format: (value: number) => value.toFixed(0),
+    },
+    {
       id: 'createdAt',
       label: 'Created At',
       align: 'center',
       format: (value: number) => value.toFixed(2),
     },
-    {
-      id: 'updatedAt',
-      label: 'Updated At',
-      align: 'center',
-      format: (value: number) => value.toFixed(2),
-    }
   ];
 
   return (
     <Box>
-      <Typography variant='h4'>Dashboard</Typography>
+      <Typography variant="h4">Dashboard</Typography>
       <Box className={classes.tableContainer}>
         <MuiTable rows={rows} columns={columns} />
       </Box>

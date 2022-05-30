@@ -1,7 +1,7 @@
 import { BaseModel } from './base';
 import { Class } from './class';
 import { Principal } from './principal';
-import { SchoolClass } from './schoolClass';
+import { SchoolClassRoom } from './schoolClassRoom';
 import { Student } from './student';
 import { Teacher } from './teacher';
 
@@ -42,9 +42,9 @@ export class School extends BaseModel {
         to: 'Student.schoolID',
       },
     },
-    schoolClass: {
+    schoolClassRoom: {
       relation: BaseModel.ManyToManyRelation,
-      modelClass: SchoolClass,
+      modelClass: SchoolClassRoom,
       join: {
         from: 'School.schoolID',
         through: {

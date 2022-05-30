@@ -136,4 +136,21 @@ export class UserService extends SecureService {
       throw new Error(err);
     }
   };
+
+  public getLeaderboard = async (schoolId: number) => {
+    try {
+      const response = await fetch(Config.services.user.leaderboard, {
+        method: 'POST',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+        body: JSON.stringify({ schoolId }),
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
 }
