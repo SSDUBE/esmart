@@ -63,7 +63,10 @@
     ]
   },
   "devDependencies": {
+    "@cypress/react": "^5.12.5",
+    "@cypress/webpack-dev-server": "^1.8.4",
     "@types/react-html5-camera-photo": "^1.5.1",
+    "cypress": "^10.1.0",
     "prettier": "^2.4.1"
   }
 }
