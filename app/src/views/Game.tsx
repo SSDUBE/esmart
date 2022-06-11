@@ -28,15 +28,18 @@ export const Game = () => {
           const chats: IMessage[] = [];
 
           querySnapshot.forEach((doc) => {
-            chats.push({
-              _id: doc.data()?._id,
-              createdAt: doc.data()?.createdAt.toDate(),
-              text: doc.data()?.text,
-              user: doc.data()?.user,
-            });
+            console.log('doc ', doc.data()?.text);
+            if (typeof doc.data()?.text === 'string') {
+              chats.push({
+                _id: doc.data()?._id,
+                createdAt: doc.data()?.createdAt.toDate(),
+                text: doc.data()?.text,
+                user: doc.data()?.user,
+              });
+            }
           });
 
-          setMessages(chats)
+          setMessages(chats);
         }
       );
     })();
@@ -65,7 +68,7 @@ export const Game = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={{width: 150, height: 250}}>
+      <View style={{ width: 120, height: 220 }}>
         <FaceRecognation />
       </View>
       <GiftedChat

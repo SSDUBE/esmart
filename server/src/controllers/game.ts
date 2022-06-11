@@ -1,5 +1,6 @@
 // @ts-ignore
 import anagrams from 'english-anagrams';
+import { initializeApp } from 'firebase/app';
 import { Logger } from '../utils/logger';
 import cron from 'node-cron';
 import { Game } from '../models/game';
@@ -8,9 +9,25 @@ import { Anagrams } from '../models/anagrams';
 import { Request, Response } from 'express';
 import { Leaderboard } from '../models/Leaderboard';
 import { HTTP_CODES } from '../globals';
+import { db } from '../utils/firebase';
+import {
+  doc,
+  setDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  collection,
+} from 'firebase/firestore';
 
 export const startGame = async () => {
   try {
+    const _id = Math.random()
+    await setDoc(doc(db, 'chats', '1111'), {
+      _id: 111,
+      createdAt: new Date(),
+      text: {text: 'backend', word: 'there'},
+      user: 1,
+    });
     // cron.schedule('*/20 * * * * *', () => {
     //   console.log('running a task every minute');
     //   createGame();

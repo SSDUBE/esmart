@@ -50,38 +50,45 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
 
   function biomatric(values: any, setSubmitting: any) {
     (async () => {
-      const isBiomatricSupported = await LocalAuthentication.hasHardwareAsync();
+      try {
+        const isBiomatricSupported =
+          await LocalAuthentication.hasHardwareAsync();
 
-      if (isBiomatricSupported) {
-        const isSaveBiomatric = await LocalAuthentication.isEnrolledAsync();
+        if (isBiomatricSupported) {
+          const isSaveBiomatric = await LocalAuthentication.isEnrolledAsync();
 
-        if (isSaveBiomatric) {
-          let result = await LocalAuthentication.authenticateAsync({
-            promptMessage: 'Scan your finger.',
-          });
-          if (result) {
-            const pair = keypair();
-            const auth = new AuthService();
-            const res = await auth.signinUser(values);
+          if (isSaveBiomatric) {
+            let result = await LocalAuthentication.authenticateAsync({
+              promptMessage: 'Scan your finger.',
+            });
+            if (result) {
+              setSubmitting(true)
+              const pair = keypair();
+              const auth = new AuthService();
+              const res = await auth.signinUser(values);
 
-            console.log('res::: ', res);
-            if (res.success) {
-              // context.user.update(res.data);
-              // TODO to dispatch actions to context
-              context.user.update(res.data);
-              navigation.navigate('HomeStack');
+              setSubmitting(false)
+              if (res.success) {
+                // context.user.update(res.data);
+                // TODO to dispatch actions to context
+                context.user.update(res.data);
+                navigation.navigate('Home');
+              } else {
+                Alert.alert('Oops!!!', res.message);
+              }
             } else {
-              Alert.alert('Oops!!!', res.message);
+              Alert.alert('Failed to validate finger print');
             }
           } else {
-            Alert.alert('Failed to validate finger print');
+            Alert.alert('Ooops!!', 'Please add finger print to your device');
           }
+          //do something fingerprint specific
         } else {
-          Alert.alert('Ooops!!', 'Please add finger print to your device');
+          Alert.alert('Oops!!!', 'Device does not have biomatric');
         }
-        //do something fingerprint specific
-      } else {
-        Alert.alert('Oops!!!', 'Device does not have biomatric');
+      } catch (err) {
+        console.log('Failed to sign in ', err);
+        Alert.alert('Oops!!!', 'Failed to sign in');
       }
     })();
   }
@@ -153,20 +160,6 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
           </View>
         )}
       </Formik>
-      {/* <View
-        style={[
-          styles.notificationWrapper,
-          { marginTop: notificationMarginTop },
-        ]}
-      >
-        <Notification
-          showNotification={showNotification}
-          handleCloseNotification={handleCloseNotification}
-          type='Error'
-          firstLine="Those credentials don't look right."
-          secondLine='Please try again.'
-        />
-      </View> */}
     </KeyboardAvoidingView>
   );
 };
@@ -208,5 +201,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  spinnerTextStyle: {
+    color: '#FFF'
   },
 });

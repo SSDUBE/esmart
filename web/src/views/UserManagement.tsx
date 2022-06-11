@@ -190,7 +190,7 @@ export const UserManagement = () => {
 
         users.data.forEach((user: any) => {
           user.active = user.active ? 'True' : 'False';
-          user.createdAt = dayjs(user.createdAt).format('YYYY/MM/DD mm:ss')
+          user.createdAt = dayjs(user.createdAt).format('YYYY/MM/DD mm:ss');
           tempRows.push(createData({ ...user }));
         });
 
@@ -319,7 +319,7 @@ export const UserManagement = () => {
   );
 
   return (
-    <Box>
+    <Box style={{ overflow: 'scroll' }}>
       <Typography variant="h4" style={{ marginBottom: 10 }}>
         Users
       </Typography>

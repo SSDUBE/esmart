@@ -14,16 +14,16 @@ import { AppProvider } from '../context/context';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function HomeStack() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name='Home' component={Home} />
-      <Tab.Screen name='Leader Board' component={LeaderBoard} />
-      <Tab.Screen name='Profile' component={Profile} />
-      <Tab.Screen name='Logout' component={Home} />
-    </Tab.Navigator>
-  );
-}
+// function HomeStack() {
+//   return (
+//     <Tab.Navigator>
+//       <Tab.Screen name='Home' component={Home} />
+//       <Tab.Screen name='Leader Board' component={LeaderBoard} />
+//       <Tab.Screen name='Profile' component={Profile} />
+//       <Tab.Screen name='Logout' component={Home} />
+//     </Tab.Navigator>
+//   );
+// }
 
 function AuthStack() {
   return (
@@ -39,7 +39,8 @@ export const AppStack = () => {
     <AppProvider>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name='AuthStack' component={AuthStack} />
-        <Stack.Screen name='HomeStack' component={HomeStack} />
+        {/* <Stack.Screen name='HomeStack' component={HomeStack} /> */}
+        <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Game' component={Game} />
       </Stack.Navigator>
     </AppProvider>
