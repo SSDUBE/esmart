@@ -21,6 +21,7 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
         schoolName: '',
         contactNumber: '',
         classId: '',
+        channelName: '',
       },
     },
     user: {
@@ -38,7 +39,8 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
             contactNumber: data.contactNumber,
             schoolId: data.schoolID,
             schoolName: data.schoolName ? data.schoolName : null,
-            classId: data.classID
+            classId: data.classID,
+            channelName: data.channelName
           };
           const contextParams = { ...state.global };
           const updateUser = Object.assign(contextParams.user, newUser);

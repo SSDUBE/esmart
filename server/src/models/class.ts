@@ -3,8 +3,9 @@ import { School } from './school';
 
 export class Class extends BaseModel {
   public readonly classID!: string;
-  public grade?: string;
-  public wordLen?: string;
+  public channel?: string;
+  public grade?: number;
+  public wordLen?: number;
 
   static tableName: string = 'Class';
   static idColumn: string = 'classID';

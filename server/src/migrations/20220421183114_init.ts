@@ -50,6 +50,7 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.schema.createTable('Class', (table: Knex.TableBuilder) => {
     table.increments('classID').notNullable().unique().primary();
+    table.string('channel').notNullable().unique();
     table.integer('grade').notNullable();
     table.integer('wordLen').notNullable();
     auditing(knex, table);

@@ -7,6 +7,7 @@ import { Principal } from '../models/principal';
 import { Teacher } from '../models/teacher';
 import { Student } from '../models/student';
 import { Admin } from '../models/admin';
+import { Class } from '../models/class';
 
 const secret = AUTH.SECRET;
 
@@ -61,6 +62,12 @@ export const signin = async (req: Request, res: Response) => {
         { idNumber: users[index]?.idNumber, email: users[index]?.email },
         secret
       );
+
+      if (users[index]?.roleType === 'STUDENT' && users[1]?.classID) {
+        const classDetails = await Class.query().where('classID', '=', users[1]?.classID)
+        // @ts-ignore
+        users[index].channelName = classDetails[0].channel
+      }
 
       return res.json({
         success: true,

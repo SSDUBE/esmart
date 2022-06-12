@@ -84,7 +84,9 @@ export const Game = () => {
     let unsub: any = '';
 
     (async function () {
-      const ref = collection(db, 'chats');
+      const { channelName } = context.global.user;
+
+      const ref = collection(db, channelName);
       unsub = onSnapshot(
         query(ref, orderBy('createdAt', 'desc')),
         async (querySnapshot) => {
@@ -114,13 +116,14 @@ export const Game = () => {
 
   const onSend = React.useCallback(async (messages: IMessage[] = []) => {
     try {
+      const { channelName } = context.global.user;
       const { _id, createdAt, text, user } = messages[0];
 
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, messages)
       );
 
-      await setDoc(doc(db, 'chats', _id.toString()), {
+      await setDoc(doc(db, channelName, _id.toString()), {
         _id,
         createdAt,
         text,
