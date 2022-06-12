@@ -11,13 +11,17 @@ import Icon from '@expo/vector-icons/FontAwesome';
 import { colors } from '../constants/Colors';
 import { iPhoneSize } from '../constants/IphoneSize';
 import { RoundedButton } from '../components/RoundedButton';
+import { NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../navigations/RootStackParamList';
 
 const esmartLogo = require('../../assets/img/esmart-logo.png');
 
-export const GetStarted = (props: any) => {
+interface IHome {
+  navigation: NavigationProp<RootStackParamList>;
+}
 
+export const GetStarted = (props: IHome) => {
   const { navigation } = props;
-  // const { email, password } = this.state;
 
   return (
     <ScrollView style={styles.wrapper}>
@@ -29,17 +33,8 @@ export const GetStarted = (props: any) => {
           textColor={colors.white}
           handleOnPress={() => navigation.navigate('Signin')}
         />
-
-        {/* <TouchableHighlight
-          style={styles.moreOptionsButton}
-          onPress={() => {}}
-        >
-          <Text style={styles.moreOptionsButtonText}>More options</Text>
-        </TouchableHighlight> */}
         <View style={styles.termsAndConditions}>
-          <Text style={styles.termsText}>
-            By tapping Continue, Create Account or More
-          </Text>
+          <Text style={styles.termsText}>By tapping Get Started</Text>
           <Text style={styles.termsText}>{' options,'}</Text>
           <Text style={styles.termsText}>{"I agree to Esmart's "}</Text>
           <TouchableHighlight style={styles.linkButton}>
@@ -63,6 +58,10 @@ export const GetStarted = (props: any) => {
     </ScrollView>
   );
 };
+
+GetStarted.navigationOptions = () => ({
+  headerShown: false,
+});
 
 let termsTextSize = 13;
 let headingTextSize = 30;

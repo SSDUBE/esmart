@@ -54,7 +54,7 @@ export const FaceRecognation = () => {
 
   function handleFacesDetected({ faces }: FaceDetectionResult) {
     setFaceData(faces);
-    console.log('faces ', faces);
+    // console.log('faces ', faces);
   }
 
   return (

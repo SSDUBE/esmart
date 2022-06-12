@@ -5,14 +5,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GetStarted } from '../views/GetStarted';
 import { Home } from '../views/Home';
 import { Signin } from '../views/Signin';
-import { NavigationProps } from './RootStackParamList';
+import { RootStackParamList } from './RootStackParamList';
 import { LeaderBoard } from '../views/LeaderBoard';
 import { Profile } from '../views/Profile';
 import { Game } from '../views/Game';
 import { AppProvider } from '../context/context';
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // function HomeStack() {
 //   return (
@@ -37,8 +37,12 @@ function AuthStack() {
 export const AppStack = () => {
   return (
     <AppProvider>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name='AuthStack' component={AuthStack} />
+      <Stack.Navigator>
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name='AuthStack'
+          component={AuthStack}
+        />
         {/* <Stack.Screen name='HomeStack' component={HomeStack} /> */}
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Game' component={Game} />

@@ -1,8 +1,7 @@
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-
-type RootStackParamList = {
+export type RootStackParamList = {
   GetStarted: undefined;
   Signin: undefined;
+  Home: undefined;
+  AuthStack: undefined;
+  Game: undefined;
 };
-
-export type NavigationProps = NativeStackScreenProps<RootStackParamList, 'GetStarted'>;

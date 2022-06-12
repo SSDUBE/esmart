@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from 'react';
+import React, { FunctionComponent } from 'react';
 import {
   KeyboardAvoidingView,
   StyleSheet,
@@ -6,12 +6,10 @@ import {
   View,
   Text,
   Alert,
-  ActivityIndicator,
 } from 'react-native';
 import { InputField } from '../components/InputField';
 import { Loader } from '../components/Loader';
 import { NextArrowButton } from '../components/NextArrowButton';
-import { Notification } from '../components/Notification';
 import { colors } from '../constants/Colors';
 import { iPhoneSize } from '../constants/IphoneSize';
 import { Formik } from 'formik';
@@ -21,11 +19,8 @@ import * as Keychain from 'react-native-keychain';
 import keypair from 'keypair';
 import { AuthService } from '../services/AuthService';
 import { AppContext } from '../context/context';
-
-interface ISignin {
-  login: any;
-  navigation: any;
-}
+import { NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../navigations/RootStackParamList';
 
 const ValidationSchema = Yup.object().shape({
   idNumber: Yup.string()
@@ -39,14 +34,12 @@ const ValidationSchema = Yup.object().shape({
   password: Yup.string().required('Password is required'),
 });
 
-export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
+interface ISignin {
+  navigation: NavigationProp<RootStackParamList>;
+}
+
+export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
   const context: any = React.useContext(AppContext);
-
-  const [formValid, setFormValid] = React.useState(true);
-
-  function handleCloseNotification() {
-    setFormValid(true);
-  }
 
   function biomatric(values: any, setSubmitting: any) {
     (async () => {
@@ -62,15 +55,18 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
               promptMessage: 'Scan your finger.',
             });
             if (result) {
-              setSubmitting(true)
+              setSubmitting(true);
               const pair = keypair();
               const auth = new AuthService();
               const res = await auth.signinUser(values);
 
-              setSubmitting(false)
+              setSubmitting(false);
               if (res.success) {
-                // context.user.update(res.data);
-                // TODO to dispatch actions to context
+                if (res.data.roleType !== 'STUDENT') {
+                  Alert.alert('Oooh Noo!!!', 'Only students can play games');
+                  return;
+                }
+
                 context.user.update(res.data);
                 navigation.navigate('Home');
               } else {
@@ -93,15 +89,8 @@ export const Signin: FunctionComponent<ISignin> = ({ login, navigation }) => {
     })();
   }
 
-  const showNotification = !formValid;
-  const background = formValid ? colors.green01 : colors.darkOrange;
-  const notificationMarginTop = showNotification ? 10 : 0;
-
   return (
-    <KeyboardAvoidingView
-      style={[{ backgroundColor: background }, styles.wrapper]}
-      behavior='padding'
-    >
+    <KeyboardAvoidingView style={styles.wrapper} behavior='padding'>
       <Formik
         initialValues={{ idNumber: '', password: '' }}
         validationSchema={ValidationSchema}
@@ -173,6 +162,7 @@ const styles = StyleSheet.create({
   wrapper: {
     display: 'flex',
     flex: 1,
+    backgroundColor: colors.green01,
   },
   scrollViewWrapper: {
     marginTop: 70,
@@ -203,6 +193,6 @@ const styles = StyleSheet.create({
     right: 0,
   },
   spinnerTextStyle: {
-    color: '#FFF'
+    color: '#FFF',
   },
 });
