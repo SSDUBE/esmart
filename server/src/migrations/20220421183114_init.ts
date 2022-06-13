@@ -52,15 +52,21 @@ export async function up(knex: Knex): Promise<void> {
     table.increments('classID').notNullable().unique().primary();
     table.string('channel').notNullable().unique();
     table.integer('grade').notNullable();
-    table.integer('wordLen').notNullable();
+    auditing(knex, table);
+  });
+
+  await knex.schema.createTable('GameWords', (table: Knex.TableBuilder) => {
+    table.increments('gameWordID').notNullable().unique().primary();
+    table.string('word', 50).notNullable();
     auditing(knex, table);
   });
 
   await knex.schema.createTable('Game', (table: Knex.TableBuilder) => {
     table.increments('gameID').notNullable().unique().primary();
-    table.string('word', 50).notNullable();
+    // table.string('word', 50).notNullable();
     table.boolean('complete').notNullable().defaultTo(false);
     table.integer('classID').references('Class.classID').notNullable();
+    table.integer('gameWordID').references('GameWords.gameWordID').notNullable();
     auditing(knex, table);
   });
 
@@ -88,7 +94,7 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('Leaderboard', (table: Knex.TableBuilder) => {
     table.increments('leaderboardID').notNullable().unique().primary();
     table.integer('score', 50).notNullable();
-    table.string('studentIdNumber').references('Student.idNumber').notNullable();
+    table.string('idNumber').references('Student.idNumber').notNullable();
     auditing(knex, table);
   });
 
@@ -119,5 +125,6 @@ export async function down(knex: Knex): Promise<void> {
     .dropTable('School')
     .dropTable('Anagrams')
     .dropTable('Game')
-    .dropTable('Class');
+    .dropTable('Class')
+    .dropTable('GameWords')
 }

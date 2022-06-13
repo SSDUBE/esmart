@@ -3,7 +3,7 @@ import { BaseModel } from './base';
 
 export class Leaderboard extends BaseModel {
   public readonly leaderboardID!: number;
-  public readonly studentIdNumber!: string;
+  public readonly idNumber!: string;
   public score!: number;
   public createdAt!: Date;
   public updatedAt!: Date;

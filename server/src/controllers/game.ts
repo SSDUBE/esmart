@@ -1,5 +1,5 @@
 // @ts-ignore
-import anagrams from 'english-anagrams';
+import anagramSolver from 'anagram-solver';
 import { initializeApp } from 'firebase/app';
 import { Logger } from '../utils/logger';
 import cron from 'node-cron';
@@ -7,7 +7,7 @@ import { Game } from '../models/game';
 import { Class } from '../models/class';
 import { Anagrams } from '../models/anagrams';
 import { Request, Response } from 'express';
-import { Leaderboard } from '../models/Leaderboard';
+import { Leaderboard } from '../models/leaderboard';
 import { HTTP_CODES } from '../globals';
 import { db } from '../utils/firebase';
 import {
@@ -18,20 +18,15 @@ import {
   orderBy,
   collection,
 } from 'firebase/firestore';
+import { GameWords } from '../models/gameWords';
 
 export const startGame = async () => {
   try {
-    const _id = Math.random()
-    await setDoc(doc(db, 'chats', '1111'), {
-      _id: 111,
-      createdAt: new Date(),
-      text: {gameWord: 'backend', word: 'there'},
-      user: 1,
-    });
     // cron.schedule('*/20 * * * * *', () => {
     //   console.log('running a task every minute');
     //   createGame();
     // });
+    createGame();
   } catch (err) {
     Logger.log('error ' + err);
   }
@@ -39,15 +34,17 @@ export const startGame = async () => {
 
 const createGame = async () => {
   try {
-    const word = 'latters';
-    const foundAnagrams = anagrams(word);
+    const words = await GameWords.query();
     const classes = await Class.query();
 
+    console.log('classes ', classes)
     await Game.query().update({ complete: true });
 
     for (let i = 0; i < classes.length; i++) {
+      const randomNum = Math.floor(Math.random() * words.length);
+      const foundAnagrams = await anagramSolver(words[randomNum].word);
       const game = await Game.query().insertGraphAndFetch({
-        word,
+        gameWordID: words[randomNum].gameWordID,
         classID: classes[i].classID,
       });
       for (let i = 0; i < foundAnagrams.length; i++) {
@@ -56,9 +53,16 @@ const createGame = async () => {
           gameID: game.gameID,
         });
       }
+
+      // await setDoc(doc(db, 'chats', '1111'), {
+      //   _id: 111,
+      //   createdAt: new Date(),
+      //   text: {gameWord: 'backend', word: 'there'},
+      //   user: 1,
+      // });
     }
 
-    console.log('anagrams ', foundAnagrams);
+    // console.log('anagrams ', foundAnagrams);
   } catch (err) {
     Logger.log('Something went wrong' + err);
   }
@@ -73,7 +77,7 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     //   // Principal.query().whereNot('idNumber', '=', idNumber),
     // ]);
 
-    console.log('schoolId ', schoolId)
+    console.log('schoolId ', schoolId);
     if (schoolId) {
       board = await Leaderboard.query()
         .select('leaderboard.*', 'student.*')
@@ -81,7 +85,7 @@ export const getLeaderboard = async (req: Request, res: Response) => {
         .leftJoin(
           'Student as student',
           'student.idNumber',
-          'leaderboard.studentIdNumber'
+          'leaderboard.idNumber'
         )
         .where('student.schoolID', '=', schoolId);
     } else {
@@ -91,7 +95,7 @@ export const getLeaderboard = async (req: Request, res: Response) => {
         .leftJoin(
           'Student as student',
           'student.idNumber',
-          'leaderboard.studentIdNumber'
+          'leaderboard.idNumber'
         );
     }
 

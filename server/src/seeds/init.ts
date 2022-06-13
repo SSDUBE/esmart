@@ -7,18 +7,18 @@ export async function seed(knex: Knex): Promise<void> {
 
   // Inserts seed entries
   await knex('Class').insert([
-    { grade: 1, wordLen: 5, channel: 'gradeOne' },
-    { grade: 2, wordLen: 5, channel: 'gradeTwo' },
-    { grade: 3, wordLen: 5, channel: 'gradeThree' },
-    { grade: 4, wordLen: 5, channel: 'gradeFour' },
-    { grade: 5, wordLen: 5, channel: 'gradeFive' },
-    { grade: 6, wordLen: 5, channel: 'gradeSix' },
-    { grade: 7, wordLen: 5, channel: 'gradeSeven' },
-    { grade: 8, wordLen: 5, channel: 'gradeEight' },
-    { grade: 9, wordLen: 5, channel: 'gradeNine' },
-    { grade: 10, wordLen: 5, channel: 'gradeTen' },
-    { grade: 11, wordLen: 5, channel: 'gradeEleven' },
-    { grade: 12, wordLen: 5, channel: 'gradeTwelve' },
+    { grade: 1, channel: 'gradeOne' },
+    { grade: 2, channel: 'gradeTwo' },
+    { grade: 3, channel: 'gradeThree' },
+    { grade: 4, channel: 'gradeFour' },
+    { grade: 5, channel: 'gradeFive' },
+    { grade: 6, channel: 'gradeSix' },
+    { grade: 7, channel: 'gradeSeven' },
+    { grade: 8, channel: 'gradeEight' },
+    { grade: 9, channel: 'gradeNine' },
+    { grade: 10, channel: 'gradeTen' },
+    { grade: 11, channel: 'gradeEleven' },
+    { grade: 12, channel: 'gradeTwelve' },
   ]);
 
   await knex('Admin').insert([
@@ -30,5 +30,28 @@ export async function seed(knex: Knex): Promise<void> {
       email: 'admin@gmail.com',
       password: await PasswordBcrypt.encrypt('Admin@123'),
     },
+  ]);
+
+  await knex('GameWords').insert([
+    { word: 'aelst' },
+    { word: 'aeprs' },
+    { word: 'aelrst' },
+    { word: 'abets' },
+    { word: 'least' },
+    { word: 'stake' },
+    { word: 'pares' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
+    // { word: '' },
   ]);
 }
