@@ -21,6 +21,7 @@ import { AuthService } from '../services/AuthService';
 import { AppContext } from '../context/context';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigations/RootStackParamList';
+import { Helpers } from '../utilities/Helpers';
 
 const ValidationSchema = Yup.object().shape({
   idNumber: Yup.string()
@@ -67,6 +68,8 @@ export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
                   return;
                 }
 
+                const helper = new Helpers()
+                await helper.setInStorage('token', res.accessToken);
                 context.user.update(res.data);
                 navigation.navigate('Home');
               } else {

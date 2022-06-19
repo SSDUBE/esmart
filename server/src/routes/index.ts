@@ -1,5 +1,5 @@
 // import { playGame } from '../controllers/game';
-import { getLeaderboard } from '../controllers/game';
+import { allocatePoints, getLeaderboard } from '../controllers/game';
 import { GetallSchools } from '../controllers/school';
 import {
   // getRoles,
@@ -34,6 +34,7 @@ export = function (app: any) {
   app.post(`${route}/users/:idNumber`, authentication, getAllUsers);
   app.delete(`${route}/user/:idNumber`, authentication, deleteUser);
   app.post(`${route}/leaderboard`, authentication, getLeaderboard);
+  app.post(`${route}/allocate-points`, authentication, allocatePoints);
   app.put(
     `${route}/school/activate-or-deactivate`,
     authentication,

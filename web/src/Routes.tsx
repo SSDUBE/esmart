@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { RouteItems } from './constants';
 import { AppContext } from './context/context';
+import { Helpers } from './utilities/Helpers';
 
 const AppRoutes = () => {
   const navigate = useNavigate();
@@ -9,16 +10,23 @@ const AppRoutes = () => {
   const context: any = React.useContext(AppContext);
 
   React.useEffect(() => {
-    const isLogin = context.global.user.isLogin;
+    (async function(){
+      const isLogin = context.global.user.isLogin;
 
-    if (!isLogin) {
-      if (location.pathname.includes('signup')) {
-        return navigate('/signup');
+      if (!context.global.user.active) {
+        await Helpers.removeInStorage('token');
+        return navigate('/signin')
       }
-      return navigate('/signin');
-    }
 
-    navigate('/dashboard');
+      if (!isLogin) {
+        if (location.pathname.includes('signup')) {
+          return navigate('/signup');
+        }
+        return navigate('/signin');
+      }
+  
+      navigate('/dashboard');
+    })()
   }, [context.global.user.isLogin]);
 
   return (

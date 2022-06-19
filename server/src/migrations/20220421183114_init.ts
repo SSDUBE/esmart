@@ -55,8 +55,8 @@ export async function up(knex: Knex): Promise<void> {
     auditing(knex, table);
   });
 
-  await knex.schema.createTable('GameWords', (table: Knex.TableBuilder) => {
-    table.increments('gameWordID').notNullable().unique().primary();
+  await knex.schema.createTable('Scrumble', (table: Knex.TableBuilder) => {
+    table.increments('scrumbleID').notNullable().unique().primary();
     table.string('word', 50).notNullable();
     auditing(knex, table);
   });
@@ -66,13 +66,14 @@ export async function up(knex: Knex): Promise<void> {
     // table.string('word', 50).notNullable();
     table.boolean('complete').notNullable().defaultTo(false);
     table.integer('classID').references('Class.classID').notNullable();
-    table.integer('gameWordID').references('GameWords.gameWordID').notNullable();
+    table.integer('scrumbleID').references('Scrumble.scrumbleID').notNullable();
     auditing(knex, table);
   });
 
   await knex.schema.createTable('Anagrams', (table: Knex.TableBuilder) => {
     table.increments('anagramID').notNullable().unique().primary();
     table.string('anagram').notNullable();
+    table.boolean('selected').notNullable().defaultTo(false);
     table.integer('gameID').references('Game.gameID').notNullable();
     auditing(knex, table);
   });
@@ -126,5 +127,5 @@ export async function down(knex: Knex): Promise<void> {
     .dropTable('Anagrams')
     .dropTable('Game')
     .dropTable('Class')
-    .dropTable('GameWords')
+    .dropTable('Scrumble')
 }

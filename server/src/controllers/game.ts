@@ -18,15 +18,15 @@ import {
   orderBy,
   collection,
 } from 'firebase/firestore';
-import { GameWords } from '../models/gameWords';
+import { Scrumble } from '../models/scrumble';
 
 export const startGame = async () => {
   try {
     // cron.schedule('*/20 * * * * *', () => {
-    //   console.log('running a task every minute');
+    //   Logger.log('Now running cron job')
     //   createGame();
     // });
-    createGame();
+    // createGame();
   } catch (err) {
     Logger.log('error ' + err);
   }
@@ -34,19 +34,19 @@ export const startGame = async () => {
 
 const createGame = async () => {
   try {
-    const words = await GameWords.query();
+    const words = await Scrumble.query();
     const classes = await Class.query();
 
-    console.log('classes ', classes)
     await Game.query().update({ complete: true });
 
     for (let i = 0; i < classes.length; i++) {
       const randomNum = Math.floor(Math.random() * words.length);
       const foundAnagrams = await anagramSolver(words[randomNum].word);
       const game = await Game.query().insertGraphAndFetch({
-        gameWordID: words[randomNum].gameWordID,
+        scrumbleID: words[randomNum].scrumbleID,
         classID: classes[i].classID,
       });
+
       for (let i = 0; i < foundAnagrams.length; i++) {
         await Anagrams.query().insertGraph({
           anagram: foundAnagrams[i],
@@ -54,15 +54,14 @@ const createGame = async () => {
         });
       }
 
-      // await setDoc(doc(db, 'chats', '1111'), {
-      //   _id: 111,
-      //   createdAt: new Date(),
-      //   text: {gameWord: 'backend', word: 'there'},
-      //   user: 1,
-      // });
+      console.log('starting another game');
+      await setDoc(doc(db, classes[i].channel, '1111'), {
+        _id: 111,
+        createdAt: new Date(),
+        text: { scrumble: words[randomNum].word, gameID: game.gameID },
+        user: 1,
+      });
     }
-
-    // console.log('anagrams ', foundAnagrams);
   } catch (err) {
     Logger.log('Something went wrong' + err);
   }
@@ -72,12 +71,7 @@ export const getLeaderboard = async (req: Request, res: Response) => {
   try {
     const { schoolId } = req.body;
     let board: any = [];
-    // const user = await Promise.all([
-    //   // Teacher.query().whereNot('idNumber', '=', idNumber),
-    //   // Principal.query().whereNot('idNumber', '=', idNumber),
-    // ]);
 
-    console.log('schoolId ', schoolId);
     if (schoolId) {
       board = await Leaderboard.query()
         .select('leaderboard.*', 'student.*')
@@ -105,6 +99,56 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     });
   } catch (err) {
     Logger.error('Failed to get all user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const allocatePoints = async (req: Request, res: Response) => {
+  try {
+    const { gameID, idNumber, answer } = req.body;
+
+    if (!gameID || !idNumber || !answer) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'gameID, idNumber or answer are missing in body',
+      });
+    }
+
+    const gameRes = await Anagrams.query()
+      .select('game.*', 'anagrams.*')
+      .from('Anagrams as anagrams')
+      .leftJoin('Game as game', 'anagrams.gameID', 'game.gameID')
+      .where('game.complete', '=', false)
+      .andWhere('game.gameID', '=', gameID)
+      .andWhere('anagrams.anagram', '=', answer.toLowerCase())
+      .andWhere('anagrams.selected', '=', false);
+
+    if (gameRes.length > 0) {
+      const [leaderboard, _] = await Promise.all([
+        Leaderboard.query().where({ idNumber }),
+        Anagrams.query()
+          .patch({ selected: true })
+          .where('anagramID', '=', gameRes[0].anagramID),
+      ]);
+
+      if (leaderboard.length > 0) {
+        await Leaderboard.query()
+          .patch({ score: leaderboard[0].score + answer.length })
+          .where({ idNumber });
+      } else {
+        await Leaderboard.query().insert({ score: answer.length, idNumber });
+      }
+    }
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      correct: gameRes.length > 0,
+    });
+  } catch (err) {
+    Logger.error('Failed to allocate points to user ' + err);
     return res.status(HTTP_CODES.SERVER_ERROR).json({
       success: false,
       message: 'Something went wrong please try again',

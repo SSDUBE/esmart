@@ -21,13 +21,27 @@ export const signin = async (req: Request, res: Response) => {
     ).toString();
     const [idNumber, password] = decodedCredentials.split(':');
     let users = await Promise.all([
-      Principal.query().findOne({ idNumber }),
-      Student.query().findOne({ idNumber }),
-      Teacher.query().findOne({ idNumber }),
+      Principal.query()
+        .select('principal.*', 'school.*')
+        .from('Principal as principal')
+        .leftJoin('School as school', 'school.schoolID', 'principal.schoolID')
+        .where({ idNumber })
+        .first(),
+      Student.query()
+        .select('student.*', 'school.*')
+        .from('Student as student')
+        .leftJoin('School as school', 'school.schoolID', 'student.schoolID')
+        .where({ idNumber })
+        .first(),
+      Teacher.query()
+        .select('teacher.*', 'school.*')
+        .from('Teacher as teacher')
+        .leftJoin('School as school', 'school.schoolID', 'teacher.schoolID')
+        .where({ idNumber })
+        .first(),
       Admin.query().findOne({ idNumber }),
     ]);
-    let index = 0
-    // let [principal, teacher] = user;
+    let index = 0;
 
     for (let i = 0; i < users.length; i++) {
       if (users[i]) {
@@ -38,7 +52,7 @@ export const signin = async (req: Request, res: Response) => {
         if (!verify) {
           users[i] = undefined;
         }
-        index = i
+        index = i;
         break;
       }
     }
@@ -49,7 +63,7 @@ export const signin = async (req: Request, res: Response) => {
         message: 'Username or password incorrect',
       });
     }
-  
+
     if (users[index]) {
       if (!users[index]?.active) {
         return res.status(HTTP_CODES.FORBIDDEN).json({
@@ -64,9 +78,13 @@ export const signin = async (req: Request, res: Response) => {
       );
 
       if (users[index]?.roleType === 'STUDENT' && users[1]?.classID) {
-        const classDetails = await Class.query().where('classID', '=', users[1]?.classID)
+        const classDetails = await Class.query().where(
+          'classID',
+          '=',
+          users[1]?.classID
+        );
         // @ts-ignore
-        users[index].channelName = classDetails[0].channel
+        users[index].channelName = classDetails[0].channel;
       }
 
       return res.json({

@@ -32,7 +32,7 @@ export async function seed(knex: Knex): Promise<void> {
     },
   ]);
 
-  await knex('GameWords').insert([
+  await knex('Scrumble').insert([
     { word: 'aelst' },
     { word: 'aeprs' },
     { word: 'aelrst' },

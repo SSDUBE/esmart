@@ -3,7 +3,7 @@ import { BaseModel } from './base';
 
 export class Game extends BaseModel {
   public readonly gameID!: number;
-  public gameWordID!: number;
+  public scrumbleID!: number;
   public complete!: boolean;
   public classID!: string;
   public anagrams!: Partial<Anagrams>;

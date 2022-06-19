@@ -6,6 +6,7 @@ interface IAppProvider {}
 export const AppContext = React.createContext('App');
 
 export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
+
   const [state, setState] = React.useState({
     global: {
       user: {
@@ -26,7 +27,7 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
       update: async (data: any) => {
         if (data) {
           const newUser = {
-            active: true,
+            active: data.active,
             isLogin: true,
             firstName: data.firstName,
             lastName: data.lastName,

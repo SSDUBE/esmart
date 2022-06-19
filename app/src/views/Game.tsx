@@ -23,11 +23,23 @@ import {
 import { colors } from '../constants/Colors';
 import * as Location from 'expo-location';
 import { getCameraPermissionsAsync } from 'expo-camera';
+import { GameService } from '../services/Game';
+// @ts-ignore
+import RewardsComponent from 'react-native-rewards';
+
+interface IScrumble {
+  scrumble: string;
+  gameId: number;
+}
 
 export const Game = () => {
   const context: any = React.useContext(AppContext);
+  const [animationState, setAnimationState] = React.useState('rest');
   const [messages, setMessages] = React.useState<IMessage[]>([]);
-  const [angram, setAnagram] = React.useState('Game starting shortly');
+  const [newScrumble, setNewScrumble] = React.useState<IScrumble>({
+    scrumble: 'Game starting shortly',
+    gameId: 0,
+  });
   const appState = React.useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = React.useState(
     appState.current
@@ -102,7 +114,10 @@ export const Game = () => {
                 user: doc.data()?.user,
               });
             } else {
-              setAnagram(doc.data().text.gameWord);
+              setNewScrumble({
+                scrumble: doc.data().text.scrumble,
+                gameId: doc.data().text.gameID,
+              });
             }
           });
 
@@ -116,7 +131,7 @@ export const Game = () => {
 
   const onSend = React.useCallback(async (messages: IMessage[] = []) => {
     try {
-      const { channelName } = context.global.user;
+      const { channelName, idNumber } = context.global.user;
       const { _id, createdAt, text, user } = messages[0];
 
       setMessages((previousMessages) =>
@@ -129,6 +144,17 @@ export const Game = () => {
         text,
         user,
       });
+
+      const game = new GameService();
+      const res = await game.allocatePoints({
+        gameID: newScrumble.gameId,
+        idNumber,
+        answer: text,
+      });
+
+      if (res.correct) {
+        setAnimationState('reward')
+      }
     } catch (err) {
       console.log('Something went wrong ', err);
     }
@@ -141,7 +167,7 @@ export const Game = () => {
           <FaceRecognation />
         </View>
         <View style={styles.anagramContainer}>
-          <Text style={styles.anagram}>{angram}</Text>
+          <Text style={styles.anagram}>{newScrumble.scrumble}</Text>
         </View>
       </View>
       <GiftedChat
@@ -153,6 +179,11 @@ export const Game = () => {
           name: context.global.user.firstName,
           avatar: 'https://placeimg.com/140/140/any',
         }}
+      />
+      <RewardsComponent
+        animationType='confetti'
+        state={animationState}
+        onRest={() => setAnimationState('rest')}
       />
     </SafeAreaView>
   );

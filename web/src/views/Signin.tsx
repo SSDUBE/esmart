@@ -64,7 +64,6 @@ const Signin = () => {
                   const service = new UserService();
                   const user = await service.get();
 
-                  console.log('user ', user)
                   if (user.data.roleType === 'STUDENT') {
                     await Helpers.removeInStorage('token')
                     swal(

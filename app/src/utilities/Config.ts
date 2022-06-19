@@ -8,5 +8,8 @@ export const Config = {
     user: {
       signin: `${domain}/esmart/sign-in`,
     },
+    game: {
+      allocatePoints: `${domain}/esmart/allocate-points`,
+    }
   },
 };

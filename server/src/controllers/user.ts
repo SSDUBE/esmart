@@ -42,12 +42,7 @@ export const getUser = async (req: Request, res: Response) => {
         .leftJoin('School as school', 'school.schoolID', 'student.schoolID')
         .where('student.idNumber', '=', idNumber)
         .first(),
-      Admin.query()
-        .select('admin.*', 'school.*')
-        .from('Admin as admin')
-        .leftJoin('School as school', 'school.schoolID', 'admin.schoolID')
-        .where('admin.idNumber', '=', idNumber)
-        .first(),
+      Admin.query().findOne({ idNumber }),
     ]);
 
     return res.json({
