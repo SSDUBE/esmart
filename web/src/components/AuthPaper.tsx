@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Box, Typography, Paper, Theme } from '@mui/material';
-import Background from '../assets/background.jpeg';
+import Background from '../assets/background.jpg';
 import { theme } from '../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({

@@ -38,6 +38,7 @@ interface IRouteItems {
 
 const Signin = lazy(() => import('../views/Signin'));
 const Signup = lazy(() => import('../views/Signup'));
+const Welcome = lazy(() => import('../views/Welcome'));
 
 export const RouteItems: IRouteItems = {
   open: {
@@ -46,6 +47,11 @@ export const RouteItems: IRouteItems = {
       Component: null,
     },
     routes: [
+      {
+        paths: ['/welcome'],
+        Component: Welcome,
+        name: 'Welcome',
+      },
       {
         paths: ['/signin'],
         Component: Signin,

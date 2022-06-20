@@ -42,6 +42,7 @@ export const signin = async (req: Request, res: Response) => {
       Admin.query().findOne({ idNumber }),
     ]);
     let index = 0;
+    let isPasswordCorrect = true;
 
     for (let i = 0; i < users.length; i++) {
       if (users[i]) {
@@ -50,7 +51,8 @@ export const signin = async (req: Request, res: Response) => {
           users[i]!.password
         );
         if (!verify) {
-          users[i] = undefined;
+          // users[i] = undefined;
+          isPasswordCorrect = false;
         }
         index = i;
         break;
@@ -60,7 +62,14 @@ export const signin = async (req: Request, res: Response) => {
     if (!users[index]) {
       return res.status(HTTP_CODES.NOT_FOUND).json({
         success: false,
-        message: 'Username or password incorrect',
+        message: 'Username is incorrect',
+      });
+    }
+
+    if (!isPasswordCorrect) {
+      return res.status(HTTP_CODES.NOT_FOUND).json({
+        success: false,
+        message: 'Password is incorrect',
       });
     }
 

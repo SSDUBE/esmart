@@ -207,6 +207,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginLeft: 10,
     marginTop: 10,
+    zIndex: 9999
   },
   container: {
     flex: 1,

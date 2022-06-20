@@ -22,7 +22,7 @@ import { Scrumble } from '../models/scrumble';
 
 export const startGame = async () => {
   try {
-    // cron.schedule('*/20 * * * * *', () => {
+    // cron.schedule('*/40 * * * * *', () => {
     //   Logger.log('Now running cron job')
     //   createGame();
     // });
@@ -110,6 +110,7 @@ export const allocatePoints = async (req: Request, res: Response) => {
   try {
     const { gameID, idNumber, answer } = req.body;
 
+    console.log('hello thete')
     if (!gameID || !idNumber || !answer) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,

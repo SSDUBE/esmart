@@ -42,6 +42,13 @@ const baseTheme = createTheme({
         },
       },
     },
+    MuiFab: {
+      styleOverrides: {
+        root: {
+          background: '#EC8144'
+        }
+      }
+    },
     MuiTypography: {
       styleOverrides: {
         root: {

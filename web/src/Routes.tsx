@@ -15,14 +15,14 @@ const AppRoutes = () => {
 
       if (!context.global.user.active) {
         await Helpers.removeInStorage('token');
-        return navigate('/signin')
+        return navigate('/welcome')
       }
 
       if (!isLogin) {
         if (location.pathname.includes('signup')) {
           return navigate('/signup');
         }
-        return navigate('/signin');
+        return navigate('/welcome');
       }
   
       navigate('/dashboard');
@@ -50,6 +50,7 @@ const AppRoutes = () => {
 
               for (let i = 0; i < paths.length; i++) {
                 (roles?.includes(context.global.user.roleType) ||
+                  paths.includes('/welcome') ||
                   paths.includes('/signin') ||
                   paths.includes('/signup')) &&
                   routeComponents.push(

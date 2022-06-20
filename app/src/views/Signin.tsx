@@ -6,6 +6,7 @@ import {
   View,
   Text,
   Alert,
+  TouchableOpacity
 } from 'react-native';
 import { InputField } from '../components/InputField';
 import { Loader } from '../components/Loader';
@@ -55,13 +56,13 @@ export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
             let result = await LocalAuthentication.authenticateAsync({
               promptMessage: 'Scan your finger.',
             });
+
+            setSubmitting(true);
             if (result) {
-              setSubmitting(true);
               const pair = keypair();
               const auth = new AuthService();
               const res = await auth.signinUser(values);
 
-              setSubmitting(false);
               if (res.success) {
                 if (res.data.roleType !== 'STUDENT') {
                   Alert.alert('Oooh Noo!!!', 'Only students can play games');
@@ -73,19 +74,25 @@ export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
                 context.user.update(res.data);
                 navigation.navigate('Home');
               } else {
+                setSubmitting(false);
                 Alert.alert('Oops!!!', res.message);
               }
             } else {
+              setSubmitting(false);
               Alert.alert('Failed to validate finger print');
             }
+            setSubmitting(false);
           } else {
+            setSubmitting(false);
             Alert.alert('Ooops!!', 'Please add finger print to your device');
           }
           //do something fingerprint specific
         } else {
+          setSubmitting(false);
           Alert.alert('Oops!!!', 'Device does not have biomatric');
         }
       } catch (err) {
+        setSubmitting(false);
         console.log('Failed to sign in ', err);
         Alert.alert('Oops!!!', 'Failed to sign in');
       }
@@ -147,7 +154,10 @@ export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
                 error={errors.password}
               />
             </ScrollView>
-            <NextArrowButton handleNextButton={handleSubmit} />
+            {/* <TouchableOpacity onPress={handleSubmit} disabled={isSubmitting} style={{backgroundColor: 'red'}}>
+              <Text>Login</Text>
+            </TouchableOpacity> */}
+            <NextArrowButton handleNextButton={handleSubmit} disabled={isSubmitting}/>
             <Loader modalVisible={isSubmitting} animationType='fade' />
           </View>
         )}
