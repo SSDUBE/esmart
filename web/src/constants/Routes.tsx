@@ -6,6 +6,7 @@ import {
 } from '@mui/icons-material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 // import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { Outlet } from 'react-router-dom';
 import { AppDrawer } from '../components/AppDrawer';
@@ -13,6 +14,7 @@ import { UpdateProfile } from '../views/UpdateProfile';
 import { Dashboard } from '../views/Dashboard';
 import { UserManagement } from '../views/UserManagement';
 import { SchoolManagement } from '../views/SchoolManagement';
+import { GameSettings } from '../views/GameSettings';
 
 interface IBaseRoute {
   path: string;
@@ -101,6 +103,13 @@ export const RouteItems: IRouteItems = {
         Icon: AccountCircleIcon,
         name: 'Update Profile',
         roles: ['ADMIN', 'PRINCIPAL', 'TEACHER']
+      },
+      {
+        paths: ['/game-setting'],
+        Component: GameSettings,
+        Icon: SettingsApplicationsIcon,
+        name: 'Game Setting',
+        roles: ['ADMIN']
       },
     ],
   },

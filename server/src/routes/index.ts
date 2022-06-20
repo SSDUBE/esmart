@@ -2,6 +2,7 @@
 import {
   allocatePoints,
   createScrumble,
+  deleteScrumble,
   getDashboardData,
   getGameScrumbles,
   getLeaderboard,
@@ -44,6 +45,7 @@ export = function (app: any) {
   app.get(`${route}/dashboard-data`, authentication, getDashboardData);
   app.get(`${route}/game-scrumble`, authentication, getGameScrumbles);
   app.put(`${route}/create-scrumble`, authentication, createScrumble);
+  app.delete(`${route}/scrumble`, authentication, deleteScrumble);
   app.put(
     `${route}/school/activate-or-deactivate`,
     authentication,

@@ -20,6 +20,10 @@ export const Config = {
       update: `${domain}/esmart/update-user`,
       leaderboard: `${domain}/esmart/leaderboard`,
       activateOrDeactivateSchool: `${domain}/esmart/school/activate-or-deactivate`,
+      dashboardData: `${domain}/esmart/dashboard-data`,
+      scrumbles: `${domain}/esmart/game-scrumble`,
+      createScrumble: `${domain}/esmart/create-scrumble`,
+      deleteScrumble: `${domain}/esmart/scrumble`,
     }
   }
 }

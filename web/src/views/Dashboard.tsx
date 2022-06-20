@@ -86,12 +86,14 @@ export const Dashboard = () => {
   const context: any = React.useContext(AppContext);
   const classes = useStyles();
   const [rows, setRows] = React.useState<ITableData[]>([]);
+  const [tileData, setTileData] = React.useState<any>({})
 
   React.useEffect(() => {
     (async function () {
       const { schoolId } = context.global.user;
       const user = new UserService();
       const leaderboard = await user.getLeaderboard(schoolId);
+      const dashboardData = await user.getDashboardData();
       const tempRows: ITableData[] = [];
 
       leaderboard.data.forEach((board: any) => {
@@ -111,6 +113,7 @@ export const Dashboard = () => {
       });
 
       setRows(tempRows);
+      setTileData(dashboardData.data)
     })();
   }, []);
 
@@ -212,7 +215,7 @@ export const Dashboard = () => {
             <Grid item xs={4} md={2} key={idx}>
               <LeaderBoardStatusCard
                 title={item.name}
-                totalBit={6}
+                totalBit={tileData[Object.keys(tileData)[idx]]}
                 status={item.status}
               />
             </Grid>

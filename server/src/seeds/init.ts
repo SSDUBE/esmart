@@ -33,13 +33,13 @@ export async function seed(knex: Knex): Promise<void> {
   ]);
 
   await knex('Scrumble').insert([
-    { word: 'aelst' },
-    { word: 'aeprs' },
-    { word: 'aelrst' },
-    { word: 'abets' },
-    { word: 'least' },
-    { word: 'stake' },
-    { word: 'pares' },
+    { word: 'aelst', wordLength: 5 },
+    { word: 'aeprs', wordLength: 5 },
+    { word: 'aelrst', wordLength: 5 },
+    { word: 'abets', wordLength: 5 },
+    { word: 'least', wordLength: 5 },
+    { word: 'stake', wordLength: 5 },
+    { word: 'pares', wordLength: 5 },
     // { word: '' },
     // { word: '' },
     // { word: '' },

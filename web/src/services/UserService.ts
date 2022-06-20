@@ -32,7 +32,11 @@ export class UserService extends SecureService {
     }
   };
 
-  public getAllUsers = async (userId: string, schoolId: string, roleType: string) => {
+  public getAllUsers = async (
+    userId: string,
+    schoolId: string,
+    roleType: string
+  ) => {
     try {
       const response = await fetch(
         Config.services.user.all.replace(':idNumber', userId),
@@ -154,15 +158,87 @@ export class UserService extends SecureService {
     }
   };
 
-  public activateOrDeactivateSchool = async (status: boolean, schoolId?: number) => {
+  public activateOrDeactivateSchool = async (
+    status: boolean,
+    schoolId?: number
+  ) => {
     try {
-      const response = await fetch(Config.services.user.activateOrDeactivateSchool, {
+      const response = await fetch(
+        Config.services.user.activateOrDeactivateSchool,
+        {
+          method: 'PUT',
+          headers: {
+            ...this.defaultHeaders,
+            Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+          },
+          body: JSON.stringify({ status, schoolId }),
+        }
+      );
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
+
+  public getDashboardData = async () => {
+    try {
+      const response = await fetch(Config.services.user.dashboardData, {
+        method: 'GET',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
+
+  public getScrumbles = async () => {
+    try {
+      const response = await fetch(Config.services.user.scrumbles, {
+        method: 'GET',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
+
+  public createScrumble = async (word: string) => {
+    try {
+      const response = await fetch(Config.services.user.createScrumble, {
         method: 'PUT',
         headers: {
           ...this.defaultHeaders,
           Authorization: `Basic ${await Helpers.getInStorage('token')}`,
         },
-        body: JSON.stringify({ status, schoolId }),
+        body: JSON.stringify({ newWord: word }),
+      });
+
+      return response.json();
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  };
+
+  public dealeteScrumble = async (scrumbleId: string) => {
+    try {
+      const response = await fetch(Config.services.user.deleteScrumble, {
+        method: 'DELETE',
+        headers: {
+          ...this.defaultHeaders,
+          Authorization: `Basic ${await Helpers.getInStorage('token')}`,
+        },
+        body: JSON.stringify({ scrumbleId }),
       });
 
       return response.json();

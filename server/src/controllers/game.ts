@@ -172,11 +172,11 @@ export const getDashboardData = async (req: Request, res: Response) => {
     return res.status(HTTP_CODES.OK).json({
       success: true,
       data: {
-        totalStudents: dbData[0],
-        totalTeachers: dbData[1],
-        totalGames: dbData[2],
-        totalSchools: dbData[3],
-        totalSuspended: dbData[4],
+        totalStudents: dbData[0][0].count,
+        totalTeachers: dbData[1][0].count,
+        totalGames: dbData[2][0].count,
+        totalSchools: dbData[3][0].count,
+        totalSuspended: dbData[4][0].count,
       },
     });
   } catch (err) {
@@ -229,7 +229,43 @@ export const createScrumble = async (req: Request, res: Response) => {
 
     const scrumble = await Scrumble.query().insertAndFetch({
       word: newWord.toLowerCase(),
+      wordLength: newWord.length,
     });
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: scrumble,
+    });
+  } catch (err) {
+    Logger.error('Failed to allocate points to user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const deleteScrumble = async (req: Request, res: Response) => {
+  try {
+    const { scrumbleId } = req.body;
+
+    if (!scrumbleId) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'scrumbleId missing in body',
+      });
+    }
+
+    const findWord = await Scrumble.query().findById(scrumbleId);
+
+    if (!findWord) {
+      return res.status(HTTP_CODES.NOT_FOUND).json({
+        success: false,
+        message: 'Scrumble not found',
+      });
+    }
+
+    const scrumble = await Scrumble.query().deleteById(scrumbleId);
 
     return res.status(HTTP_CODES.OK).json({
       success: true,

@@ -213,7 +213,6 @@ export const SchoolManagement = () => {
   }
 
   function PDF() {
-    console.log('rows ', rows);
     return (
       <Document>
         <Page size="A4" style={styles.page}>
