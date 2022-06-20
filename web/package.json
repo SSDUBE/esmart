@@ -18,6 +18,8 @@
     "@types/react-dom": "^17.0.0",
     "add": "^2.0.6",
     "dayjs": "^1.11.2",
+    "docx": "^7.3.0",
+    "file-saver": "^2.0.5",
     "formik": "^2.2.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -71,6 +73,7 @@
   "devDependencies": {
     "@cypress/react": "^5.12.5",
     "@cypress/webpack-dev-server": "^1.8.4",
+    "@types/file-saver": "^2.0.5",
     "@types/react-html5-camera-photo": "^1.5.1",
     "cypress": "^10.1.0",
     "prettier": "^2.4.1"

@@ -20,6 +20,7 @@ import { LeaderBoardStatus } from '../constants';
 import { theme } from '../Theme';
 // @ts-ignore
 import ReactExport from 'react-export-excel';
+import { downloadWord } from '../components/DownloadWord';
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -67,8 +68,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.dark,
   },
   excelContainer: {
-    marginRight: theme.spacing(2)
-  }
+    marginRight: theme.spacing(2),
+  },
 }));
 
 const styles = StyleSheet.create({
@@ -96,8 +97,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing(2),
   },
 });
-
-
 
 export const Dashboard = () => {
   const context: any = React.useContext(AppContext);
@@ -184,7 +183,6 @@ export const Dashboard = () => {
   ];
 
   function PDF() {
-    console.log('rows ', rows);
     return (
       <Document>
         <Page size="A4" style={styles.page}>
@@ -222,10 +220,14 @@ export const Dashboard = () => {
   }
 
   function downloadExcel() {
-    const tempRows = [...rows]
+    const tempRows = [...rows];
 
     return (
-      <ExcelFile element={<Typography className={classes.excelText}>Download Excel!</Typography>}>
+      <ExcelFile
+        element={
+          <Typography className={classes.excelText}>Download Excel!</Typography>
+        }
+      >
         <ExcelSheet data={tempRows} name="Student Report">
           <ExcelColumn label="First Name" value="lastName" />
           <ExcelColumn label="ID Number" value="idNumber" />
@@ -237,6 +239,7 @@ export const Dashboard = () => {
       </ExcelFile>
     );
   }
+
   return (
     <Box>
       <Typography variant="h4" style={{ marginBottom: 30 }}>
@@ -256,8 +259,17 @@ export const Dashboard = () => {
         })}
       </Grid>
       <Box display="flex" justifyContent="flex-end" style={{ marginTop: 30 }}>
+        <Box className={classes.excelContainer}>
+          <Typography className={classes.excelText} onClick={() => downloadWord(rows)}>
+            Download Word!
+          </Typography>
+        </Box>
         <Box className={classes.excelContainer}>{downloadExcel()}</Box>
-        <PDFDownloadLink document={<PDF />} fileName="report.pdf" style={{color: theme.palette.primary.dark}}>
+        <PDFDownloadLink
+          document={<PDF />}
+          fileName="report.pdf"
+          style={{ color: theme.palette.primary.dark }}
+        >
           {({ blob, url, loading, error }) =>
             loading ? 'Loading document...' : 'Download Pdf!'
           }
