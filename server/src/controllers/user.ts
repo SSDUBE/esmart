@@ -9,6 +9,7 @@ import { Teacher } from '../models/teacher';
 import { Student } from '../models/student';
 import { School } from '../models/school';
 import { Admin } from '../models/admin';
+import { Game } from '../models/game';
 
 export const getUser = async (req: Request, res: Response) => {
   try {

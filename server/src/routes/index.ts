@@ -1,5 +1,11 @@
 // import { playGame } from '../controllers/game';
-import { allocatePoints, getLeaderboard } from '../controllers/game';
+import {
+  allocatePoints,
+  createScrumble,
+  getDashboardData,
+  getGameScrumbles,
+  getLeaderboard,
+} from '../controllers/game';
 import { GetallSchools } from '../controllers/school';
 import {
   // getRoles,
@@ -35,6 +41,9 @@ export = function (app: any) {
   app.delete(`${route}/user/:idNumber`, authentication, deleteUser);
   app.post(`${route}/leaderboard`, authentication, getLeaderboard);
   app.post(`${route}/allocate-points`, authentication, allocatePoints);
+  app.get(`${route}/dashboard-data`, authentication, getDashboardData);
+  app.get(`${route}/game-scrumble`, authentication, getGameScrumbles);
+  app.put(`${route}/create-scrumble`, authentication, createScrumble);
   app.put(
     `${route}/school/activate-or-deactivate`,
     authentication,

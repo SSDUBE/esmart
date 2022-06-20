@@ -19,6 +19,9 @@ import {
   collection,
 } from 'firebase/firestore';
 import { Scrumble } from '../models/scrumble';
+import { Student } from '../models/student';
+import { Teacher } from '../models/teacher';
+import { School } from '../models/school';
 
 export const startGame = async () => {
   try {
@@ -110,7 +113,6 @@ export const allocatePoints = async (req: Request, res: Response) => {
   try {
     const { gameID, idNumber, answer } = req.body;
 
-    console.log('hello thete')
     if (!gameID || !idNumber || !answer) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,
@@ -147,6 +149,91 @@ export const allocatePoints = async (req: Request, res: Response) => {
     return res.status(HTTP_CODES.OK).json({
       success: true,
       correct: gameRes.length > 0,
+    });
+  } catch (err) {
+    Logger.error('Failed to allocate points to user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const getDashboardData = async (req: Request, res: Response) => {
+  try {
+    const dbData: any = await Promise.all([
+      Student.query().count(),
+      Teacher.query().count(),
+      Game.query().count(),
+      School.query().count(),
+      Student.query().count().where('suspended', '=', true),
+    ]);
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: {
+        totalStudents: dbData[0],
+        totalTeachers: dbData[1],
+        totalGames: dbData[2],
+        totalSchools: dbData[3],
+        totalSuspended: dbData[4],
+      },
+    });
+  } catch (err) {
+    Logger.error('Failed to allocate points to user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const getGameScrumbles = async (req: Request, res: Response) => {
+  try {
+    const scrumble = await Scrumble.query();
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: scrumble,
+    });
+  } catch (err) {
+    Logger.error('Failed to allocate points to user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const createScrumble = async (req: Request, res: Response) => {
+  try {
+    const { newWord } = req.body;
+
+    if (!newWord) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'word missing in body',
+      });
+    }
+
+    const findWord = await Scrumble.query().findOne({
+      word: newWord.toLowerCase(),
+    });
+
+    if (findWord) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'Word already exists',
+      });
+    }
+
+    const scrumble = await Scrumble.query().insertAndFetch({
+      word: newWord.toLowerCase(),
+    });
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: scrumble,
     });
   } catch (err) {
     Logger.error('Failed to allocate points to user ' + err);

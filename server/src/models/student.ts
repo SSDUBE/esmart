@@ -11,6 +11,7 @@ export class Student extends BaseModel {
   public active!: string;
   public schoolID!: string;
   public classID!: string;
+  public suspended?: boolean;
 
   static tableName: string = 'Student';
   static idColumn: string = 'idNumber';
