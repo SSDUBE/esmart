@@ -162,7 +162,8 @@ export const getUser = async (req: Request, res: Response) => {
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const { idNumber } = req.params;
-    const { schoolId } = req.body;
+    const { schoolId, roleType } = req.body;
+    let user: [Teacher[], Principal[], Student[]] = [[], [], []];
 
     if (!idNumber) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
@@ -171,15 +172,32 @@ export const getAllUsers = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await Promise.all([
-      Teacher.query().whereNot('idNumber', '=', idNumber),
-      Principal.query().whereNot('idNumber', '=', idNumber),
-      Student.query()
-        .select('student.*', 'class.*')
-        .from('Student as student')
-        .leftJoin('Class as class', 'class.classID', 'student.classID')
-        .whereNot('idNumber', '=', idNumber),
-    ]);
+    if (roleType === 'ADMIN') {
+      user = await Promise.all([
+        Teacher.query().whereNot('idNumber', '=', idNumber),
+        Principal.query().whereNot('idNumber', '=', idNumber),
+        Student.query()
+          .select('student.*', 'class.*')
+          .from('Student as student')
+          .leftJoin('Class as class', 'class.classID', 'student.classID')
+          .whereNot('idNumber', '=', idNumber),
+      ]);
+    } else {
+      user = await Promise.all([
+        Teacher.query()
+          .whereNot('idNumber', '=', idNumber)
+          .andWhere('schoolID', '=', schoolId),
+        Principal.query()
+          .whereNot('idNumber', '=', idNumber)
+          .andWhere('schoolID', '=', schoolId),
+        Student.query()
+          .select('student.*', 'class.*')
+          .from('Student as student')
+          .leftJoin('Class as class', 'class.classID', 'student.classID')
+          .whereNot('idNumber', '=', idNumber)
+          .andWhere('schoolID', '=', schoolId),
+      ]);
+    }
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
@@ -213,9 +231,6 @@ export const getAllGrades = async (_req: Request, res: Response) => {
 
 export const addNewUser = async (req: Request, res: Response) => {
   try {
-    // const authHeader = req.headers.authorization;
-    // const token = authHeader!.split(' ')[1];
-    // const decode: any = jwt.decode(token);
     let {
       firstname,
       idNumber,
@@ -223,18 +238,9 @@ export const addNewUser = async (req: Request, res: Response) => {
       password,
       roleType,
       schoolId,
-      // grade,
+      email,
       gradeId,
     } = req.body;
-
-    // if (roleType === 'STUDENT') {
-    //   if (!grade || !gradeId) {
-    //     return res.status(HTTP_CODES.FORBIDDEN).json({
-    //       success: false,
-    //       message: 'grade, and gradeId are required params',
-    //     });
-    //   }
-    // }
 
     if (
       !firstname ||
@@ -242,13 +248,14 @@ export const addNewUser = async (req: Request, res: Response) => {
       !idNumber ||
       !password ||
       !roleType ||
-      !schoolId
+      !schoolId ||
+      !email
       // !schoolName
     ) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,
         message:
-          'firstname, lastname, idNumber, roleType, gradeType, schoolId, schoolName and password are required params',
+          'email, firstname, lastname, idNumber, roleType, gradeType, schoolId, schoolName and password are required params',
       });
     }
 
@@ -262,7 +269,8 @@ export const addNewUser = async (req: Request, res: Response) => {
     }
 
     try {
-      let createUser: Teacher | Student | undefined = undefined;
+      let createUser: Teacher | Student | Principal | Admin | undefined =
+        undefined;
 
       password = await PasswordBcrypt.encrypt(password);
 
@@ -286,6 +294,33 @@ export const addNewUser = async (req: Request, res: Response) => {
           createUser = await Teacher.query().insertAndFetch({
             idNumber,
             password,
+            email: email,
+            firstName: firstname,
+            lastName: lastname,
+            schoolID: schoolId,
+          });
+        }
+      } else if (roleType === 'PRINCIPAL') {
+        const principal = await Principal.query().findOne({ idNumber });
+
+        if (principal?.schoolID === schoolId) {
+          return res.status(HTTP_CODES.NOT_ALLOWED).json({
+            success: false,
+            message: 'Principal already exists',
+          });
+        }
+
+        if (principal) {
+          createUser = await Principal.query()
+            .patch({ schoolID: schoolId })
+            .where({ idNumber })
+            .returning('*')
+            .first();
+        } else {
+          createUser = await Principal.query().insertAndFetch({
+            idNumber,
+            password,
+            email: email,
             firstName: firstname,
             lastName: lastname,
             schoolID: schoolId,
@@ -311,12 +346,31 @@ export const addNewUser = async (req: Request, res: Response) => {
           createUser = await Student.query().insertAndFetch({
             idNumber,
             password,
+            email: email,
             firstName: firstname,
             lastName: lastname,
             schoolID: schoolId,
             classID: gradeId,
           });
         }
+      } else if (roleType === 'ADMIN') {
+        const student = await Admin.query().findOne({ idNumber });
+
+        if (student) {
+          return res.status(HTTP_CODES.NOT_ALLOWED).json({
+            success: false,
+            message: 'Admin already exists in the system',
+          });
+        }
+
+        createUser = await Admin.query().insertAndFetch({
+          idNumber,
+          firstName: firstname,
+          lastName: lastname,
+          contactNumber: '',
+          email,
+          password: await PasswordBcrypt.encrypt('Admin@123'),
+        });
       }
 
       return res.status(HTTP_CODES.OK).json({

@@ -41,11 +41,9 @@ const ValidationSchema = (validatePass: any, isEditing: boolean) =>
     contactNumber: isEditing
       ? Yup.string().required('Email is required')
       : Yup.string().optional(),
-    email: isEditing
-      ? Yup.string()
-          .required('Email is required')
-          .email('Please enter a valid email')
-      : Yup.string().optional(),
+    email: Yup.string()
+      .required('Email is required')
+      .email('Please enter a valid email'),
     password: !validatePass
       ? Yup.string().matches(
           /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8,}$/,
@@ -179,14 +177,21 @@ export const UserManagement = () => {
   React.useEffect(() => {
     (async function () {
       try {
-        const { schoolId, idNumber } = context.global.user;
+        const { schoolId, idNumber, roleType } = context.global.user;
         const tempRows: ITableData[] = [];
         const user = new UserService();
+        let roles: string[] = [];
 
-        const roles = ['TEACHER', 'STUDENT'];
+        if (roleType === 'PRINCIPAL') {
+          roles = ['TEACHER', 'STUDENT', 'PRINCIPAL'];
+        } else if (roleType === 'TEACHER') {
+          roles = ['TEACHER', 'STUDENT'];
+        } else if (roleType === 'ADMIN') {
+          roles = ['ADMIN'];
+        }
 
         const grades = await user.getGrades();
-        const users = await user.getAllUsers(idNumber, schoolId);
+        const users = await user.getAllUsers(idNumber, schoolId, roleType);
 
         users.data.forEach((user: any) => {
           user.active = user.active ? 'True' : 'False';
@@ -293,7 +298,7 @@ export const UserManagement = () => {
         >
           Edit
         </Button>
-        {roleType === 'ADMIN' && (
+        {(roleType === 'ADMIN' || roleType === 'PRINCIPAL') && (
           <IconButton
             classes={{
               root: classes.iconButton,
@@ -323,19 +328,17 @@ export const UserManagement = () => {
       <Typography variant="h4" style={{ marginBottom: 10 }}>
         Users
       </Typography>
-      {context.global.user.roleType !== 'ADMIN' && (
-        <Box style={{ width: 150, marginBottom: 20 }}>
-          <Button
-            onClick={() => {
-              setShowModal(true);
-              setIsEditing(false);
-            }}
-          >
-            <AddCircleOutlineIcon style={{ marginRight: 10 }} />
-            Add User
-          </Button>
-        </Box>
-      )}
+      <Box style={{ width: 150, marginBottom: 20 }}>
+        <Button
+          onClick={() => {
+            setShowModal(true);
+            setIsEditing(false);
+          }}
+        >
+          <AddCircleOutlineIcon style={{ marginRight: 10 }} />
+          Add User
+        </Button>
+      </Box>
       <MuiTable rows={rows} columns={columns} />
       <MuiModal open={showModal} setOnClose={setShowModal}>
         <Typography variant="h5">
@@ -377,6 +380,7 @@ export const UserManagement = () => {
                 lastname,
                 password,
                 schoolId,
+                email: values.email,
                 // schoolName,
                 // @ts-ignore
                 // grade: gradeType.type,
@@ -392,7 +396,6 @@ export const UserManagement = () => {
                 await handleEdit({
                   ...newUser,
                   active: editUser.active,
-                  email: values.email,
                   contactNumber: values.contactNumber,
                 });
               } else {
@@ -454,16 +457,14 @@ export const UserManagement = () => {
                     />
                   </Grid>
                 )}
-                {isEditing && (
-                  <Grid item xs={12}>
-                    <FTextField
-                      type="email"
-                      name="email"
-                      label="Email"
-                      placeholder="Email"
-                    />
-                  </Grid>
-                )}
+                <Grid item xs={12}>
+                  <FTextField
+                    type="email"
+                    name="email"
+                    label="Email"
+                    placeholder="Email"
+                  />
+                </Grid>
                 <Grid item xs={12}>
                   <FTextField
                     type="text"

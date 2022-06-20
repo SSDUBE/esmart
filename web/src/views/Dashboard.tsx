@@ -1,5 +1,5 @@
 import React from 'react';
-import { Theme, Typography } from '@mui/material';
+import { Theme, Typography, Grid } from '@mui/material';
 import { Box } from '@mui/system';
 import { MuiTable } from '../components/MuiTable';
 import { makeStyles } from '@mui/styles';
@@ -15,6 +15,9 @@ import {
   PDFViewer,
   PDFDownloadLink,
 } from '@react-pdf/renderer';
+import { LeaderBoardStatusCard } from '../components/LeaderBoardStatusCard';
+import { LeaderBoardStatus } from '../constants';
+import { theme } from '../Theme';
 
 interface IData {
   firstName: string;
@@ -73,6 +76,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 12,
     marginLeft: 12,
+  },
+  title: {
+    marginBottom: theme.spacing(2),
   },
 });
 
@@ -197,8 +203,23 @@ export const Dashboard = () => {
 
   return (
     <Box>
-      <Typography variant="h4">Dashboard</Typography>
-      <Box display="flex" justifyContent="flex-end">
+      <Typography variant="h4" style={{ marginBottom: 30 }}>
+        Dashboard
+      </Typography>
+      <Grid container spacing={2}>
+        {LeaderBoardStatus.map((item, idx) => {
+          return (
+            <Grid item xs={4} md={2} key={idx}>
+              <LeaderBoardStatusCard
+                title={item.name}
+                totalBit={6}
+                status={item.status}
+              />
+            </Grid>
+          );
+        })}
+      </Grid>
+      <Box display="flex" justifyContent="flex-end" style={{ marginTop: 30 }}>
         <PDFDownloadLink document={<PDF />} fileName="report.pdf">
           {({ blob, url, loading, error }) =>
             loading ? 'Loading document...' : 'Download Report!'
