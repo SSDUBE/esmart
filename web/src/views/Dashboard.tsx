@@ -18,6 +18,12 @@ import {
 import { LeaderBoardStatusCard } from '../components/LeaderBoardStatusCard';
 import { LeaderBoardStatus } from '../constants';
 import { theme } from '../Theme';
+// @ts-ignore
+import ReactExport from 'react-export-excel';
+
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
 
 interface IData {
   firstName: string;
@@ -36,6 +42,7 @@ interface ITableData {
   createdAt: string;
   classID: number;
 }
+
 interface IColumn {
   id: 'firstName' | 'lastName' | 'idNumber' | 'score' | 'classID' | 'createdAt';
   label: string;
@@ -54,6 +61,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: theme.spacing(1),
     marginRight: theme.spacing(1),
   },
+  excelText: {
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    color: theme.palette.primary.dark,
+  },
+  excelContainer: {
+    marginRight: theme.spacing(2)
+  }
 }));
 
 const styles = StyleSheet.create({
@@ -82,11 +97,13 @@ const styles = StyleSheet.create({
   },
 });
 
+
+
 export const Dashboard = () => {
   const context: any = React.useContext(AppContext);
   const classes = useStyles();
   const [rows, setRows] = React.useState<ITableData[]>([]);
-  const [tileData, setTileData] = React.useState<any>({})
+  const [tileData, setTileData] = React.useState<any>({});
 
   React.useEffect(() => {
     (async function () {
@@ -113,7 +130,7 @@ export const Dashboard = () => {
       });
 
       setRows(tempRows);
-      setTileData(dashboardData.data)
+      setTileData(dashboardData.data);
     })();
   }, []);
 
@@ -204,6 +221,22 @@ export const Dashboard = () => {
     );
   }
 
+  function downloadExcel() {
+    const tempRows = [...rows]
+
+    return (
+      <ExcelFile element={<Typography className={classes.excelText}>Download Excel!</Typography>}>
+        <ExcelSheet data={tempRows} name="Student Report">
+          <ExcelColumn label="First Name" value="lastName" />
+          <ExcelColumn label="ID Number" value="idNumber" />
+          <ExcelColumn label="Score" value="score" />
+          <ExcelColumn label="Score" value="score" />
+          <ExcelColumn label="Class" value="classID" />
+          <ExcelColumn label="Created At" value="createdAt" />
+        </ExcelSheet>
+      </ExcelFile>
+    );
+  }
   return (
     <Box>
       <Typography variant="h4" style={{ marginBottom: 30 }}>
@@ -223,9 +256,10 @@ export const Dashboard = () => {
         })}
       </Grid>
       <Box display="flex" justifyContent="flex-end" style={{ marginTop: 30 }}>
-        <PDFDownloadLink document={<PDF />} fileName="report.pdf">
+        <Box className={classes.excelContainer}>{downloadExcel()}</Box>
+        <PDFDownloadLink document={<PDF />} fileName="report.pdf" style={{color: theme.palette.primary.dark}}>
           {({ blob, url, loading, error }) =>
-            loading ? 'Loading document...' : 'Download Report!'
+            loading ? 'Loading document...' : 'Download Pdf!'
           }
         </PDFDownloadLink>
       </Box>

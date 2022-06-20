@@ -7,6 +7,7 @@ const baseTheme = createTheme({
     primary: {
       main: '#073a98',
       light: 'rgb(236, 129, 68)',
+      dark: '#EC8144'
     },
     common: {
       white: '#fff',
