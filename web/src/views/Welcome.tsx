@@ -37,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingBottom: theme.spacing(8),
     color: theme.palette.primary.light,
     fontSize: theme.spacing(4),
+    width: theme.spacing(85)
   },
   button: {
     width: theme.spacing(20),
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   socilaMedialContainer: {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: theme.spacing(10)
+    marginTop: theme.spacing(10),
   },
   socialMedia: {
     display: 'flex',
@@ -60,47 +61,34 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const data = [
   {
-    cover: 'https://images6.alphacoders.com/679/thumb-1920-679459.jpg',
+    cover: 'https://images.unsplash.com/photo-1555431189-0fabf2667795?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80',
     title: 'Interstaller',
   },
   {
-    cover: 'https://images2.alphacoders.com/851/thumb-1920-85182.jpg',
+    cover: 'https://images.unsplash.com/photo-1597392582469-a697322d5c16?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     title: 'Inception',
   },
   {
-    cover: 'https://images6.alphacoders.com/875/thumb-1920-875570.jpg',
+    cover: 'https://images.unsplash.com/photo-1592431913823-7af6b323da9b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     title: 'Blade Runner 2049',
   },
   {
-    cover: 'https://images6.alphacoders.com/114/thumb-1920-1141749.jpg',
+    cover: 'https://images.unsplash.com/reserve/uZYSV4nuQeyq64azfVIn_15130980706_64134efc6e_o.jpg?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1167&q=80',
     title: 'Icon man 3',
   },
   {
-    cover: 'https://images3.alphacoders.com/948/thumb-1920-948864.jpg',
+    cover: 'https://images.unsplash.com/photo-1461958508236-9a742665a0d5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     title: 'Venom',
   },
   {
-    cover: 'https://images2.alphacoders.com/631/thumb-1920-631095.jpg',
+    cover: 'https://images.unsplash.com/photo-1592431913823-7af6b323da9b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     title: 'Steins Gate',
   },
   {
-    cover: 'https://images4.alphacoders.com/665/thumb-1920-665242.png',
+    cover: 'https://images.unsplash.com/photo-1571149829199-33981870803f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
     title: 'One Punch Man',
   },
-  {
-    cover: 'https://images2.alphacoders.com/738/thumb-1920-738176.png',
-    title: 'A Silent Voice',
-  },
-  {
-    cover: 'https://images8.alphacoders.com/100/thumb-1920-1005531.jpg',
-    title: 'Demon Slayer',
-  },
-  {
-    cover: 'https://images2.alphacoders.com/582/thumb-1920-582804.png',
-    title: 'Attack On Titan',
-  },
 ];
-
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -139,10 +127,13 @@ const Welcome = () => {
       <Typography variant="h2" className={classes.welcome}>
         WELCOME TO ESMART
       </Typography>
-      <Typography variant="h5" className={classes.description}>
-        esmart is a gaming platform
-      </Typography>
-
+      <Box display='flex' justifyContent='center'>
+        <Typography variant="h5" className={classes.description}>
+          esmart is a gaming platform which allows students to compete in english
+          game by getting a scrumble and deriving as many words as possible from
+          the scrumble
+        </Typography>
+      </Box>
       <Box style={{ width: '100%', position: 'relative' }}>
         <ResponsiveContainer
           carouselRef={ref}
