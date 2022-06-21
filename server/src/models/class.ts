@@ -7,7 +7,7 @@ export class Class extends BaseModel {
   public grade!: number;
   // public wordLen?: number;
 
-  static tableName: string = 'Class';
+  static tableName: string = 'CLASS';
   static idColumn: string = 'classID';
 
   // static relationMappings = {

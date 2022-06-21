@@ -8,7 +8,7 @@ export class Game extends BaseModel {
   public classID!: string;
   public anagrams!: Partial<Anagrams>;
 
-  static tableName: string = 'Game';
+  static tableName: string = 'GAME';
   static idColumn: string = 'gameID';
 
   static relationMappings = {
@@ -16,8 +16,8 @@ export class Game extends BaseModel {
       relation: BaseModel.HasOneRelation,
       modelClass: Anagrams,
       join: {
-        from: 'Game.gameID',
-        to: 'Anagrams.gameID',
+        from: 'GAME.gameID',
+        to: 'ANAGRAMS.gameID',
       },
     },
   };

@@ -12,7 +12,7 @@ export class Admin extends BaseModel {
   public password!: string;
   public active!: string;
 
-  static tableName: string = 'Admin';
+  static tableName: string = 'ADMIN';
   static idColumn: string = 'idNumber';
 
   // static relationMappings = {

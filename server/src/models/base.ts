@@ -38,11 +38,13 @@ export class BaseModel extends Model {
     }
   }
 
-  // public $beforeUpdate(_opt: any, queryContext: QueryContext) {
-  //   if (!queryContext.user) {
-  //     throw new Error(
-  //       `$beforeUpdate: User missing from context: ${queryContext}.`
-  //     );
-  //   }
-  // }
+  public $beforeUpdate(_opt: any, queryContext: QueryContext) {
+    // @ts-ignore
+    this.updatedAt = new Date()
+    // if (!queryContext.user) {
+    //   throw new Error(
+    //     `$beforeUpdate: User missing from context: ${queryContext}.`
+    //   );
+    // }
+  }
 }

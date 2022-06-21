@@ -14,7 +14,7 @@ export class School extends BaseModel {
   public school!: Partial<School>;
   public class!: Partial<Class>;
 
-  static tableName: string = 'School';
+  static tableName: string = 'SCHOOL';
   static idColumn: string = 'schoolID';
 
   static relationMappings = {
@@ -22,37 +22,37 @@ export class School extends BaseModel {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: Principal,
       join: {
-        from: 'School.schoolID',
-        to: 'Principal.schoolID',
+        from: 'SCHOOL.schoolID',
+        to: 'PRINCIPAL.schoolID',
       },
     },
     teacher: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: Teacher,
       join: {
-        from: 'School.schoolID',
-        to: 'Teacher.schoolID',
+        from: 'SCHOOL.schoolID',
+        to: 'TEACHER.schoolID',
       },
     },
     student: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: Student,
       join: {
-        from: 'School.schoolID',
-        to: 'Student.schoolID',
+        from: 'SCHOOL.schoolID',
+        to: 'STUDENT.schoolID',
       },
     },
     schoolClassRoom: {
       relation: BaseModel.ManyToManyRelation,
       modelClass: SchoolClassRoom,
       join: {
-        from: 'School.schoolID',
+        from: 'SCHOOL.schoolID',
         through: {
           modelClass: Class,
-          from: 'SchoolClass.classID',
-          to: 'Class.classID',
+          from: 'SCHOOLCLASSROOM.classID',
+          to: 'CLASS.classID',
         },
-        to: 'SchoolClass.schoolID',
+        to: 'SCHOOLCLASSROOM.schoolID',
       },
     },
   };

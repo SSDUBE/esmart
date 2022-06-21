@@ -175,7 +175,7 @@ const Signup = () => {
                     }}
                   >
                     <Typography>
-                      Don't have an account?{' '}
+                      Already have an account?{' '}
                       <Link href="signin" underline="hover">
                         Sign in
                       </Link>

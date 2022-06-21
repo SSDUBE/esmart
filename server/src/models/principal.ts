@@ -13,7 +13,7 @@ export class Principal extends BaseModel {
   public active!: string;
   public school!: Partial<School>;
 
-  static tableName: string = 'Principal';
+  static tableName: string = 'PRINCIPAL';
   static idColumn: string = 'idNumber';
 
   static relationMappings = {
@@ -21,8 +21,8 @@ export class Principal extends BaseModel {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: School,
       join: {
-        from: 'School.schoolID',
-        to: 'Principal.schoolID',
+        from: 'SCHOOL.schoolID',
+        to: 'PRINCIPAL.schoolID',
       },
     },
     // school: {

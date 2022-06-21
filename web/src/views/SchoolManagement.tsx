@@ -37,7 +37,7 @@ interface IColumn {
 
 const useStyles = makeStyles((theme: Theme) => ({
   iconButton: {
-    backgroundColor: 'rgb(207, 213, 227)',
+    backgroundColor: theme.palette.primary.dark,
     width: theme.spacing(3.2),
     height: theme.spacing(3.2),
     borderRadius: 15,
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   icon: {
     width: 17,
     height: 17,
-    color: 'rgb(207, 213, 227)',
+    color: theme.palette.common.white,
   },
 }));
 

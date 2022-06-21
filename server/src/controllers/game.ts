@@ -78,9 +78,9 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     if (schoolId) {
       board = await Leaderboard.query()
         .select('leaderboard.*', 'student.*')
-        .from('Leaderboard as leaderboard')
+        .from('LEADERBOARD as leaderboard')
         .leftJoin(
-          'Student as student',
+          'STUDENT as student',
           'student.idNumber',
           'leaderboard.idNumber'
         )
@@ -88,9 +88,9 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     } else {
       board = await Leaderboard.query()
         .select('leaderboard.*', 'student.*')
-        .from('Leaderboard as leaderboard')
+        .from('LEADERBOARD as leaderboard')
         .leftJoin(
-          'Student as student',
+          'STUDENT as student',
           'student.idNumber',
           'leaderboard.idNumber'
         );
@@ -122,8 +122,8 @@ export const allocatePoints = async (req: Request, res: Response) => {
 
     const gameRes = await Anagrams.query()
       .select('game.*', 'anagrams.*')
-      .from('Anagrams as anagrams')
-      .leftJoin('Game as game', 'anagrams.gameID', 'game.gameID')
+      .from('ANAGRAMS as anagrams')
+      .leftJoin('GAME as game', 'anagrams.gameID', 'game.gameID')
       .where('game.complete', '=', false)
       .andWhere('game.gameID', '=', gameID)
       .andWhere('anagrams.anagram', '=', answer.toLowerCase())

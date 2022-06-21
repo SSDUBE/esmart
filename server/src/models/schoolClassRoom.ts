@@ -6,5 +6,6 @@ export class SchoolClassRoom extends BaseModel {
   public readonly classID!: string;
   public readonly schoolID!: string;
 
-  static tableName: string = 'SchoolClassRoom';
+  static tableName: string = 'SCHOOLCLASSROOM';
+  static idColumn: string = 'schoolClassRoomID';
 }

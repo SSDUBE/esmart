@@ -27,20 +27,20 @@ export const getUser = async (req: Request, res: Response) => {
     const [principal, teacher, student, admin] = await Promise.all([
       Principal.query()
         .select('principal.*', 'school.*')
-        .from('Principal as principal')
-        .leftJoin('School as school', 'school.schoolID', 'principal.schoolID')
+        .from('PRINCIPAL as principal')
+        .leftJoin('SCHOOL as school', 'school.schoolID', 'principal.schoolID')
         .where('principal.idNumber', '=', idNumber)
         .first(),
       Teacher.query()
         .select('teacher.*', 'school.*')
-        .from('Teacher as teacher')
-        .leftJoin('School as school', 'school.schoolID', 'teacher.schoolID')
+        .from('TEACHER as teacher')
+        .leftJoin('SCHOOL as school', 'school.schoolID', 'teacher.schoolID')
         .where('teacher.idNumber', '=', idNumber)
         .first(),
       Student.query()
         .select('student.*', 'school.*')
-        .from('Student as student')
-        .leftJoin('School as school', 'school.schoolID', 'student.schoolID')
+        .from('STUDENT as student')
+        .leftJoin('SCHOOL as school', 'school.schoolID', 'student.schoolID')
         .where('student.idNumber', '=', idNumber)
         .first(),
       Admin.query().findOne({ idNumber }),
@@ -164,7 +164,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const { idNumber } = req.params;
     const { schoolId, roleType } = req.body;
-    let user: [Teacher[], Principal[], Student[]] = [[], [], []];
+    let user: [Teacher[], Principal[], Student[], Admin[]] = [[], [], [], []];
 
     if (!idNumber) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
@@ -179,9 +179,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
         Principal.query().whereNot('idNumber', '=', idNumber),
         Student.query()
           .select('student.*', 'class.*')
-          .from('Student as student')
-          .leftJoin('Class as class', 'class.classID', 'student.classID')
+          .from('STUDENT as student')
+          .leftJoin('CLASS as class', 'class.classID', 'student.classID')
           .whereNot('idNumber', '=', idNumber),
+        Admin.query().whereNot('idNumber', '=', idNumber)
       ]);
     } else {
       user = await Promise.all([
@@ -193,16 +194,17 @@ export const getAllUsers = async (req: Request, res: Response) => {
           .andWhere('schoolID', '=', schoolId),
         Student.query()
           .select('student.*', 'class.*')
-          .from('Student as student')
-          .leftJoin('Class as class', 'class.classID', 'student.classID')
+          .from('STUDENT as student')
+          .leftJoin('CLASS as class', 'class.classID', 'student.classID')
           .whereNot('idNumber', '=', idNumber)
           .andWhere('schoolID', '=', schoolId),
+        Admin.query().where('idNumber', '=', null)
       ]);
     }
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
-      data: [...user[0], ...user[1], ...user[2]],
+      data: [...user[0], ...user[1], ...user[2], ...user[3]],
     });
   } catch (err) {
     Logger.error('Failed to get all user ' + err);

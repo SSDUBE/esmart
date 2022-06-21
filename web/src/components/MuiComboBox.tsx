@@ -34,6 +34,7 @@ export const ComboBox: FunctionComponent<IProps> = ({
   return (
     <Box>
       <Autocomplete
+        disableClearable
         onChange={handleChange}
         disablePortal
         options={data}

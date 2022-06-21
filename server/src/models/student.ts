@@ -13,6 +13,6 @@ export class Student extends BaseModel {
   public classID!: string;
   public suspended?: boolean;
 
-  static tableName: string = 'Student';
+  static tableName: string = 'STUDENT';
   static idColumn: string = 'idNumber';
 }

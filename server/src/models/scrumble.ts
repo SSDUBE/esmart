@@ -7,6 +7,6 @@ export class Scrumble extends BaseModel {
   public createdAt!: Date;
   public wordLength!: number;
 
-  static tableName: string = 'Scrumble';
+  static tableName: string = 'SCRUMBLE';
   static idColumn: string = 'scrumbleID';
 }

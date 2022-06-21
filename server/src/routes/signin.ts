@@ -23,20 +23,20 @@ export const signin = async (req: Request, res: Response) => {
     let users = await Promise.all([
       Principal.query()
         .select('principal.*', 'school.*')
-        .from('Principal as principal')
-        .leftJoin('School as school', 'school.schoolID', 'principal.schoolID')
+        .from('PRINCIPAL as principal')
+        .leftJoin('SCHOOL as school', 'school.schoolID', 'principal.schoolID')
         .where({ idNumber })
         .first(),
       Student.query()
         .select('student.*', 'school.*')
-        .from('Student as student')
-        .leftJoin('School as school', 'school.schoolID', 'student.schoolID')
+        .from('STUDENT as student')
+        .leftJoin('SCHOOL as school', 'school.schoolID', 'student.schoolID')
         .where({ idNumber })
         .first(),
       Teacher.query()
         .select('teacher.*', 'school.*')
-        .from('Teacher as teacher')
-        .leftJoin('School as school', 'school.schoolID', 'teacher.schoolID')
+        .from('TEACHER as teacher')
+        .leftJoin('SCHOOL as school', 'school.schoolID', 'teacher.schoolID')
         .where({ idNumber })
         .first(),
       Admin.query().findOne({ idNumber }),

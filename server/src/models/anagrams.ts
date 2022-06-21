@@ -6,6 +6,6 @@ export class Anagrams extends BaseModel {
   public selected!: boolean;
   public gameID!: number;
 
-  static tableName: string = 'Anagrams';
+  static tableName: string = 'ANAGRAMS';
   static idColumn: string = 'anagramID';
 }

@@ -98,7 +98,7 @@ interface IColumn {
 
 const useStyles = makeStyles((theme: Theme) => ({
   iconButton: {
-    backgroundColor: 'rgb(207, 213, 227)',
+    backgroundColor: theme.palette.primary.dark,
     width: theme.spacing(3.2),
     height: theme.spacing(3.2),
     borderRadius: 15,
@@ -107,7 +107,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   icon: {
     width: 17,
     height: 17,
-    color: 'rgb(207, 213, 227)',
+    color: theme.palette.common.white,
   },
 }));
 
@@ -288,16 +288,18 @@ export const UserManagement = () => {
     const { roleType } = context.global.user;
     const actions = (
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Button
-          style={{ width: 20, height: 25 }}
-          onClick={() => {
-            setIsEditing(true);
-            setShowModal(true);
-            setEditUser(data);
-          }}
-        >
-          Edit
-        </Button>
+        {roleType !== 'ADMIN' && (
+          <Button
+            style={{ width: 20, height: 25 }}
+            onClick={() => {
+              setIsEditing(true);
+              setShowModal(true);
+              setEditUser(data);
+            }}
+          >
+            Edit
+          </Button>
+        )}
         {(roleType === 'ADMIN' || roleType === 'PRINCIPAL') && (
           <IconButton
             classes={{

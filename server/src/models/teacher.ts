@@ -11,6 +11,6 @@ export class Teacher extends BaseModel {
   public password!: string;
   public active!: string;
 
-  static tableName: string = 'Teacher';
+  static tableName: string = 'TEACHER';
   static idColumn: string = 'idNumber';
 }

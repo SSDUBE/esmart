@@ -22,9 +22,9 @@ const AppRoutes = () => {
         if (location.pathname.includes('signup')) {
           return navigate('/signup');
         }
-        return navigate('/welcome');
+        const path = location.pathname || '/welcome'
+        return navigate(path);
       }
-  
       navigate('/dashboard');
     })()
   }, [context.global.user.isLogin]);

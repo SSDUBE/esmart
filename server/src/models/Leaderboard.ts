@@ -8,6 +8,6 @@ export class Leaderboard extends BaseModel {
   public createdAt!: Date;
   public updatedAt!: Date;
 
-  static tableName: string = 'Leaderboard';
+  static tableName: string = 'LEADERBOARD';
   static idColumn: string = 'leaderboardID';
 }

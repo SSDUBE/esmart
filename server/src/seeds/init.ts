@@ -3,10 +3,10 @@ import { PasswordBcrypt } from '../controllers/passwordBcrypt';
 
 export async function seed(knex: Knex): Promise<void> {
   // Deletes ALL existing entries
-  await knex('Class').del();
+  await knex('CLASS').del();
 
   // Inserts seed entries
-  await knex('Class').insert([
+  await knex('CLASS').insert([
     { grade: 1, channel: 'gradeOne' },
     { grade: 2, channel: 'gradeTwo' },
     { grade: 3, channel: 'gradeThree' },
@@ -21,18 +21,58 @@ export async function seed(knex: Knex): Promise<void> {
     { grade: 12, channel: 'gradeTwelve' },
   ]);
 
-  await knex('Admin').insert([
+  await knex('ADMIN').insert([
     {
       idNumber: '9701014800084',
-      firstName: 'admin',
-      lastName: 'admin',
+      firstName: 'Sindiso',
+      lastName: 'Dube',
       contactNumber: '0796015904',
       email: 'admin@gmail.com',
       password: await PasswordBcrypt.encrypt('Admin@123'),
     },
+    {
+      idNumber: '9801014800082',
+      firstName: 'Zanele',
+      lastName: '',
+      contactNumber: '0796015904',
+      email: 'admin@gmail.com',
+      password: await PasswordBcrypt.encrypt('Admin@123'),
+    },
+    {
+      idNumber: '9806014800081',
+      firstName: 'Lwando',
+      lastName: 'Test',
+      contactNumber: '0796015904',
+      email: 'lwando@gmail.com',
+      password: await PasswordBcrypt.encrypt('Admin@123'),
+    },
+    {
+      idNumber: '9806114800080',
+      firstName: 'Tebatso',
+      lastName: 'Test1',
+      contactNumber: '0796015904',
+      email: 'tebatso@gmail.com',
+      password: await PasswordBcrypt.encrypt('Admin@123'),
+    },
+    {
+      idNumber: '9701014811084',
+      firstName: 'Samnkelisiwe',
+      lastName: 'Test2',
+      contactNumber: '0796015904',
+      email: 'sam@gmail.com',
+      password: await PasswordBcrypt.encrypt('Admin@123'),
+    },
+    {
+      idNumber: '9806204800181',
+      firstName: 'Themba',
+      lastName: 'knoza',
+      contactNumber: '0796015904',
+      email: 'khoza@gmail.com',
+      password: await PasswordBcrypt.encrypt('Admin@123'),
+    },
   ]);
 
-  await knex('Scrumble').insert([
+  await knex('SCRUMBLE').insert([
     { word: 'aelst', wordLength: 5 },
     { word: 'aeprs', wordLength: 5 },
     { word: 'aelrst', wordLength: 5 },
