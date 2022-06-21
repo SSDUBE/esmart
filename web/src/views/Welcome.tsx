@@ -101,6 +101,7 @@ export const data = [
   },
 ];
 
+
 const Welcome = () => {
   const navigate = useNavigate();
   const classes = useStyles();

@@ -26,6 +26,7 @@
     "expo-status-bar": "~1.2.0",
     "firebase": "^9.8.1",
     "formik": "^2.2.9",
+    "geolib": "^3.3.3",
     "keypair": "^1.0.4",
     "react": "17.0.1",
     "react-dom": "17.0.1",

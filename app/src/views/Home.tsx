@@ -36,34 +36,42 @@ interface IHome {
 }
 
 export const Home = ({ navigation }: IHome) => {
+  const [loading, setLoading] = React.useState(false);
   const context: any = React.useContext(AppContext);
   let [fontsLoaded] = useFonts({
     Inter_500Medium,
     Inter_600SemiBold,
   });
-  // const [location, setLocation] =
-  //   React.useState<Location.LocationObject | null>(null);
+  const [location, setLocation] =
+    React.useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  // const [mapRegion, setmapRegion] = React.useState({
-  //   latitude: -25.551297,
-  //   longitude: 28.109171,
-  //   latitudeDelta: 0.0622,
-  //   longitudeDelta: 0.0121,
-  // });
 
   React.useEffect(() => {
     (async () => {
-      let location = await Location.requestForegroundPermissionsAsync();
-      const camera = await Camera.requestCameraPermissionsAsync();
+      try {
+        setLoading(true);
+        let location = await Location.requestForegroundPermissionsAsync();
+        const camera = await Camera.requestCameraPermissionsAsync();
 
-      if (location.status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
+        if (location.status !== 'granted') {
+          setLoading(false);
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
 
-      if (camera.status !== 'granted') {
-        setErrorMsg('Permission to access camera was denied');
-        return;
+        if (camera.status !== 'granted') {
+          setLoading(false);
+          setErrorMsg('Permission to access camera was denied');
+          return;
+        }
+
+        const res = await Location.getCurrentPositionAsync();
+        context.user.updateLocation(res);
+        setLocation(res);
+        setLoading(false);
+      } catch (err) {
+        console.log('Home something went wrong', err);
+        Alert.alert('Something went wrong please try again');
       }
     })();
   }, []);
@@ -130,16 +138,19 @@ export const Home = ({ navigation }: IHome) => {
 
   return (
     <SafeAreaView>
-      {/* <Maps region={mapRegion} /> */}
       {points()}
       <View style={styles.button}>
         <RoundedButton
+          loading={loading}
+          disabled={loading}
           text='Play Game'
           background={colors.green01}
           textColor={colors.white}
           handleOnPress={playGame}
         />
       </View>
+      <Loader modalVisible={loading} animationType='fade' />
+
     </SafeAreaView>
   );
 };

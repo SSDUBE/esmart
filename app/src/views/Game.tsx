@@ -27,15 +27,22 @@ import { GameService } from '../services/Game';
 // @ts-ignore
 import RewardsComponent from 'react-native-rewards';
 import { LocationPermissionResponse } from 'expo-location';
+import { getDistance, getPreciseDistance } from 'geolib';
+import { NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../navigations/RootStackParamList';
 
 interface IScrumble {
   scrumble: string;
   gameId: number;
 }
 
-export const Game = () => {
-  const [location, setLocation] =
-    React.useState<LocationPermissionResponse | null>(null);
+interface IGame {
+  navigation: NavigationProp<RootStackParamList>;
+}
+
+export const Game = ({ navigation }: IGame) => {
+  // const [location, setLocation] =
+  //   React.useState<Location.LocationObject | null>(null);
   const context: any = React.useContext(AppContext);
   const [animationState, setAnimationState] = React.useState('rest');
   const [messages, setMessages] = React.useState<IMessage[]>([]);
@@ -61,12 +68,14 @@ export const Game = () => {
   }
 
   React.useEffect(() => {
+    let watchLocation: any = null
     const subscription = AppState.addEventListener(
       'change',
       _handleAppStateChange
     );
 
     (async () => {
+
       if (appState.current === 'active') {
         const permission = await Location.getForegroundPermissionsAsync();
         const camera = await getCameraPermissionsAsync();
@@ -88,39 +97,41 @@ export const Game = () => {
         }
       }
 
-      Location.watchPositionAsync(
+      const { coords } = context.global.user.location;
+      console.log('location ', coords);
+
+      watchLocation = await Location.watchPositionAsync(
         {
           // Tracking options
           accuracy: Location.Accuracy.High,
-          distanceInterval: 1,
+          distanceInterval: 0,
         },
         (location) => {
-          console.log('location ', location)
-          /* Location object example:
-            {
-              coords: {
-                accuracy: 20.100000381469727,
-                altitude: 61.80000305175781,
-                altitudeAccuracy: 1.3333333730697632,
-                heading: 288.87445068359375,
-                latitude: 36.7384213,
-                longitude: 3.3463877,
-                speed: 0.051263172179460526,
-              },
-              mocked: false,
-              timestamp: 1640286855545,
-            };
-          */
-          // Do something with location...
+          if (location) {
+            let pdis = getPreciseDistance(
+              { latitude: coords.latitude, longitude: coords.longitude },
+              {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }
+            );
+
+            if (pdis > 20) {
+              Alert.alert('Location change has been detected your account has been suspend')
+              return watchLocation.remove()
+            }
+            console.log('locationlocation ', pdis);
+          }
         }
       );
       // let location = await Location.getBackgroundPermissionsAsync();
       // setLocation(location);
     })();
-    // return () => {
-    //   // @ts-ignore
-    //   subscription.removeEventListener();
-    // };
+    return async() => {
+      await watchLocation.remove()
+      // @ts-ignore
+      await subscription.remove();
+    };
   }, [appStateVisible]);
 
   React.useLayoutEffect(() => {
@@ -191,7 +202,6 @@ export const Game = () => {
     }
   }, []);
 
-  console.log('location ', location);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.cameraContainer}>
