@@ -26,6 +26,7 @@ import { getCameraPermissionsAsync } from 'expo-camera';
 import { GameService } from '../services/Game';
 // @ts-ignore
 import RewardsComponent from 'react-native-rewards';
+import { LocationPermissionResponse } from 'expo-location';
 
 interface IScrumble {
   scrumble: string;
@@ -33,6 +34,8 @@ interface IScrumble {
 }
 
 export const Game = () => {
+  const [location, setLocation] =
+    React.useState<LocationPermissionResponse | null>(null);
   const context: any = React.useContext(AppContext);
   const [animationState, setAnimationState] = React.useState('rest');
   const [messages, setMessages] = React.useState<IMessage[]>([]);
@@ -84,8 +87,36 @@ export const Game = () => {
           return;
         }
       }
-    })();
 
+      Location.watchPositionAsync(
+        {
+          // Tracking options
+          accuracy: Location.Accuracy.High,
+          distanceInterval: 1,
+        },
+        (location) => {
+          console.log('location ', location)
+          /* Location object example:
+            {
+              coords: {
+                accuracy: 20.100000381469727,
+                altitude: 61.80000305175781,
+                altitudeAccuracy: 1.3333333730697632,
+                heading: 288.87445068359375,
+                latitude: 36.7384213,
+                longitude: 3.3463877,
+                speed: 0.051263172179460526,
+              },
+              mocked: false,
+              timestamp: 1640286855545,
+            };
+          */
+          // Do something with location...
+        }
+      );
+      // let location = await Location.getBackgroundPermissionsAsync();
+      // setLocation(location);
+    })();
     // return () => {
     //   // @ts-ignore
     //   subscription.removeEventListener();
@@ -153,13 +184,14 @@ export const Game = () => {
       });
 
       if (res.correct) {
-        setAnimationState('reward')
+        setAnimationState('reward');
       }
     } catch (err) {
       console.log('Something went wrong ', err);
     }
   }, []);
 
+  console.log('location ', location);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.cameraContainer}>
@@ -207,7 +239,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginLeft: 10,
     marginTop: 10,
-    zIndex: 9999
+    zIndex: 9999,
   },
   container: {
     flex: 1,

@@ -41,15 +41,15 @@ export const Home = ({ navigation }: IHome) => {
     Inter_500Medium,
     Inter_600SemiBold,
   });
-  const [location, setLocation] =
-    React.useState<Location.LocationObject | null>(null);
+  // const [location, setLocation] =
+  //   React.useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [mapRegion, setmapRegion] = React.useState({
-    latitude: -25.551297,
-    longitude: 28.109171,
-    latitudeDelta: 0.0622,
-    longitudeDelta: 0.0121,
-  });
+  // const [mapRegion, setmapRegion] = React.useState({
+  //   latitude: -25.551297,
+  //   longitude: 28.109171,
+  //   latitudeDelta: 0.0622,
+  //   longitudeDelta: 0.0121,
+  // });
 
   React.useEffect(() => {
     (async () => {
@@ -65,9 +65,6 @@ export const Home = ({ navigation }: IHome) => {
         setErrorMsg('Permission to access camera was denied');
         return;
       }
-
-      // let location = await Location.getCurrentPositionAsync({});
-      // setLocation(location);
     })();
   }, []);
 

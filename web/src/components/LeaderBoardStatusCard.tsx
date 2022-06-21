@@ -11,6 +11,10 @@ import BookIcon from '@mui/icons-material/Book';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 import SchoolIcon from '@mui/icons-material/School';
 import BlockIcon from '@mui/icons-material/Block';
+import game from '../assets/game.jpg';
+import teacher from '../assets/school.jpeg';
+import SchoolImg from '../assets/teacher.jpg';
+import dayjs from 'dayjs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -35,6 +39,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     paddingLeft: 15,
+  },
+  tooltipContainer: {
+    display: 'flex',
+    alignItems: 'center',
   },
 }));
 
@@ -76,14 +84,65 @@ export const LeaderBoardStatusCard: FunctionComponent<Props> = ({
     suspendedStudents: <BlockIcon style={{ color: '#EE4C4C' }} />,
   };
 
+  const data: any = {
+    'Total Students': {
+      img: SchoolImg,
+      text: (
+        <em>
+          {totalBit} student(s) where created this report if for{' '}
+          {dayjs().format('DD/MM/YYYY')}
+        </em>
+      ),
+    },
+    'Total Teachers': {
+      img: teacher,
+      text: (
+        <em>
+          {totalBit} teacher(s) where created this report if for{' '}
+          {dayjs().format('DD/MM/YYYY')}
+        </em>
+      ),
+    },
+    'Total Games': {
+      img: game,
+      text: (
+        <em>
+          {totalBit} game(s) where created this report if for{' '}
+          {dayjs().format('DD/MM/YYYY')}
+        </em>
+      ),
+    },
+    'Total Schools': {
+      img: SchoolImg,
+      text: (
+        <em>
+          {totalBit} school(s) where created this report if for{' '}
+          {dayjs().format('DD/MM/YYYY')}
+        </em>
+      ),
+    },
+    'Suspendend Students': {
+      img: SchoolImg,
+      text: (
+        <em>
+          {totalBit} student(s) where suspended this report if for{' '}
+          {dayjs().format('DD/MM/YYYY')}
+        </em>
+      ),
+    },
+  };
+
   return (
     <HtmlTooltip
       title={
-        <React.Fragment>
-          <Typography color="inherit">Tooltip with HTML</Typography>
-          <em>{"And here's"}</em> <b>{'some'}</b> <u>{'amazing content'}</u>.{' '}
-          {"It's very engaging. Right?"}
-        </React.Fragment>
+        <Box className={classes.tooltipContainer}>
+          <img src={data[title].img} style={{ width: 30, height: 30 }} />
+          <Box style={{ marginLeft: 9 }}>
+            <Typography color="inherit">{title}</Typography>
+            <br />
+            {data[title].text}
+          </Box>
+        </Box>
       }
     >
       <Box className={classes.container}>

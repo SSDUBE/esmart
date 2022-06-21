@@ -102,7 +102,7 @@ export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
   return (
     <KeyboardAvoidingView style={styles.wrapper} behavior='padding'>
       <Formik
-        initialValues={{ idNumber: '', password: '' }}
+        initialValues={{ idNumber: '2201015800081', password: 'Simba@123' }}
         validationSchema={ValidationSchema}
         onSubmit={async (values, { setSubmitting }) => {
           try {
@@ -129,6 +129,7 @@ export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
             <ScrollView style={styles.scrollView}>
               <Text style={styles.loginHeader}>Sign in</Text>
               <InputField
+                defaultValue={values.idNumber}
                 labelText='ID NUMBER'
                 labelTextSize={14}
                 labelColor={colors.white}
@@ -142,6 +143,7 @@ export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
                 autoFocus
               />
               <InputField
+                defaultValue={values.password}
                 labelText='PASSWORD'
                 labelTextSize={14}
                 labelColor={colors.white}

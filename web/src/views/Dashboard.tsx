@@ -1,5 +1,5 @@
 import React from 'react';
-import { Theme, Typography, Grid } from '@mui/material';
+import { Theme, Typography, Grid, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import { MuiTable } from '../components/MuiTable';
 import { makeStyles } from '@mui/styles';
@@ -102,6 +102,7 @@ export const Dashboard = () => {
   const context: any = React.useContext(AppContext);
   const classes = useStyles();
   const [rows, setRows] = React.useState<ITableData[]>([]);
+  const [filteredRow, setFilteredRows] = React.useState<ITableData[]>([]);
   const [tileData, setTileData] = React.useState<any>({});
 
   React.useEffect(() => {
@@ -129,6 +130,7 @@ export const Dashboard = () => {
       });
 
       setRows(tempRows);
+      setFilteredRows(tempRows);
       setTileData(dashboardData.data);
     })();
   }, []);
@@ -240,6 +242,14 @@ export const Dashboard = () => {
     );
   }
 
+  function handleChange(val: any) {
+    const temp = [...rows];
+    const res = temp.filter((item) =>
+      item.firstName.toLowerCase().includes(val.target.value.toLowerCase())
+    );
+    setFilteredRows(res);
+  }
+
   return (
     <Box>
       <Typography variant="h4" style={{ marginBottom: 30 }}>
@@ -258,9 +268,20 @@ export const Dashboard = () => {
           );
         })}
       </Grid>
+      <Box style={{ marginTop: 30 }} display="flex" justifyContent="flex-end">
+        <TextField
+          style={{ width: 500 }}
+          id="outlined-required"
+          label="Search Student"
+          onChange={handleChange}
+        />
+      </Box>
       <Box display="flex" justifyContent="flex-end" style={{ marginTop: 30 }}>
         <Box className={classes.excelContainer}>
-          <Typography className={classes.excelText} onClick={() => downloadWord(rows)}>
+          <Typography
+            className={classes.excelText}
+            onClick={() => downloadWord(rows)}
+          >
             Download Word!
           </Typography>
         </Box>
@@ -276,7 +297,7 @@ export const Dashboard = () => {
         </PDFDownloadLink>
       </Box>
       <Box className={classes.tableContainer}>
-        <MuiTable rows={rows} columns={columns} />
+        <MuiTable rows={filteredRow} columns={columns} />
       </Box>
     </Box>
   );

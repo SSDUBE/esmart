@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   backgroundImage: {
     position: 'absolute',
     width: '100%',
-    height: '100vh',
+    // height: '100%',
     zIndex: -1,
   },
   contentContainer: {},
