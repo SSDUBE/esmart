@@ -7,6 +7,8 @@ import {
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import HailIcon from '@mui/icons-material/Hail';
 // import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { Outlet } from 'react-router-dom';
 import { AppDrawer } from '../components/AppDrawer';
@@ -81,35 +83,56 @@ export const RouteItems: IRouteItems = {
         Component: Dashboard,
         Icon: SpeedIcon,
         name: 'Dashboard',
-        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER']
+        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
       },
       {
-        paths: ['/user-management'],
+        paths: ['/admin-management'],
+        Component: UserManagement,
+        Icon: ManageAccountsIcon,
+        name: 'Admin Management',
+        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
+      },
+      {
+        paths: ['/student-management'],
+        Component: UserManagement,
+        Icon: HailIcon,
+        name: 'Principal Management',
+        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
+      },
+      {
+        paths: ['/teacher-management'],
         Component: UserManagement,
         Icon: PeopleAltIcon,
-        name: 'User Management',
-        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER']
+        name: 'Teacher Management',
+        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
+      },
+      {
+        paths: ['/student-management'],
+        Component: UserManagement,
+        Icon: PeopleAltIcon,
+        name: 'Student Management',
+        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
       },
       {
         paths: ['/school-management'],
         Component: SchoolManagement,
         Icon: HistoryEduIcon,
         name: 'School Management',
-        roles: ['ADMIN']
+        roles: ['ADMIN'],
       },
       {
         paths: ['/update-profile'],
         Component: UpdateProfile,
         Icon: AccountCircleIcon,
         name: 'Update Profile',
-        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER']
+        roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
       },
       {
         paths: ['/game-setting'],
         Component: GameSettings,
         Icon: SettingsApplicationsIcon,
         name: 'Game Setting',
-        roles: ['ADMIN']
+        roles: ['ADMIN'],
       },
     ],
   },

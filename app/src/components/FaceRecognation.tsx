@@ -1,25 +1,71 @@
 import React from 'react';
-import { Text, View, StyleSheet, SafeAreaView } from 'react-native';
+import { Text, View, StyleSheet, SafeAreaView, Pressable } from 'react-native';
 // import * as tf from '@tensorflow/tfjs';
 import { Camera, FaceDetectionResult } from 'expo-camera';
 import * as FaceDetector from 'expo-face-detector';
 import { Face } from 'expo-camera/build/Camera.types';
+import { cropPicture } from '../utilities/imageHelper';
+import {
+  convertBase64ToTensor,
+  getModel,
+  startPrediction,
+} from '../utilities/tensorHelper';
 // import * as facemesh from '@tensorflow/tfjs'
 
-export const FaceRecognation = () => {
-  const camRef = React.useRef(null)
+const RESULT_MAPPING = ['9701014800011', '9701014800011', '9811100934083'];
+
+export const FaceRecognation = ({ suspendAccount }: any) => {
+  const camRef = React.useRef<any>(null);
   const [hasPermission, setHasPermissions] = React.useState(false);
   const [isTfReady, setIsTfReady] = React.useState(false);
   const [faceData, setFaceData] = React.useState<Face[]>([]);
 
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const [presentedModel, setPresentedModel] = React.useState('');
+
   React.useEffect(() => {
-    (async function () {
-      // await tf.ready();
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermissions(status === 'granted');
-      setIsTfReady(true);
-    })();
+    // (async function () {
+    //   // await tf.ready();
+    //   const { status } = await Camera.requestCameraPermissionsAsync();
+    //   setHasPermissions(status === 'granted');
+    //   setIsTfReady(true);
+
+    // })();
+    console.log('am ready');
+    setInterval(function () {
+      console.log('hello there');
+      handleImageCapture();
+    }, 15000);
   }, []);
+
+  async function handleImageCapture() {
+    setIsProcessing(true);
+    const imageData = await camRef.current.takePictureAsync({
+      base64: true,
+    });
+
+    processImagePrediction(imageData);
+  }
+
+  async function processImagePrediction(base64Img: any) {
+    const croppedData = await cropPicture(base64Img, 300);
+    const model = await getModel();
+    const tensor = await convertBase64ToTensor(croppedData?.base64);
+
+    const prediction = await startPrediction(model, tensor);
+
+    const highestPrediction = prediction.indexOf(
+      Math.max.apply(null, prediction)
+    );
+
+    if ((prediction[highestPrediction] * 100) < 60) {
+      suspendAccount(null)
+    } else {
+      suspendAccount(RESULT_MAPPING[highestPrediction])
+    }
+    console.log('highestPrediction111 ', prediction[highestPrediction]);
+    console.log('highestPrediction ', RESULT_MAPPING[highestPrediction]);
+  }
 
   function getFaceView() {
     if (faceData.length === 0) {
@@ -81,6 +127,7 @@ export const FaceRecognation = () => {
       >
         {/* {getFaceView()} */}
       </Camera>
+      {/* <Pressable onPress={handleImageCapture} style={{width: 60, height: 20, backgroundColor: 'red'}}></Pressable> */}
     </View>
   );
 };

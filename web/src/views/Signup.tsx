@@ -85,7 +85,7 @@ const Signup = () => {
 
                 if (res.success) {
                   swal('Hooray!!!', res.message, 'success');
-                  resetForm()
+                  resetForm();
                 } else {
                   swal('Oops!!!', res.message, 'error');
                 }

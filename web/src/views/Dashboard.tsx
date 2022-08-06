@@ -250,13 +250,15 @@ export const Dashboard = () => {
     setFilteredRows(res);
   }
 
+  const { roleType } = context.global.user;
+
   return (
     <Box>
       <Typography variant="h4" style={{ marginBottom: 30 }}>
         Dashboard
       </Typography>
       <Grid container spacing={2}>
-        {LeaderBoardStatus.map((item, idx) => {
+        {roleType === 'ADMIN' && LeaderBoardStatus.map((item, idx) => {
           return (
             <Grid item xs={4} md={2} key={idx}>
               <LeaderBoardStatusCard

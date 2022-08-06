@@ -25,6 +25,7 @@ import { RoundedButton } from '../components/RoundedButton';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigations/RootStackParamList';
 import { Camera, getCameraPermissionsAsync } from 'expo-camera';
+import { GameService } from '../services/Game';
 // import { Maps } from '../components/Maps';
 // import { Biomatric } from '../components/Biomatric';
 // import { FaceRecognation } from '../components/FaceRecognation';
@@ -36,6 +37,7 @@ interface IHome {
 }
 
 export const Home = ({ navigation }: IHome) => {
+  const [point, setPoints] = React.useState(0)
   const [loading, setLoading] = React.useState(false);
   const context: any = React.useContext(AppContext);
   let [fontsLoaded] = useFonts({
@@ -50,9 +52,12 @@ export const Home = ({ navigation }: IHome) => {
     (async () => {
       try {
         setLoading(true);
+        const game = new GameService();
+        let points = await game.getStudentPoints(context.global.user.idNumber);
         let location = await Location.requestForegroundPermissionsAsync();
         const camera = await Camera.requestCameraPermissionsAsync();
 
+        console.log('points ', points)
         if (location.status !== 'granted') {
           setLoading(false);
           setErrorMsg('Permission to access location was denied');
@@ -69,6 +74,7 @@ export const Home = ({ navigation }: IHome) => {
         context.user.updateLocation(res);
         setLocation(res);
         setLoading(false);
+        setPoints(points.score)
       } catch (err) {
         console.log('Home something went wrong', err);
         Alert.alert('Something went wrong please try again');
@@ -96,7 +102,7 @@ export const Home = ({ navigation }: IHome) => {
 
           <View style={{ marginBottom: 20 }}>
             <PointsCell
-              value={12}
+              value={point}
               coinAndPointsCircleStyle={{
                 marginTop: height * 0.02,
                 marginBottom: height * 0.02,
@@ -150,7 +156,6 @@ export const Home = ({ navigation }: IHome) => {
         />
       </View>
       <Loader modalVisible={loading} animationType='fade' />
-
     </SafeAreaView>
   );
 };

@@ -1,7 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Box, Typography, Paper, Theme } from '@mui/material';
-import Background from '../assets/background.jpg';
+// @ts-ignore
+import Background from '../assets/videos/background.mp4';
 import { theme } from '../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -40,6 +41,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  video: {
+    position: 'absolute',
+    height: '100vh',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -999,
+  },
 }));
 
 interface Props {
@@ -53,7 +63,10 @@ export const AuthPaper = ({ children, title, subTitle }: Props) => {
 
   return (
     <Box className={classes.container}>
-      <img src={Background} alt="logo" className={classes.backgroundImage} />
+      {/* <img src={Background} alt="logo" className={classes.backgroundImage} /> */}
+      <video autoPlay muted loop className={classes.video}>
+        <source src={Background} type="video/mp4" />
+      </video>
       <Box className={classes.paperContainer}>
         <Paper elevation={3} className={classes.paper}>
           <Box className={classes.subContainer}>

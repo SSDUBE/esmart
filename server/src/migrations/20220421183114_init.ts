@@ -91,7 +91,7 @@ export async function up(knex: Knex): Promise<void> {
     table.integer('schoolID').references('SCHOOL.schoolID').notNullable();
     table.integer('classID').references('CLASS.classID').notNullable();
     table.boolean('suspended').defaultTo(false);
-    table.date('suspendedDate').defaultTo(knex.fn.now());
+    table.date('suspendedDate');
     auditing(knex, table);
   });
 

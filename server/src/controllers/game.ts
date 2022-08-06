@@ -25,7 +25,7 @@ import { School } from '../models/school';
 
 export const startGame = async () => {
   try {
-    // cron.schedule('*/40 * * * * *', () => {
+    // cron.schedule('*/60 * * * * *', () => {
     //   Logger.log('Now running cron job')
     //   createGame();
     // });
@@ -113,7 +113,10 @@ export const allocatePoints = async (req: Request, res: Response) => {
   try {
     const { gameID, idNumber, answer } = req.body;
 
-    if (!gameID || !idNumber || !answer) {
+    console.log('req.body ', req.body)
+
+
+    if (gameID === null || gameID === undefined || !idNumber || !answer) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,
         message: 'gameID, idNumber or answer are missing in body',
@@ -273,6 +276,62 @@ export const deleteScrumble = async (req: Request, res: Response) => {
     });
   } catch (err) {
     Logger.error('Failed to allocate points to user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const getStudenPoints = async (req: Request, res: Response) => {
+  try {
+    const { idNumber } = req.params;
+
+    if (!idNumber) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'idNumber missing in params',
+      });
+    }
+
+    const board = await Leaderboard.query().findOne({ idNumber });
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      score: board ? board.score : 0,
+    });
+  } catch (err) {
+    Logger.error('Failed to fetch points to user ' + err);
+    return res.status(HTTP_CODES.SERVER_ERROR).json({
+      success: false,
+      message: 'Something went wrong please try again',
+    });
+  }
+};
+
+export const suspendStudent = async (req: Request, res: Response) => {
+  try {
+    const { idNumber } = req.params;
+
+    if (!idNumber) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'idNumber missing in params',
+      });
+    }
+
+    const update = await Student.query()
+      .patch({ suspended: true, suspendedDate: new Date() })
+      .where({ idNumber })
+      .returning('*')
+      .first();
+
+    return res.status(HTTP_CODES.OK).json({
+      success: true,
+      score: update,
+    });
+  } catch (err) {
+    Logger.error('Failed to suspend the student ' + err);
     return res.status(HTTP_CODES.SERVER_ERROR).json({
       success: false,
       message: 'Something went wrong please try again',

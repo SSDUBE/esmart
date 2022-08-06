@@ -53,12 +53,12 @@ const SideMenuNavLink = (props: ISideMenuNavLinkProps) => {
 
 export const SideMenuNav = () => {
   const navigate = useNavigate();
-  const [signout, setSignOut] = React.useState(false)
+  const [signout, setSignOut] = React.useState(false);
   const context: any = React.useContext(AppContext);
 
   async function handleLogout() {
     await Helpers.removeInStorage('token');
-    navigate('/signin')
+    navigate('/signin');
   }
 
   return (
@@ -78,7 +78,7 @@ export const SideMenuNav = () => {
       </List>
       <ListItem
         button
-        style={{position: 'absolute', bottom: 20}}
+        style={{ position: 'absolute', bottom: 20 }}
         onClick={() => setSignOut(true)}
       >
         <ListItemIcon>

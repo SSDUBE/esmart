@@ -66,7 +66,7 @@ export const downloadWord = (leaderboardData: ITableData[]) => {
   const table = new docx.Table({
     columnWidths: [3505, 5505],
     rows: [
-      ...tableRows
+      ...tableRows,
       // new docx.TableRow({
       //   children: [
       //     new docx.TableCell({
@@ -118,6 +118,6 @@ export const downloadWord = (leaderboardData: ITableData[]) => {
   });
 
   docx.Packer.toBlob(doc).then((blob) => {
-    saveAs(blob, "Leaderboard-Report.docx");
+    saveAs(blob, 'Leaderboard-Report.docx');
   });
 };

@@ -7,6 +7,7 @@ import {
   Alert,
   AppState,
   AppStateStatus,
+  Vibration,
 } from 'react-native';
 import { AppContext } from '../context/context';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
@@ -24,16 +25,15 @@ import { colors } from '../constants/Colors';
 import * as Location from 'expo-location';
 import { getCameraPermissionsAsync } from 'expo-camera';
 import { GameService } from '../services/Game';
-// @ts-ignore
-import RewardsComponent from 'react-native-rewards';
 import { LocationPermissionResponse } from 'expo-location';
 import { getDistance, getPreciseDistance } from 'geolib';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigations/RootStackParamList';
+import { Loader } from '../components/Loader';
 
 interface IScrumble {
   scrumble: string;
-  gameId: number;
+  gameID: number;
 }
 
 interface IGame {
@@ -43,12 +43,13 @@ interface IGame {
 export const Game = ({ navigation }: IGame) => {
   // const [location, setLocation] =
   //   React.useState<Location.LocationObject | null>(null);
+  const [isLoadingGame, setIsLoadingGame] = React.useState(false);
+  const [isFirebaseLoading, setIFirebaseLoading] = React.useState(false);
   const context: any = React.useContext(AppContext);
-  const [animationState, setAnimationState] = React.useState('rest');
   const [messages, setMessages] = React.useState<IMessage[]>([]);
   const [newScrumble, setNewScrumble] = React.useState<IScrumble>({
     scrumble: 'Game starting shortly',
-    gameId: 0,
+    gameID: 0,
   });
   const appState = React.useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = React.useState(
@@ -68,14 +69,14 @@ export const Game = ({ navigation }: IGame) => {
   }
 
   React.useEffect(() => {
-    let watchLocation: any = null
+    let watchLocation: any = null;
     const subscription = AppState.addEventListener(
       'change',
       _handleAppStateChange
     );
 
     (async () => {
-
+      setIsLoadingGame(true);
       if (appState.current === 'active') {
         const permission = await Location.getForegroundPermissionsAsync();
         const camera = await getCameraPermissionsAsync();
@@ -85,6 +86,7 @@ export const Game = ({ navigation }: IGame) => {
             'Oops!!!',
             'Location permissions required please go to setting and enable location permission'
           );
+          setIsLoadingGame(false);
           return;
         }
 
@@ -93,21 +95,22 @@ export const Game = ({ navigation }: IGame) => {
             'Oops!!!',
             'Camera permissions required please go to setting and enable camera permission'
           );
+          setIsLoadingGame(false);
           return;
         }
       }
 
       const { coords } = context.global.user.location;
-      console.log('location ', coords);
 
       watchLocation = await Location.watchPositionAsync(
         {
           // Tracking options
           accuracy: Location.Accuracy.High,
-          distanceInterval: 0,
+          distanceInterval: 5,
         },
-        (location) => {
+        async (location) => {
           if (location) {
+            const game = new GameService();
             let pdis = getPreciseDistance(
               { latitude: coords.latitude, longitude: coords.longitude },
               {
@@ -116,21 +119,26 @@ export const Game = ({ navigation }: IGame) => {
               }
             );
 
-            if (pdis > 20) {
-              Alert.alert('Location change has been detected your account has been suspend')
-              return watchLocation.remove()
+            if (pdis > 500) {
+              // await game.suspendAccount(context.global.user.idNumber);
+              // navigation.navigate('Signin');
+              // Alert.alert(
+              //   'Location change has been detected your account has been suspend'
+              // );
+              // return watchLocation.remove();
             }
             console.log('locationlocation ', pdis);
           }
         }
       );
+      setIsLoadingGame(false);
       // let location = await Location.getBackgroundPermissionsAsync();
       // setLocation(location);
     })();
-    return async() => {
-      await watchLocation.remove()
+    return async () => {
+      await watchLocation.remove();
       // @ts-ignore
-      await subscription.remove();
+      await subscription.removeEventListener();
     };
   }, [appStateVisible]);
 
@@ -138,6 +146,7 @@ export const Game = ({ navigation }: IGame) => {
     let unsub: any = '';
 
     (async function () {
+      setIFirebaseLoading(true);
       const { channelName } = context.global.user;
 
       const ref = collection(db, channelName);
@@ -147,7 +156,6 @@ export const Game = ({ navigation }: IGame) => {
           const chats: IMessage[] = [];
 
           querySnapshot.forEach((doc) => {
-            // console.log('doc ', doc.data()?.text);
             if (typeof doc.data()?.text === 'string') {
               chats.push({
                 _id: doc.data()?._id,
@@ -158,7 +166,7 @@ export const Game = ({ navigation }: IGame) => {
             } else {
               setNewScrumble({
                 scrumble: doc.data().text.scrumble,
-                gameId: doc.data().text.gameID,
+                gameID: doc.data().text.gameID,
               });
             }
           });
@@ -166,47 +174,75 @@ export const Game = ({ navigation }: IGame) => {
           setMessages(chats);
         }
       );
+      setIFirebaseLoading(false);
     })();
 
     return unsub;
   }, []);
 
-  const onSend = React.useCallback(async (messages: IMessage[] = []) => {
-    try {
-      const { channelName, idNumber } = context.global.user;
-      const { _id, createdAt, text, user } = messages[0];
+  const onSend = React.useCallback(
+    async (messages: IMessage[] = [], newScrumble: any) => {
+      try {
+        const { channelName, idNumber } = context.global.user;
+        const { _id, createdAt, text, user } = messages[0];
 
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, messages)
-      );
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, messages)
+        );
 
-      await setDoc(doc(db, channelName, _id.toString()), {
-        _id,
-        createdAt,
-        text,
-        user,
-      });
+        await setDoc(doc(db, channelName, _id.toString()), {
+          _id,
+          createdAt,
+          text,
+          user,
+        });
 
-      const game = new GameService();
-      const res = await game.allocatePoints({
-        gameID: newScrumble.gameId,
-        idNumber,
-        answer: text,
-      });
+        const game = new GameService();
 
-      if (res.correct) {
-        setAnimationState('reward');
+        const res = await game.allocatePoints({
+          gameID: newScrumble.gameID,
+          idNumber,
+          answer: text,
+        });
+
+        if (res.success) {
+        } else {
+          console.log('error ', res);
+        }
+      } catch (err) {
+        console.log('Something went wrong ', err);
       }
-    } catch (err) {
-      console.log('Something went wrong ', err);
-    }
-  }, []);
+    },
+    []
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.cameraContainer}>
         <View style={{ width: 120, height: 220 }}>
-          <FaceRecognation />
+          <FaceRecognation
+            suspendAccount={async (val: any) => {
+              const game = new GameService();
+
+              console.log('val ', val)
+              if (val) {
+                // await game.suspendAccount(context.global.user.idNumber);
+                // navigation.navigate('Signin');
+                // Alert.alert(
+                //   'Face change has been detected your account has been suspend'
+                // );
+              } else {
+                // if (context.global.user.idNumber !== val) {
+                //   await game.suspendAccount(context.global.user.idNumber);
+                //   navigation.navigate('Signin');
+                //   Alert.alert(
+                //     'Face change has been detected your account has been suspend'
+                //   );
+                // }
+              }
+              console.log('val ', val);
+            }}
+          />
         </View>
         <View style={styles.anagramContainer}>
           <Text style={styles.anagram}>{newScrumble.scrumble}</Text>
@@ -215,18 +251,17 @@ export const Game = ({ navigation }: IGame) => {
       <GiftedChat
         messages={messages}
         showAvatarForEveryMessage={true}
-        onSend={(messages) => onSend(messages)}
+        onSend={(messages) => onSend(messages, newScrumble)}
         user={{
           _id: context.global.user.idNumber,
           name: context.global.user.firstName,
           avatar: 'https://placeimg.com/140/140/any',
         }}
       />
-      <RewardsComponent
-        animationType='confetti'
-        state={animationState}
-        onRest={() => setAnimationState('rest')}
-      />
+      {/* <Loader
+        modalVisible={isLoadingGame || isFirebaseLoading}
+        animationType='fade'
+      /> */}
     </SafeAreaView>
   );
 };

@@ -10,23 +10,24 @@ const AppRoutes = () => {
   const context: any = React.useContext(AppContext);
 
   React.useEffect(() => {
-    (async function(){
+    (async function () {
       const isLogin = context.global.user.isLogin;
 
+      console.log('hello ', context.global.user)
       if (!context.global.user.active) {
-        await Helpers.removeInStorage('token');
-        return navigate('/welcome')
+        // await Helpers.removeInStorage('token');
+        return navigate('/welcome');
       }
 
       if (!isLogin) {
         if (location.pathname.includes('signup')) {
           return navigate('/signup');
         }
-        const path = location.pathname || '/welcome'
+        const path = location.pathname || '/welcome';
         return navigate(path);
       }
       navigate('/dashboard');
-    })()
+    })();
   }, [context.global.user.isLogin]);
 
   return (

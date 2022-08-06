@@ -7,7 +7,7 @@ const baseTheme = createTheme({
     primary: {
       main: '#073a98',
       light: 'rgb(236, 129, 68)',
-      dark: '#EC8144'
+      dark: '#EC8144',
     },
     common: {
       white: '#fff',
@@ -46,9 +46,9 @@ const baseTheme = createTheme({
     MuiFab: {
       styleOverrides: {
         root: {
-          background: '#EC8144'
-        }
-      }
+          background: '#EC8144',
+        },
+      },
     },
     MuiTypography: {
       styleOverrides: {

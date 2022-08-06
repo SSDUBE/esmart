@@ -87,6 +87,15 @@ export const signin = async (req: Request, res: Response) => {
       );
 
       if (users[index]?.roleType === 'STUDENT' && users[1]?.classID) {
+
+        // @ts-ignore
+        if (users[index]?.suspended) {
+          return res.status(HTTP_CODES.NOT_FOUND).json({
+            success: false,
+            message: 'This account has been suspended for cheating',
+          });
+        }
+
         const classDetails = await Class.query().where(
           'classID',
           '=',

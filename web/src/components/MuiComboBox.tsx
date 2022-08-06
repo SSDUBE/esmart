@@ -10,7 +10,7 @@ interface IProps {
   data: any[];
   handleChange: any;
   error: string | undefined;
-  defaultValue?: any
+  defaultValue?: any;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -27,7 +27,7 @@ export const ComboBox: FunctionComponent<IProps> = ({
   data,
   handleChange,
   error,
-  defaultValue
+  defaultValue,
 }) => {
   const classes = useStyles();
 

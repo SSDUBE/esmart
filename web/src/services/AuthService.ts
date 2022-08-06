@@ -22,12 +22,15 @@ export class AuthService extends SecureService {
           ...this.defaultHeaders,
           Authorization: `Basic ${btoa(`${user.idNumber}:${user.password}`)}`,
         },
-        body: JSON.stringify({ email: user.email, schoolName: user.schoolName }),
+        body: JSON.stringify({
+          email: user.email,
+          schoolName: user.schoolName,
+        }),
       });
 
       return response.json();
     } catch (err: any) {
-      throw new Error(err)
+      throw new Error(err);
     }
   };
 
@@ -43,7 +46,7 @@ export class AuthService extends SecureService {
 
       return response.json();
     } catch (err: any) {
-      throw new Error(err)
+      throw new Error(err);
     }
   };
 }

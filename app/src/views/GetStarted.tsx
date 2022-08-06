@@ -28,6 +28,10 @@ export const GetStarted = (props: IHome) => {
       <View style={styles.welcomeWrapper}>
         <Image source={esmartLogo} style={styles.logo} />
         <Text style={styles.welcomeText}>Welcome to Esmart.</Text>
+        <Text style={styles.description}>
+          Esmart is a real time english gaming plartform to improve students
+          perfomance in english
+        </Text>
         <RoundedButton
           text='Get Started'
           textColor={colors.white}
@@ -92,7 +96,7 @@ const styles = StyleSheet.create({
     fontSize: headingTextSize,
     color: colors.white,
     fontWeight: '300',
-    marginBottom: 200,
+    marginBottom: 40,
   },
   facebookButtonIcon: {
     color: colors.green01,
@@ -122,4 +126,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.white,
   },
+  description: {
+    color: colors.white,
+    fontSize: 16,
+    marginBottom: 180,
+    textAlign: 'center'
+  }
 });

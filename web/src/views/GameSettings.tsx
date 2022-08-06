@@ -122,7 +122,9 @@ export const GameSettings = () => {
 
       const index = tempRows.findIndex((row) => row.scrumbleID === scrumbleId);
 
-      const res = await user.dealeteScrumble(tempRows[index].scrumbleID.toString());
+      const res = await user.dealeteScrumble(
+        tempRows[index].scrumbleID.toString()
+      );
 
       if (res.success) {
         swal('Hooray!!!', 'Scrumble was successfully deleted', 'success');

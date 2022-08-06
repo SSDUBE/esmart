@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import swal from 'sweetalert';
 import { UserService } from '../services/UserService';
 
 interface IAppProvider {}
@@ -11,7 +12,7 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
     global: {
       user: {
         isLogin: false,
-        active: true,
+        active: false,
         firstName: '',
         lastName: '',
         createdAt: '',
@@ -58,13 +59,15 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
   });
 
   React.useEffect(() => {
-    async function getUserProfile() {
-      const tempUserService = new UserService()
-      const user = await tempUserService.get()
-      state.user.update(user.data)
+    try {
+      (async function() {
+        const tempUserService = new UserService();
+        const user = await tempUserService.get();
+        state.user.update(user.data);
+      })()
+    } catch (err) {
+      swal('Oops!!!', 'Something went wrong pleas try signing in', 'error');
     }
-
-    getUserProfile()
   }, [state.user]);
 
   const updateGlobal = (params: any) => {

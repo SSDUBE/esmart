@@ -1,7 +1,7 @@
-import { Domains } from "./Enums"
+import { Domains } from './Enums';
 
-const env = process.env.REACT_ENV || 'development' // options: 'development', 'test', 'production'.
-let domain = Domains[env]
+const env = process.env.REACT_ENV || 'development'; // options: 'development', 'test', 'production'.
+let domain = Domains[env];
 
 export const Config = {
   services: {
@@ -24,6 +24,6 @@ export const Config = {
       scrumbles: `${domain}/esmart/game-scrumble`,
       createScrumble: `${domain}/esmart/create-scrumble`,
       deleteScrumble: `${domain}/esmart/scrumble`,
-    }
-  }
-}
+    },
+  },
+};

@@ -241,15 +241,14 @@ export const UserManagement = () => {
 
       const res = await user.updateUser(addUser);
 
-      const index = tempRows.findIndex(
+      const index = rows.findIndex((row) => {
         // @ts-ignore
-        (row) => (row.idNumber = editUser?.idNumber)
-      );
+        return (row.idNumber = editUser.idNumber);
+      });
 
       if (res.success) {
         swal('Hooray!!!', 'User was successfully updated', 'success');
         tempRows[index] = createData(addUser);
-
         setRows(tempRows);
       } else {
         swal('Oops!!!', res.message, 'error');

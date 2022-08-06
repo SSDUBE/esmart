@@ -102,7 +102,7 @@ export const Signin: FunctionComponent<ISignin> = ({ navigation }) => {
   return (
     <KeyboardAvoidingView style={styles.wrapper} behavior='padding'>
       <Formik
-        initialValues={{ idNumber: '2201015800081', password: 'Simba@123' }}
+        initialValues={{ idNumber: '', password: '' }}
         validationSchema={ValidationSchema}
         onSubmit={async (values, { setSubmitting }) => {
           try {

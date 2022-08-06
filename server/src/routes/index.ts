@@ -6,6 +6,8 @@ import {
   getDashboardData,
   getGameScrumbles,
   getLeaderboard,
+  getStudenPoints,
+  suspendStudent,
 } from '../controllers/game';
 import { GetallSchools } from '../controllers/school';
 import {
@@ -46,6 +48,8 @@ export = function (app: any) {
   app.get(`${route}/game-scrumble`, authentication, getGameScrumbles);
   app.put(`${route}/create-scrumble`, authentication, createScrumble);
   app.delete(`${route}/scrumble`, authentication, deleteScrumble);
+  app.get(`${route}/student-points/:idNumber`, authentication, getStudenPoints);
+  app.put(`${route}/suspend-student/:idNumber`, authentication, suspendStudent);
   app.put(
     `${route}/school/activate-or-deactivate`,
     authentication,

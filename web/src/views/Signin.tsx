@@ -65,13 +65,13 @@ const Signin = () => {
                   const user = await service.get();
 
                   if (user.data.roleType === 'STUDENT') {
-                    await Helpers.removeInStorage('token')
+                    await Helpers.removeInStorage('token');
                     swal(
                       'Oops!!!',
                       'User not authorized to access this platform',
                       'error'
-                    )
-                    return
+                    );
+                    return;
                   }
 
                   context.user.update(user.data);

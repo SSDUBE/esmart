@@ -10,6 +10,8 @@ export const Config = {
     },
     game: {
       allocatePoints: `${domain}/esmart/allocate-points`,
+      points: `${domain}/esmart/student-points/:idNumber`,
+      suspend: `${domain}/esmart/suspend-student/:idNumber`,
     }
   },
 };
