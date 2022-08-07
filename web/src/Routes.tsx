@@ -13,7 +13,6 @@ const AppRoutes = () => {
     (async function () {
       const isLogin = context.global.user.isLogin;
 
-      console.log('hello ', context.global.user)
       if (!context.global.user.active) {
         // await Helpers.removeInStorage('token');
         return navigate('/welcome');

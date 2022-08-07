@@ -7,7 +7,6 @@ interface IAppProvider {}
 export const AppContext = React.createContext('App');
 
 export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
-
   const [state, setState] = React.useState({
     global: {
       user: {
@@ -60,11 +59,11 @@ export const AppProvider: FunctionComponent<IAppProvider> = ({ children }) => {
 
   React.useEffect(() => {
     try {
-      (async function() {
+      (async function () {
         const tempUserService = new UserService();
         const user = await tempUserService.get();
         state.user.update(user.data);
-      })()
+      })();
     } catch (err) {
       swal('Oops!!!', 'Something went wrong pleas try signing in', 'error');
     }

@@ -5,13 +5,13 @@ import { AUTH } from '../globals';
 const secret = AUTH.SECRET;
 
 interface IUser {
-  id: string
-  idNumber: string
+  id: string;
+  idNumber: string;
 }
 
 export function decodeUserToken(req: Request) {
   const authHeader: string = req.headers.authorization!;
-  let user: IUser | null = null
+  let user: IUser | null = null;
 
   if (authHeader) {
     const [, token] = authHeader.split(' ');
@@ -27,7 +27,7 @@ export function decodeUserToken(req: Request) {
       }
       jwt.verify(token, secret);
     } catch (err) {
-      throw new Error('Token has an invalid subject')
+      throw new Error('Token has an invalid subject');
     }
     return user;
   }

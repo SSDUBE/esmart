@@ -87,7 +87,6 @@ export const signin = async (req: Request, res: Response) => {
       );
 
       if (users[index]?.roleType === 'STUDENT' && users[1]?.classID) {
-
         // @ts-ignore
         if (users[index]?.suspended) {
           return res.status(HTTP_CODES.NOT_FOUND).json({

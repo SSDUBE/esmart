@@ -8,13 +8,17 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SchoolIcon from '@mui/icons-material/School';
 import HailIcon from '@mui/icons-material/Hail';
 // import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { Outlet } from 'react-router-dom';
 import { AppDrawer } from '../components/AppDrawer';
 import { UpdateProfile } from '../views/UpdateProfile';
 import { Dashboard } from '../views/Dashboard';
-import { UserManagement } from '../views/UserManagement';
+import { PrincipalManagement } from '../views/PrincipalManagement';
+import { AdminManagement } from '../views/AdminManagement';
+import { TeacherManagement } from '../views/TeacherManagement';
+import { StudentManagement } from '../views/StudentManagement';
 import { SchoolManagement } from '../views/SchoolManagement';
 import { GameSettings } from '../views/GameSettings';
 
@@ -87,29 +91,29 @@ export const RouteItems: IRouteItems = {
       },
       {
         paths: ['/admin-management'],
-        Component: UserManagement,
+        Component: AdminManagement,
         Icon: ManageAccountsIcon,
         name: 'Admin Management',
         roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
       },
       {
-        paths: ['/student-management'],
-        Component: UserManagement,
+        paths: ['/principal-management'],
+        Component: PrincipalManagement,
         Icon: HailIcon,
         name: 'Principal Management',
         roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
       },
       {
         paths: ['/teacher-management'],
-        Component: UserManagement,
+        Component: TeacherManagement,
         Icon: PeopleAltIcon,
         name: 'Teacher Management',
         roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
       },
       {
         paths: ['/student-management'],
-        Component: UserManagement,
-        Icon: PeopleAltIcon,
+        Component: StudentManagement,
+        Icon: SchoolIcon,
         name: 'Student Management',
         roles: ['ADMIN', 'PRINCIPAL', 'TEACHER'],
       },

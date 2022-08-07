@@ -1,11 +1,11 @@
-import { Logger } from "../utils/logger";
+import { Logger } from '../utils/logger';
 import { Request, Response } from 'express';
-import { HTTP_CODES } from "../globals";
-import { School } from "../models/school";
+import { HTTP_CODES } from '../globals';
+import { School } from '../models/school';
 
 export const GetallSchools = async (_req: Request, res: Response) => {
   try {
-    const schools = await School.query()
+    const schools = await School.query();
 
     return res.status(HTTP_CODES.OK).json({
       success: true,

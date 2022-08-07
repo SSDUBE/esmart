@@ -258,17 +258,18 @@ export const Dashboard = () => {
         Dashboard
       </Typography>
       <Grid container spacing={2}>
-        {roleType === 'ADMIN' && LeaderBoardStatus.map((item, idx) => {
-          return (
-            <Grid item xs={4} md={2} key={idx}>
-              <LeaderBoardStatusCard
-                title={item.name}
-                totalBit={tileData[Object.keys(tileData)[idx]]}
-                status={item.status}
-              />
-            </Grid>
-          );
-        })}
+        {roleType === 'ADMIN' &&
+          LeaderBoardStatus.map((item, idx) => {
+            return (
+              <Grid item xs={4} md={2} key={idx}>
+                <LeaderBoardStatusCard
+                  title={item.name}
+                  totalBit={tileData[Object.keys(tileData)[idx]]}
+                  status={item.status}
+                />
+              </Grid>
+            );
+          })}
       </Grid>
       <Box style={{ marginTop: 30 }} display="flex" justifyContent="flex-end">
         <TextField

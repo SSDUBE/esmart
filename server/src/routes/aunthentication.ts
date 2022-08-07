@@ -4,11 +4,7 @@ import { AUTH, HTTP_CODES } from '../globals';
 
 const secret = AUTH.SECRET;
 
-export const authentication = (
-  req: any,
-  res: Response,
-  next: NextFunction
-) => {
+export const authentication = (req: any, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (authHeader) {

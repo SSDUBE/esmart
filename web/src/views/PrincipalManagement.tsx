@@ -7,7 +7,6 @@ import { MuiModal } from '../components/MuiModal';
 import { FTextField } from '../components/FTextField';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { ComboBox } from '../components/MuiComboBox';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { makeStyles } from '@mui/styles';
 import { ConfirmiationModal } from '../components/ConfirmitionModal';
@@ -15,6 +14,7 @@ import { UserService } from '../services/UserService';
 import { AppContext } from '../context/context';
 import swal from 'sweetalert';
 import dayjs from 'dayjs';
+import { theme } from '../Theme';
 
 const ValidationSchema = (validatePass: any, isEditing: boolean) =>
   Yup.object().shape({
@@ -50,17 +50,7 @@ const ValidationSchema = (validatePass: any, isEditing: boolean) =>
           'Password must have atleast 1 upper character, one special character, one digit and must be lenght of 8'
         )
       : Yup.string().optional(),
-    roleType: Yup.object().required('Please select access type'),
-    gradeType: Yup.object().when('roleType', {
-      is: (roleType: any) => roleType && roleType.type === 'STUDENT',
-      then: Yup.object().required('Grade is a required field'),
-    }),
   });
-
-interface IRole {
-  label: string;
-  type: string;
-}
 
 interface ISelect {
   type: string;
@@ -97,13 +87,6 @@ interface IColumn {
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  iconButton: {
-    backgroundColor: theme.palette.primary.dark,
-    width: theme.spacing(3.2),
-    height: theme.spacing(3.2),
-    borderRadius: 15,
-    marginLeft: theme.spacing(1.5),
-  },
   icon: {
     width: 17,
     height: 17,
@@ -162,13 +145,11 @@ const columns: readonly IColumn[] = [
   },
 ];
 
-export const UserManagement = () => {
+export const PrincipalManagement = () => {
   const classes = useStyles();
   const [showModal, setShowModal] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
   const [confirmDeleteUser, setConfirmDeleteUser] = React.useState(false);
-  const [roles, setRoles] = React.useState<any>([]);
-  const [grades, setGrades] = React.useState<ISelect[]>([]);
   const [rows, setRows] = React.useState<ITableData[]>([]);
   const [deleteUser, setDeleteUser] = React.useState<ITableData | null>(null);
   const [editUser, setEditUser] = React.useState<ITableData | null>(null);
@@ -180,18 +161,13 @@ export const UserManagement = () => {
         const { schoolId, idNumber, roleType } = context.global.user;
         const tempRows: ITableData[] = [];
         const user = new UserService();
-        let roles: string[] = [];
 
-        if (roleType === 'PRINCIPAL') {
-          roles = ['TEACHER', 'STUDENT', 'PRINCIPAL'];
-        } else if (roleType === 'TEACHER') {
-          roles = ['TEACHER', 'STUDENT'];
-        } else if (roleType === 'ADMIN') {
-          roles = ['ADMIN'];
-        }
-
-        const grades = await user.getGrades();
-        const users = await user.getAllUsers(idNumber, schoolId, roleType);
+        const users = await user.getAllUsers(
+          idNumber,
+          schoolId,
+          roleType,
+          'PRINCIPAL'
+        );
 
         users.data.forEach((user: any) => {
           user.active = user.active ? 'True' : 'False';
@@ -199,19 +175,7 @@ export const UserManagement = () => {
           tempRows.push(createData({ ...user }));
         });
 
-        const fmtRoles = roles.map((role) => ({
-          label: role,
-          type: role,
-        }));
-
-        const fmtGrades = grades.data.map((g: any) => ({
-          label: g.classID,
-          type: g.grade,
-        }));
-
         setRows(tempRows);
-        setRoles(fmtRoles);
-        setGrades(fmtGrades);
       } catch (err) {
         console.log('something went wrong loading ', err);
       }
@@ -301,10 +265,13 @@ export const UserManagement = () => {
         )}
         {(roleType === 'ADMIN' || roleType === 'PRINCIPAL') && (
           <IconButton
-            classes={{
-              root: classes.iconButton,
+            sx={{
+              backgroundColor: '#A8A8A8',
+              width: theme.spacing(3.2),
+              height: theme.spacing(3.2),
+              borderRadius: 15,
+              marginLeft: theme.spacing(1.5),
             }}
-            className={classes.iconButton}
             onClick={() => {
               setDeleteUser(data);
               setConfirmDeleteUser(true);
@@ -319,17 +286,12 @@ export const UserManagement = () => {
     return { ...data, actions };
   }
 
-  const role = roles.find((role: IRole) => role.type === editUser?.roleType);
-  const grade = grades.find(
-    (grade: ISelect) => grade.type === editUser?.classID
-  );
-
   return (
     <Box style={{ overflow: 'scroll' }}>
       <Typography variant="h4" style={{ marginBottom: 10 }}>
-        Users
+        Principals
       </Typography>
-      <Box style={{ width: 150, marginBottom: 20 }}>
+      <Box style={{ width: 200, marginBottom: 20 }}>
         <Button
           onClick={() => {
             setShowModal(true);
@@ -337,13 +299,13 @@ export const UserManagement = () => {
           }}
         >
           <AddCircleOutlineIcon style={{ marginRight: 10 }} />
-          Add User
+          Add Principal
         </Button>
       </Box>
       <MuiTable rows={rows} columns={columns} />
       <MuiModal open={showModal} setOnClose={setShowModal}>
         <Typography variant="h5">
-          {isEditing ? 'Update User' : 'Add User'}
+          {isEditing ? 'Update Teacher' : 'Add Teacher'}
         </Typography>
         <Typography style={{ marginTop: 10, marginBottom: 15 }} component="div">
           Fill in all fields and click save to add a new user
@@ -355,8 +317,6 @@ export const UserManagement = () => {
             idNumber: editUser?.idNumber || '',
             contactNumber: editUser?.contactNumber || '',
             email: editUser?.email || '',
-            roleType: role || '',
-            gradeType: grade || '',
             password: '',
           }}
           enableReinitialize={true}
@@ -365,15 +325,8 @@ export const UserManagement = () => {
             try {
               setSubmitting(true);
               const tempRows = [...rows];
-              const {
-                firstname,
-                lastname,
-                idNumber,
-                roleType,
-                gradeType,
-                password,
-              } = values;
-              const { schoolId, schoolName } = context.global.user;
+              const { firstname, lastname, idNumber, password } = values;
+              const { schoolId } = context.global.user;
               const service = new UserService();
               const newUser = {
                 firstname,
@@ -382,15 +335,8 @@ export const UserManagement = () => {
                 password,
                 schoolId,
                 email: values.email,
-                // schoolName,
-                // @ts-ignore
-                // grade: gradeType.type,
-                // @ts-ignore
-                gradeId: gradeType.type,
-                // @ts-ignore
-                roleType: roleType.type,
-                // @ts-ignore
-                // roleId: roleType.id,
+                gradeId: '',
+                roleType: 'PRINCIPAL',
               };
 
               if (editUser) {
@@ -474,34 +420,6 @@ export const UserManagement = () => {
                     placeholder="ID Number"
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <ComboBox
-                    label="User Role"
-                    data={roles}
-                    defaultValue={values.roleType}
-                    // @ts-ignore
-                    error={errors.roleType}
-                    handleChange={(_: any, val: any) =>
-                      setFieldValue('roleType', val)
-                    }
-                  />
-                </Grid>
-                {
-                  //@ts-ignore
-                  values.roleType.type === 'STUDENT' && (
-                    <Grid item xs={12}>
-                      <ComboBox
-                        label="Student Grade"
-                        data={grades}
-                        defaultValue={values.gradeType}
-                        error={errors.gradeType}
-                        handleChange={(_: any, val: any) =>
-                          setFieldValue('gradeType', val)
-                        }
-                      />
-                    </Grid>
-                  )
-                }
                 <Grid item xs={12}>
                   <FTextField
                     type="password"

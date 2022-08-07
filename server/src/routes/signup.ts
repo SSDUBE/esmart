@@ -18,13 +18,11 @@ export const signup = async (req: Request, res: Response) => {
     const admin = await Admin.query().findOne({ idNumber });
 
     if (admin) {
-      return res
-        .status(HTTP_CODES.NOT_ALLOWED)
-        .json({
-          success: false,
-          message:
-            'This user cannot be added because he/she is an admin please try login',
-        });
+      return res.status(HTTP_CODES.NOT_ALLOWED).json({
+        success: false,
+        message:
+          'This user cannot be added because he/she is an admin please try login',
+      });
     }
 
     if (user) {

@@ -35,7 +35,8 @@ export class UserService extends SecureService {
   public getAllUsers = async (
     userId: string,
     schoolId: string,
-    roleType: string
+    roleType: string,
+    type: string
   ) => {
     try {
       const response = await fetch(
@@ -46,7 +47,7 @@ export class UserService extends SecureService {
             ...this.defaultHeaders,
             Authorization: `Basic ${await Helpers.getInStorage('token')}`,
           },
-          body: JSON.stringify({ schoolId, roleType }),
+          body: JSON.stringify({ schoolId, roleType, type }),
         }
       );
 

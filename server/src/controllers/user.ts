@@ -163,49 +163,94 @@ export const getUser = async (req: Request, res: Response) => {
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const { idNumber } = req.params;
-    const { schoolId, roleType } = req.body;
+    const { schoolId, roleType, type } = req.body;
     let user: [Teacher[], Principal[], Student[], Admin[]] = [[], [], [], []];
 
     if (!idNumber) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
         success: false,
-        message: 'idNumber and schoolId missing in params',
+        message: 'idNumber is required in params',
       });
     }
 
-    if (roleType === 'ADMIN') {
-      user = await Promise.all([
-        Teacher.query().whereNot('idNumber', '=', idNumber),
-        Principal.query().whereNot('idNumber', '=', idNumber),
-        Student.query()
+    if (!type) {
+      return res.status(HTTP_CODES.FORBIDDEN).json({
+        success: false,
+        message: 'type is required in params',
+      });
+    }
+
+    let data: any = [];
+
+    if (roleType !== 'ADMIN') {
+      if (type === 'PRINCIPAL') {
+        data = await Principal.query()
+          .whereNot('idNumber', '=', idNumber)
+          .andWhere('schoolID', '=', schoolId);
+      } else if (type === 'TEACHER') {
+        data = await Teacher.query()
+          .whereNot('idNumber', '=', idNumber)
+          .andWhere('schoolID', '=', schoolId);
+      } else if (type === 'STUDENT') {
+        data = await Student.query()
           .select('student.*', 'class.*')
           .from('STUDENT as student')
           .leftJoin('CLASS as class', 'class.classID', 'student.classID')
-          .whereNot('idNumber', '=', idNumber),
-        Admin.query().whereNot('idNumber', '=', idNumber)
-      ]);
-    } else {
-      user = await Promise.all([
-        Teacher.query()
           .whereNot('idNumber', '=', idNumber)
-          .andWhere('schoolID', '=', schoolId),
-        Principal.query()
-          .whereNot('idNumber', '=', idNumber)
-          .andWhere('schoolID', '=', schoolId),
-        Student.query()
+          .andWhere('schoolID', '=', schoolId);
+      }
+    } else if (roleType === 'ADMIN') {
+      if (type === 'PRINCIPAL') {
+        data = await Principal.query();
+      } else if (type === 'TEACHER') {
+        data = await Teacher.query();
+      } else if (type === 'ADMIN') {
+        data = await Admin.query().whereNot('idNumber', '=', idNumber);
+      } else if (type === 'STUDENT') {
+        data = await Student.query()
           .select('student.*', 'class.*')
           .from('STUDENT as student')
-          .leftJoin('CLASS as class', 'class.classID', 'student.classID')
-          .whereNot('idNumber', '=', idNumber)
-          .andWhere('schoolID', '=', schoolId),
-        Admin.query().where('idNumber', '=', null)
-      ]);
+          .leftJoin('CLASS as class', 'class.classID', 'student.classID');
+      }
     }
 
     return res.status(HTTP_CODES.OK).json({
       success: true,
-      data: [...user[0], ...user[1], ...user[2], ...user[3]],
+      data,
     });
+    // if (roleType === 'ADMIN') {
+    //   user = await Promise.all([
+    //     Teacher.query().whereNot('idNumber', '=', idNumber),
+    //     Principal.query().whereNot('idNumber', '=', idNumber),
+    //     Student.query()
+    //       .select('student.*', 'class.*')
+    //       .from('STUDENT as student')
+    //       .leftJoin('CLASS as class', 'class.classID', 'student.classID')
+    //       .whereNot('idNumber', '=', idNumber),
+    //     Admin.query().whereNot('idNumber', '=', idNumber)
+    //   ]);
+    // } else {
+    //   user = await Promise.all([
+    //     Teacher.query()
+    //       .whereNot('idNumber', '=', idNumber)
+    //       .andWhere('schoolID', '=', schoolId),
+    //     Principal.query()
+    //       .whereNot('idNumber', '=', idNumber)
+    //       .andWhere('schoolID', '=', schoolId),
+    //     Student.query()
+    //       .select('student.*', 'class.*')
+    //       .from('STUDENT as student')
+    //       .leftJoin('CLASS as class', 'class.classID', 'student.classID')
+    //       .whereNot('idNumber', '=', idNumber)
+    //       .andWhere('schoolID', '=', schoolId),
+    //     Admin.query().where('idNumber', '=', null)
+    //   ]);
+    // }
+
+    // return res.status(HTTP_CODES.OK).json({
+    //   success: true,
+    //   data: [...user[0], ...user[1], ...user[2], ...user[3]],
+    // });
   } catch (err) {
     Logger.error('Failed to get all user ' + err);
     return res.status(HTTP_CODES.SERVER_ERROR).json({

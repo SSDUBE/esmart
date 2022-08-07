@@ -113,8 +113,7 @@ export const allocatePoints = async (req: Request, res: Response) => {
   try {
     const { gameID, idNumber, answer } = req.body;
 
-    console.log('req.body ', req.body)
-
+    console.log('req.body ', req.body);
 
     if (gameID === null || gameID === undefined || !idNumber || !answer) {
       return res.status(HTTP_CODES.FORBIDDEN).json({
